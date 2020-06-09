@@ -165,10 +165,6 @@ function paint(event) {
         context.lineTo(mouseX, mouseY);
         context.stroke();
     } else {
-        // let { mouseX, mouseY } = getMousePosition(event);
-        // let width = mouseX - startX;
-        // let height = mouseY - startY;
-        // drawStrokeRect(startX, startY, width, height, strokeSlider.value, strokeColor.value, previewContext);
         previewContext.lineTo(mouseX, mouseY);
         previewContext.stroke();
     }
@@ -181,7 +177,12 @@ function paint(event) {
     previewContext.moveTo(mouseX, mouseY);
 }
 
-document.body.onmousedown = () => { mouseDown = true; }
+document.body.onmousedown = () => {
+    let { mouseX, mouseY } = getMousePosition(event);
+    startX = mouseX;
+    startY = mouseY;
+    mouseDown = true; 
+}
 document.body.onmouseup = () => {
     if (painting && rectCheck.checked) {
         let { mouseX, mouseY } = getMousePosition(event);
@@ -205,7 +206,8 @@ canvas.addEventListener('mouseleave', e => {
 canvas.addEventListener('mouseenter', e => {
     if (!mouseDown) {
         painting = false;
-    } else {
+    }
+    else {
         context.beginPath();
         previewContext.beginPath();
         painting = true;
@@ -213,11 +215,6 @@ canvas.addEventListener('mouseenter', e => {
     }
 });
 
-
-previewCanvas.addEventListener('mousedown', event => {
-    event.preventDefault();
-    console.log('wow');
-});
 
 window.addEventListener('resize', e => {
     initCanvas();
