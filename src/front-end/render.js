@@ -1,5 +1,7 @@
 const { remote, ipcRenderer } = require('electron');
+import Rectangle from './rectangle.js';
 
+let r = new Rectangle();
 
 let fileButton = document.querySelector('#file-button');
 fileButton.addEventListener('click', e => {
@@ -32,18 +34,22 @@ closeButton.addEventListener('click', e => {
 
 let mouseDown = false;
 
-// CANVAS
+// CANVAS - this is where drawings will show up
 let canvas = document.querySelector('#canvas');
 let context = canvas.getContext('2d');
 
-// PREVIEW CANVAS
+// PREVIEW CANVAS - this is where shape previews will appear before the final mouse release
 let previewCanvas = document.querySelector('#preview-canvas');
 let previewContext = previewCanvas.getContext('2d');
+
+let canvasPosition = getElementPosition(canvas);
+let canvasX = canvasPosition.x;
+let canvasY = canvasPosition.y;
 
 function setCanvasSize() {
     canvas.height = window.innerHeight - 100;   // subtract 100 to make room for the margin and the buttons
     canvas.width = window.innerWidth - 200;     // subtract 200 to make room for the sidebar 
-    previewCanvas.height = window.innerHeight - 100;   // subtract 100 to make room for the margin and the buttons
+    previewCanvas.height = window.innerHeight - 100; 
     previewCanvas.width = window.innerWidth - 200; 
 }
 
@@ -58,15 +64,6 @@ function initCanvas() {
 }
 
 initCanvas();
-
-// sample set of points for a pentagon
-let shape = [
-                { "x": 55, "y": 5 },
-                { "x": 75, "y": 5 },
-                { "x": 75, "y": 15 },
-                { "x": 65, "y": 25 },
-                { "x": 55, "y": 15 }
-            ]
 
 // rectangle with no fill
 function drawStrokeRect(x, y, width, height, lineWeight, color, context) {
@@ -97,15 +94,30 @@ function drawStrokeShape(points, lineWeight, color) {
     context.stroke();
 }
 
-function getMousePosition(event) {
+function getElementPosition(element) {
+    var xPosition = 0;
+    var yPosition = 0;
+    
+    while (element) {
+        xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
+        yPosition += (element.offsetTop - element.scrollTop + element.clientTop);
+        element = element.offsetParent;
+    }
     return {
-        mouseX: event.clientX - 200,     // subtract 200 for sidebar
-        mouseY: event.clientY - 30 - 30  // subtract 30 for title bar, 30 for canvas margin-top 
+        x: xPosition,
+        y: yPosition
     };
 }
 
+function getMousePosition(event) {
+    return {
+        mouseX: event.clientX - canvasX,   
+        mouseY: event.clientY - canvasY  
+    };
+}
+
+// to clear the canvas, just fill it with a white rectangle
 function clearCanvas() {
-    context.clearRect(0, 0, canvas.width, canvas.height);
     context.fillStyle = 'white';
     context.fillRect(0, 0, canvas.width, canvas.height);    
 }
@@ -180,22 +192,11 @@ function paint(event) {
     previewContext.moveTo(mouseX, mouseY);
 }
 
-document.body.onmousedown = () => {
-    let { mouseX, mouseY } = getMousePosition(event);
-    startX = mouseX;
-    startY = mouseY;
-    mouseDown = true; 
+document.body.onmousedown = e => {
+    mouseDown = true;
 }
-document.body.onmouseup = () => {
-    if (painting && rectCheck.checked) {
-        let { mouseX, mouseY } = getMousePosition(event);
-        let width = mouseX - startX;
-        let height = mouseY - startY;
-        drawStrokeRect(startX, startY, width, height, strokeSlider.value, strokeColor.value, context);
-        drawFillRect(startX, startY, width, height, fillColor.value);
-        previewContext.clearRect(0,0,previewCanvas.width,previewCanvas.height);
-    } 
-    mouseDown = false; 
+document.body.onmouseup = e => {
+    mouseDown = false;
 }
 
 
@@ -206,15 +207,15 @@ canvas.addEventListener('mousemove', paint);
 canvas.addEventListener('mouseleave', e => {
     if (!mouseDown ) { painting = false; }
 });
+
+
 canvas.addEventListener('mouseenter', e => {
-    if (!mouseDown) {
-        painting = false;
-    }
-    else {
+    // if we were already painting and leave the canvas, this will let us keep painting if we keep holding the mouse down.
+    // if we hold the mouse down outside of the canvas and try to enter the canvas, we won't paint
+    if (mouseDown && painting) {
         context.beginPath();
-        previewContext.beginPath();
-        painting = true;
-        paint(event);
+    } else {    // set painting to false if we enter without the mouse down. otherwise we can paint without holding mouse down
+        painting = false;
     }
 });
 
@@ -222,10 +223,5 @@ canvas.addEventListener('mouseenter', e => {
 window.addEventListener('resize', e => {
     initCanvas();
 });
-
-// examples for our draw methods
-drawStrokeRect(5,5,20,20,5,'red',context);
-drawFillRect(30, 5, 20, 20,'blue');
-drawStrokeShape(shape, 2, 'green');
 
 
