@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Wadup</title>
+        <link rel="stylesheet" href="index.css">
+        <script defer src="./front-end/render.js"></script>
+    </head>
+    <body>
+        <div class="title-bar">
+            <div class="title-button-container">
+                <div class="title-button" id="file-button">File</div>
+            </div>
+            <div class="title-button-container min-max-close">
+                <div class="title-button" id="min-button">min</div>
+                <div class="title-button" id="max-button">max</div>
+                <div class="title-button" id="close-button">X</div>
+            </div>
+        </div>
+        <div class="sidebar">
+
+            <div class="sidebar-row">
+                <label for="rect-check">Rectangle</label>
+                <input type="checkbox" class="sidebar-checkbox" id="rect-check">
+            </div>
+
+            <div class="sidebar-row">
+                <label for="stroke-color">Stroke Color</label>
+                <input type="color" class="sidebar-button" id="stroke-color">
+            </div>
+
+            <div class="sidebar-row">
+                <label for="fill-color">Fill Color</label>
+                <input type="color" class="sidebar-button" id="fill-color">
+            </div>
+
+            <div class="sidebar-row">
+                <label for="stroke-slider">Weight</label>
+                <input type="range" class="sidebar-slider" id="stroke-slider" min="1" max="100">
+            </div>
+
+            <div class="sidebar-row">
+                <button class="sidebar-button" id="canvas-clear">Clear</button>
+            </div>
+        </div>
+        <div>
+            <canvas class="canvas" id="canvas"></canvas>
+            <canvas class="canvas" id="preview-canvas"></canvas>
+        </div>
+    </body>
+</html>
+
+
+
+
