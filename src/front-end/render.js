@@ -52,6 +52,9 @@ function initCanvas() {
     context.fillStyle = 'white';
     context.fillRect(0, 0, canvas.width, canvas.height);
     previewContext.clearRect(0,0,previewCanvas.width, previewCanvas.height);
+    // the array of imageData contains info about every pixel's color
+    var imgData = context.getImageData(0, 0, canvas.width, canvas.height);
+    console.log(imgData.data);
 }
 
 initCanvas();
