@@ -23,23 +23,33 @@
         <div class="sidebar">
 
             <div class="sidebar-row">
+                <label for="brush-check">Brush</label>
+                <input type="radio" class="sidebar-checkbox" id="brush-check" name="draw-type" checked="true">
+            </div>
+
+            <div class="sidebar-row">
                 <label for="rect-check">Rectangle</label>
-                <input type="checkbox" class="sidebar-checkbox" id="rect-check">
+                <input type="radio" class="sidebar-checkbox" id="rect-check" name="draw-type">
+            </div>
+
+            <div class="sidebar-row">
+                <label for="circle-check">Circle</label>
+                <input type="radio" class="sidebar-checkbox" id="circle-check" name="draw-type">
             </div>
 
             <div class="sidebar-row">
                 <label for="stroke-color">Stroke Color</label>
-                <input type="color" class="sidebar-button" id="stroke-color">
+                <input type="color" class="sidebar-button" id="stroke-color" value="#00aadd">
             </div>
 
             <div class="sidebar-row">
                 <label for="fill-color">Fill Color</label>
-                <input type="color" class="sidebar-button" id="fill-color">
+                <input type="color" class="sidebar-button" id="fill-color" value="#ff0034">
             </div>
 
             <div class="sidebar-row">
                 <label for="stroke-slider">Weight</label>
-                <input type="range" class="sidebar-slider" id="stroke-slider" min="1" max="100">
+                <input type="range" class="sidebar-slider" id="stroke-slider" min="1" max="100" value="15">
             </div>
 
             <div class="sidebar-row">

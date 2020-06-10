@@ -78,12 +78,17 @@ body {
 .sidebar-row {
     display: flex;
     align-items: center;
-    padding: 5px 10px;
-    justify-content: space-between;
+    padding: 0px 10px;
 }
+
 
 .sidebar-row:hover {
     background-color: lightskyblue;
+}
+
+.sidebar-row label {
+    flex: 1;
+    padding: 5px 0px;
 }
 
 .sidebar-button {
