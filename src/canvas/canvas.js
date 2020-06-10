@@ -26,10 +26,10 @@ let fillColor = document.querySelector('#fill-color');
 let strokeSlider = document.querySelector('#stroke-slider');
 
 function setCanvasSize() {
-    canvas.height = window.innerHeight - 100;   // subtract 100 to make room for the margin and the buttons
-    canvas.width = window.innerWidth - 200;     // subtract 200 to make room for the sidebar 
-    previewCanvas.height = window.innerHeight - 100; 
-    previewCanvas.width = window.innerWidth - 200; 
+    canvas.height = window.innerHeight - 70;   // subtract 80 to make room for the margin and the buttons
+    canvas.width = window.innerWidth - 200 - 40;     // subtract 200 to make room for the sidebar. subtract 40 for padding-left and right
+    previewCanvas.height = window.innerHeight - 70; 
+    previewCanvas.width = window.innerWidth - 200 - 40; 
 }
 
 function initCanvas() {
@@ -38,8 +38,8 @@ function initCanvas() {
     context.fillRect(0, 0, canvas.width, canvas.height);
     previewContext.clearRect(0,0,previewCanvas.width, previewCanvas.height);
     // the array of imageData contains info about every pixel's color
-    var imgData = context.getImageData(0, 0, canvas.width, canvas.height);
-    console.log(imgData.data);
+    // var imgData = context.getImageData(0, 0, canvas.width, canvas.height);
+    // console.log(imgData.data);
 }
 
 initCanvas();
@@ -107,9 +107,7 @@ function paint(event) {
     // MOUSE DOWN IS SET TO TRUE IF I LEAVE CANVAS, LIFT MOUSE, AND REENTER CANVAS
     console.log(mouseDown);
 
-
-
-    if (!mouseDown || !painting) { return; }
+    if (!painting) { return; }
 
     let { mouseX, mouseY } = getMousePosition(event);
 
@@ -141,21 +139,13 @@ canvas.addEventListener('mousedown', startPainting);
 canvas.addEventListener('mouseup', finishedPainting);
 canvas.addEventListener('mousemove', paint);
 canvas.addEventListener('mouseenter', paintOnEnter);
-// canvas.addEventListener('mouseleave', e => {
-//     if (!mouseDown ) { painting = false; }
-// });
 
-window.addEventListener('resize', e => {
-    initCanvas();
-});
+window.addEventListener('resize', initCanvas);  // this should call some resize function that maintains the canvas state across sizes
 
+// this is a bandaid fix, i'd like to make it so that you can keep painting if you leave the window and come back but releasing mouse outside of the window lets you keep painting without mouse held.
+document.body.onmouseleave = () => { painting = false; }    
 document.body.onmousedown = e => { mouseDown = true; }
 document.body.onmouseup = e => { mouseDown = false; }
-document.body.onmouseleave = () => { painting = false; }
-document.body.onmouseenter = () => { if (mouseDown) { painting = true; } }
-
-
-
 
 
 function clearCanvas() {

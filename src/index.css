@@ -59,7 +59,8 @@ body {
 
 .canvas {
     position: absolute;
-    margin: 30px auto 0 auto;
+    margin: 20px 20px 0 20px;
+    /* padding: 0px 20px; */
 }
 
 #preview-canvas { 
