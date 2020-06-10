@@ -1,5 +1,5 @@
 const { app, BrowserWindow, ipcMain, Menu } = require('electron');
-const { template } = require('./front-end/title-menu');
+const { template } = require('./titlebar/titlemenu');
 const path = require('path');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -13,7 +13,8 @@ const createWindow = () => {
     mainWindow = new BrowserWindow({
         frame: false,
         webPreferences: {
-            nodeIntegration: true
+            nodeIntegration: true,
+            enableRemoteModule: true
         }
     });
 
