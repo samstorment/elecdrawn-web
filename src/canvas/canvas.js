@@ -1,4 +1,5 @@
 import Shape from './shape.js';
+import Fill from './fill.js';
 
 // CANVAS - this is where drawings will show up
 let canvas = document.querySelector('#canvas');
@@ -15,7 +16,9 @@ let canvasY = canvasPosition.y;
 
 
 let shape = new Shape(context);
+let fill = new Fill(canvas, context);
 
+fill.floodFill(2, 3);
 
 // Sidebar buttons
 let rectCheck = document.querySelector('#rect-check');
@@ -65,6 +68,7 @@ function startRect(event) {
 }
 
 function finishRect(event) {
+    if (!painting) { return; }
     painting = false;
     let { mouseX, mouseY } = getMousePosition(event);
     let width = mouseX - startX;
@@ -109,6 +113,7 @@ function startCircle(event) {
 
 // NEED TO DO A LOT OF CLEANING ON THE FINISH CIRCLE AND DRAW CIRCLE FUNCTIONS
 function finishCircle(event) {
+    if (!painting) { return; }
     painting = false;
     let { mouseX, mouseY } = getMousePosition(event);
     let width = mouseX - startX;
@@ -260,9 +265,9 @@ function scrollIsUp(event) {
 window.addEventListener('resize', initCanvas);  // this should call some resize function that maintains the canvas state across sizes
 
 // this is a bandaid fix, i'd like to make it so that you can keep painting if you leave the window and come back but releasing mouse outside of the window lets you keep painting without mouse held.
-document.body.onmouseleave = () => { painting = false; mouseDown = false; }    
-document.body.onmousedown = e => { mouseDown = true; }
-document.body.onmouseup = e => { mouseDown = false; }
+document.body.onmouseleave = event => { painting = false; mouseDown = false; previewContext.clearRect(0, 0, canvas.width, canvas.height); }    
+document.body.onmousedown = event => { mouseDown = true; }
+document.body.onmouseup = event => { mouseDown = false; finish(event); }
 
 
 
