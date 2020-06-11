@@ -19,14 +19,23 @@ function setCanvasSize() {
 
 function initCanvas() {
     setCanvasSize();
-    context.fillStyle = 'white';
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    previewContext.clearRect(0,0,previewCanvas.width, previewCanvas.height);
+    clearCanvas();
+    clearPreview();
 }
 
 initCanvas();
 
+
+let shape = new Shape();
+let fill = new Fill();
+
 let strokeWeight = 0;
+// checks if the mouse is down (we are painting when the mouse is clicked)
+let painting = false;
+let mouseDown = false;
+// starting mouse x and y coordinates when we draw squares, circles, etc 
+let startX = 0;
+let startY = 0;
 
 // Sidebar buttons
 let brushCheck = document.querySelector('#brush-check');
@@ -46,28 +55,11 @@ let fillColor = document.querySelector('#fill-color');
 let strokeSlider = document.querySelector('#stroke-slider');
 
 
-let shape = new Shape(context);
-// these are just testing shapes in the top left corner
-// shape.drawFillRect(0, 0, 10, 10, '#ffff00');
-// shape.drawFillRect(10, 0, 10, 10, '#ff0000');
-
-let fill = new Fill();
-
-// checks if the mouse is down (we are painting when the mouse is clicked)
-let painting = false;
-let mouseDown = false;
-let startX = 0;
-let startY = 0;
-
 function startRect(event) {
     painting = true;
     let { mouseX, mouseY } = getMousePosition(event);
     startX = mouseX;
     startY = mouseY;
-
-    // this is for drawing the preview line
-    previewContext.strokeStyle = strokeColor.value;
-    previewContext.lineWidth = strokeSlider.value;
 }
 
 function finishRect(event) {
@@ -76,13 +68,11 @@ function finishRect(event) {
     let { mouseX, mouseY } = getMousePosition(event);
     let width = mouseX - startX;
     let height = mouseY - startY;
-    shape.context = context;
     
-    shape.drawFillRect(startX, startY, width, height, fillColor.value);
-    shape.drawStrokeRect(startX, startY, width, height, strokeSlider.value, strokeColor.value);
+    shape.drawFillRect(startX, startY, width, height, fillColor.value, context);
+    shape.drawStrokeRect(startX, startY, width, height, strokeSlider.value, strokeColor.value, context);
     // only clear the preview canvas if the mouse moved
-    if (mouseX !== startX || mouseY !== startY) { previewContext.clearRect(0,0,previewCanvas.width,previewCanvas.height); }
-    
+    if (mouseX !== startX || mouseY !== startY) { clearPreview(); }
 }
 
 function drawRect(event) {
@@ -92,12 +82,10 @@ function drawRect(event) {
     let width = mouseX - startX;
     let height = mouseY - startY;
 
-    previewContext.clearRect(0, 0, canvas.width, canvas.height);
+    clearPreview();
 
-    shape.context = previewContext;
-
-    shape.drawFillRect(startX, startY, width, height, fillColor.value);
-    shape.drawStrokeRect(startX, startY, width, height, strokeSlider.value, strokeColor.value);
+    shape.drawFillRect(startX, startY, width, height, fillColor.value, previewContext);
+    shape.drawStrokeRect(startX, startY, width, height, strokeSlider.value, strokeColor.value, previewContext);
 }
 
 function startFill(event) {
@@ -107,7 +95,7 @@ function startFill(event) {
     let fillClr = fillColor.value;
     fill.floodFill(mouseX, mouseY, startClr, fillClr, canvas, context);
 
-    // previewContext.clearRect(0,0,previewCanvas.width,previewCanvas.height);
+    // clearPreview();
 }
 
 // TODO
@@ -115,14 +103,13 @@ function finishFill(event) {
 
 }
 
-
 function startPicker(event) {
   // get the color at this specific pixel and use it as the new stroke color
     let { mouseX, mouseY } = getMousePosition(event);
     let colorPicked = fill.getPixelColor(mouseX, mouseY, context);
     strokeColor.value = colorPicked;
     // update the color of the hover cursor
-    showLineHover(event);
+    showHoverCursor(event);
 }
 
 function finishPicker(event) {
@@ -135,41 +122,29 @@ function finishPicker(event) {
 function startCircle(event) {
     painting = true;
     let { mouseX, mouseY } = getMousePosition(event);
-    startX = mouseX;
-    startY = mouseY;
+    startX = mouseX; startY = mouseY;
 
+    // start a new path so we don't draw from old position, rect doesn't need this because it doesn't use stroke to draw
     context.beginPath();
-
-    previewContext.beginPath();    // start a new path so we don't draw from old position
-    previewContext.strokeStyle = strokeColor.value;
-    previewContext.lineWidth = strokeSlider.value;
+    context.lineCap = 'round';
+    previewContext.beginPath();
     previewContext.lineCap = 'round';
 }
 
-// NEED TO DO A LOT OF CLEANING ON THE FINISH CIRCLE AND DRAW CIRCLE FUNCTIONS
 function finishCircle(event) {
     if (!painting) { return; }
-
     painting = false;
+
     let { mouseX, mouseY } = getMousePosition(event);
     let width = mouseX - startX;
     let height = mouseY - startY;
     let radius = Math.sqrt(width*width + height*height);
-    
-    shape.context = context;
-    
-    context.strokeStyle = strokeColor.value;
-    context.fillStyle = fillColor.value;
-    context.lineWidth = strokeSlider.value;
-
-    context.arc(startX, startY, radius, 0, 2 * Math.PI, true);
-    context.fill();
-
-    context.arc(startX, startY, radius, 0, 2 * Math.PI, true);
-    context.stroke();
-
+        
+    shape.drawFillCircle(startX, startY, radius, fillColor.value, context);
+    shape.drawStrokeCircle(startX, startY, radius, strokeSlider.value, strokeColor.value, context);
+   
     // only clear the preview canvas if the mouse moved
-    if (mouseX !== startX || mouseY !== startY) { previewContext.clearRect(0,0,previewCanvas.width,previewCanvas.height); }
+    if (mouseX !== startX || mouseY !== startY) { clearPreview(); }
 }
 
 function drawCircle(event) {
@@ -179,21 +154,14 @@ function drawCircle(event) {
     let height = mouseY - startY;
     let radius = Math.sqrt(width*width + height*height);
 
-    previewContext.clearRect(0, 0, canvas.width, canvas.height);
+    clearPreview();
 
-    previewContext.strokeStyle = strokeColor.value;
-    previewContext.fillStyle = fillColor.value;
-    previewContext.lineWidth = strokeSlider.value;
+    shape.drawFillCircle(startX, startY, radius, fillColor.value, previewContext);
+    shape.drawStrokeCircle(startX, startY, radius, strokeSlider.value, strokeColor.value, previewContext);
 
-    previewContext.arc(startX, startY, radius, 0, 2 * Math.PI, true);
-    previewContext.fill();
-
-    previewContext.arc(startX, startY, radius, 0, 2 * Math.PI, true);
-    previewContext.stroke();
-
+    // this line makes the fill appear over the stroke
     previewContext.beginPath();
 }
-
 
 function startLine(event) {
     painting = true;
@@ -211,7 +179,6 @@ function finishLine(event) {
 }
 
 function drawLine(event) {
-
     if (!painting) { return; }
     let { mouseX, mouseY } = getMousePosition(event);
 
@@ -224,6 +191,7 @@ function drawLine(event) {
     context.moveTo(mouseX, mouseY);
 }
 
+// MAIN START, DRAW, FINISH
 function start(event) {
     if (rectCheck.checked)          { startRect(event); }
     else if (circleCheck.checked)   { startCircle(event); }
@@ -233,7 +201,8 @@ function start(event) {
 }
 
 function draw(event) {
-    if (!mouseDown)                 { showLineHover(event); }
+    // if we are just hovering over the canvas without holding the mouse, show the hover
+    if (!mouseDown)                 { showHoverCursor(event); }
     if (rectCheck.checked)          { drawRect(event); } 
     else if (circleCheck.checked)   { drawCircle(event); }
     else if (fillCheck.checked)     {  }
@@ -249,17 +218,23 @@ function finish(event) {
     else                            { finishLine(event); }
 }
 
+// EVENT LISTENERS
+canvas.addEventListener('mousedown', start);    
+canvas.addEventListener('mouseup', finish);
+canvas.addEventListener('mousemove', draw);
+canvas.addEventListener('mouseenter', paintOnEnter);
+canvas.addEventListener('mouseleave', clearOnLeave);
+canvas.addEventListener('wheel', checkScrollDirection);
 
-function showLineHover(event) {
-    let { mouseX, mouseY } = getMousePosition(event);
+// this is a bandaid fix, i'd like to make it so that you can keep painting if you leave the window and come back but releasing mouse outside of the window lets you keep painting without mouse held.
+document.body.onmouseleave = event => { painting = false; mouseDown = false; clearPreview(); }    
+document.body.onmousedown = event => { mouseDown = true; }
+document.body.onmouseup = event => { mouseDown = false; finish(event); }
 
-    previewContext.clearRect(0, 0, canvas.width, canvas.height);
+// this should call some resize function that maintains the canvas state across sizes
+window.addEventListener('resize', initCanvas);
 
-    previewContext.beginPath();
-    previewContext.arc(mouseX, mouseY, strokeSlider.value/2, 0, 2 * Math.PI, true);
-    previewContext.fillStyle = strokeColor.value;
-    previewContext.fill();
-}
+
 
 // Determines if user is still allowed to paint after they leave the canvas
 function paintOnEnter() {
@@ -272,46 +247,53 @@ function paintOnEnter() {
     }
 }
 
+// when we leave the canvas, clear the preview hover unless we are still painting
+function clearOnLeave() {
+    if (!painting) { clearPreview(); } 
+}
 
-canvas.addEventListener('mousedown', start);
-canvas.addEventListener('mouseup', finish);
-canvas.addEventListener('mousemove', draw);
-canvas.addEventListener('mouseenter', paintOnEnter);
-canvas.addEventListener('mouseleave', e => { 
-    // if we weren't painting, clear the preview context so that the hover cursor goes away
-    if (!painting) { previewContext.clearRect(0, 0, canvas.width, canvas.height); } 
-});
-
-
-canvas.addEventListener('wheel', checkScrollDirection);
-
+// change the stroke weight based on scroll direction
 function checkScrollDirection(event) {
     if (scrollIsUp(event)) {
         strokeSlider.value--;
-        showLineHover(event);
+        showHoverCursor(event);
     } else {
         strokeSlider.value++;
-        showLineHover(event);
+        showHoverCursor(event);
     }
 }
 
+// returns true if mouse scroll wheel scrolls up
 function scrollIsUp(event) {
     if (event.wheelDelta) { return event.wheelDelta > 0; }
     return event.deltaY < 0;
 }
 
-window.addEventListener('resize', initCanvas);  // this should call some resize function that maintains the canvas state across sizes
-
-// this is a bandaid fix, i'd like to make it so that you can keep painting if you leave the window and come back but releasing mouse outside of the window lets you keep painting without mouse held.
-document.body.onmouseleave = event => { painting = false; mouseDown = false; previewContext.clearRect(0, 0, canvas.width, canvas.height); }    
-document.body.onmousedown = event => { mouseDown = true; }
-document.body.onmouseup = event => { mouseDown = false; finish(event); }
-
-
-
 function clearCanvas() {
     context.fillStyle = 'white';
     context.fillRect(0, 0, canvas.width, canvas.height);    
+}
+
+function clearPreview() {
+    previewContext.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+}
+
+function showHoverCursor(event) {
+    let { mouseX, mouseY } = getMousePosition(event);
+
+    // clear the preview canvas anytime we move, but draw right after
+    clearPreview();
+
+    previewContext.beginPath();
+    // if rect is checked, make our hover cursor a square
+    if (rectCheck.checked) {
+        let length = strokeSlider.value;
+        shape.drawFillRect(mouseX-length/2, mouseY-length/2, length, length, strokeColor.value, previewContext);
+    } else {
+        previewContext.arc(mouseX, mouseY, strokeSlider.value/2, 0, 2 * Math.PI, true);
+        previewContext.fillStyle = strokeColor.value;
+        previewContext.fill();
+    }
 }
 
 // gets the starting X and Y position of given HTML element. Use this to find top left corner of canvas
