@@ -3,6 +3,8 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- this makes annoying electron warning go away -->
+        <meta http-equiv="Content-Security-Policy" content="script-src 'self';">
         <title>Wadup</title>
         <link rel="stylesheet" href="index.css">
         <!-- type module makes the script tag defer by default -->
@@ -35,6 +37,17 @@
             <div class="sidebar-row">
                 <label for="circle-check">Circle</label>
                 <input type="radio" class="sidebar-checkbox" id="circle-check" name="draw-type">
+            </div>
+
+            <div class="sidebar-row">
+                <label for="fill-check">Fill</label>
+                <input type="radio" class="sidebar-checkbox" id="fill-check" name="draw-type">
+            </div>
+
+            <!-- INSTEAD OF THIS, there should be a picker for both stroke and fill -->
+            <div class="sidebar-row">
+                <label for="picker-check">Picker</label>
+                <input type="radio" class="sidebar-checkbox" id="picker-check" name="draw-type">
             </div>
 
             <div class="sidebar-row">

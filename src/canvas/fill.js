@@ -1,24 +1,35 @@
+import Color from './color.js'
+
+let color = new Color;
+
 export default class Fill {
 
-    constructor(canvas, context) {
-        this.canvas = canvas;
-        this.context = context;
+    constructor() {
         this.pixelStack = [];
     }
 
-    floodFill(startX, startY) {
+    // startX, startY are the mosue coordinates where the paint bucket click started
+    floodFill(startX, startY, startColor, fillColor, canvas, context) {
+        // BASE CASE - if X or Y are outside of the canvas, return
+        if (startX < 0 || startX > canvas.width || startY < 0 || startY > canvas.height) { return; }
+        let pixelColor = this.getPixelColor(startX, startY, context);
         
-        this.pixelStack.push( { x: startX, y: startY } );
-
-        while (this.pixelStack.length !== 0) {
-
-            let { x, y } = this.pixelStack.pop();
-            let pixelPosition = (y * this.canvas + x) * 4;
-
-           console.log(x, y);
+        console.log(pixelColor);
+        console.log(color.hexToRGB(pixelColor));
 
 
-        }
+
     }
 
+    getPixelColor(x, y, context) {
+        // start at x, y and get data for a single 1x1 pixel
+        let pixel = context.getImageData(x, y, 1, 1).data;
+        let pixelColor = {
+            red: pixel[0],
+            green: pixel[1],
+            blue: pixel[2],
+            alpha: pixel[3]
+        }
+        return color.rbgToHex(pixelColor);
+    }
 }

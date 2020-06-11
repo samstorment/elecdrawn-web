@@ -9,25 +9,6 @@ let context = canvas.getContext('2d');
 let previewCanvas = document.querySelector('#preview-canvas');
 let previewContext = previewCanvas.getContext('2d');
 
-// Get the canvas X and Y coordinates so we knwow where to draw
-let canvasPosition = getElementPosition(canvas);
-let canvasX = canvasPosition.x;
-let canvasY = canvasPosition.y;
-
-
-let shape = new Shape(context);
-let fill = new Fill(canvas, context);
-
-fill.floodFill(2, 3);
-
-// Sidebar buttons
-let rectCheck = document.querySelector('#rect-check');
-let circleCheck = document.querySelector('#circle-check');
-let clearButton = document.querySelector('#canvas-clear');
-clearButton.addEventListener('click', clearCanvas);
-let strokeColor = document.querySelector('#stroke-color');
-let fillColor = document.querySelector('#fill-color');
-let strokeSlider = document.querySelector('#stroke-slider');
 
 function setCanvasSize() {
     canvas.height = window.innerHeight - 70;   // subtract 80 to make room for the margin and the buttons
@@ -41,20 +22,42 @@ function initCanvas() {
     context.fillStyle = 'white';
     context.fillRect(0, 0, canvas.width, canvas.height);
     previewContext.clearRect(0,0,previewCanvas.width, previewCanvas.height);
-    // the array of imageData contains info about every pixel's color
-    // var imgData = context.getImageData(0, 0, canvas.width, canvas.height);
-    // console.log(imgData.data);
 }
 
 initCanvas();
+
+let strokeWeight = 0;
+
+// Sidebar buttons
+let brushCheck = document.querySelector('#brush-check');
+let rectCheck = document.querySelector('#rect-check');
+let circleCheck = document.querySelector('#circle-check');
+let fillCheck = document.querySelector('#fill-check');
+let pickerCheck = document.querySelector('#picker-check');
+pickerCheck.addEventListener('click', event => {
+    // set the slider size to 0 so the hover cursor doesn't block our view
+    strokeWeight = strokeSlider.value;
+    strokeSlider.value = 1;
+});
+let clearButton = document.querySelector('#canvas-clear');
+clearButton.addEventListener('click', clearCanvas);
+let strokeColor = document.querySelector('#stroke-color');
+let fillColor = document.querySelector('#fill-color');
+let strokeSlider = document.querySelector('#stroke-slider');
+
+
+let shape = new Shape(context);
+// these are just testing shapes in the top left corner
+// shape.drawFillRect(0, 0, 10, 10, '#ffff00');
+// shape.drawFillRect(10, 0, 10, 10, '#ff0000');
+
+let fill = new Fill();
 
 // checks if the mouse is down (we are painting when the mouse is clicked)
 let painting = false;
 let mouseDown = false;
 let startX = 0;
 let startY = 0;
-
-
 
 function startRect(event) {
     painting = true;
@@ -97,6 +100,38 @@ function drawRect(event) {
     shape.drawStrokeRect(startX, startY, width, height, strokeSlider.value, strokeColor.value);
 }
 
+function startFill(event) {
+    painting = true;
+    let { mouseX, mouseY } = getMousePosition(event);
+    let startClr = fill.getPixelColor(mouseX, mouseY, context);
+    let fillClr = fillColor.value;
+    fill.floodFill(mouseX, mouseY, startClr, fillClr, canvas, context);
+
+    // previewContext.clearRect(0,0,previewCanvas.width,previewCanvas.height);
+}
+
+// TODO
+function finishFill(event) {
+
+}
+
+
+function startPicker(event) {
+  // get the color at this specific pixel and use it as the new stroke color
+    let { mouseX, mouseY } = getMousePosition(event);
+    let colorPicked = fill.getPixelColor(mouseX, mouseY, context);
+    strokeColor.value = colorPicked;
+    // update the color of the hover cursor
+    showLineHover(event);
+}
+
+function finishPicker(event) {
+    // return the paint mode to brush, this should actually go back to the last selected mode
+    brushCheck.checked = true;
+    // change the brush size back to its value before clicking the picker
+    strokeSlider.value = strokeWeight;
+}
+
 function startCircle(event) {
     painting = true;
     let { mouseX, mouseY } = getMousePosition(event);
@@ -114,12 +149,13 @@ function startCircle(event) {
 // NEED TO DO A LOT OF CLEANING ON THE FINISH CIRCLE AND DRAW CIRCLE FUNCTIONS
 function finishCircle(event) {
     if (!painting) { return; }
+
     painting = false;
     let { mouseX, mouseY } = getMousePosition(event);
     let width = mouseX - startX;
     let height = mouseY - startY;
     let radius = Math.sqrt(width*width + height*height);
-
+    
     shape.context = context;
     
     context.strokeStyle = strokeColor.value;
@@ -134,12 +170,9 @@ function finishCircle(event) {
 
     // only clear the preview canvas if the mouse moved
     if (mouseX !== startX || mouseY !== startY) { previewContext.clearRect(0,0,previewCanvas.width,previewCanvas.height); }
-    
 }
 
 function drawCircle(event) {
-
-  
     if (!painting) { return; }
     let { mouseX, mouseY } = getMousePosition(event);
     let width = mouseX - startX;
@@ -158,9 +191,7 @@ function drawCircle(event) {
     previewContext.arc(startX, startY, radius, 0, 2 * Math.PI, true);
     previewContext.stroke();
 
-
     previewContext.beginPath();
-
 }
 
 
@@ -196,6 +227,8 @@ function drawLine(event) {
 function start(event) {
     if (rectCheck.checked)          { startRect(event); }
     else if (circleCheck.checked)   { startCircle(event); }
+    else if (fillCheck.checked)     { startFill(event); }
+    else if (pickerCheck.checked)   { startPicker(event); }
     else                            { startLine(event); }
 }
 
@@ -203,12 +236,16 @@ function draw(event) {
     if (!mouseDown)                 { showLineHover(event); }
     if (rectCheck.checked)          { drawRect(event); } 
     else if (circleCheck.checked)   { drawCircle(event); }
+    else if (fillCheck.checked)     {  }
+    else if (pickerCheck.checked)   {  }
     else                            { drawLine(event); }
 }
 
 function finish(event) {
     if (rectCheck.checked)          { finishRect(event); } 
     else if (circleCheck.checked)   { finishCircle(event); }
+    else if (fillCheck.checked)     { finishFill(event); }
+    else if (pickerCheck.checked)   { finishPicker(event); }
     else                            { finishLine(event); }
 }
 
@@ -241,6 +278,7 @@ canvas.addEventListener('mouseup', finish);
 canvas.addEventListener('mousemove', draw);
 canvas.addEventListener('mouseenter', paintOnEnter);
 canvas.addEventListener('mouseleave', e => { 
+    // if we weren't painting, clear the preview context so that the hover cursor goes away
     if (!painting) { previewContext.clearRect(0, 0, canvas.width, canvas.height); } 
 });
 
@@ -249,10 +287,10 @@ canvas.addEventListener('wheel', checkScrollDirection);
 
 function checkScrollDirection(event) {
     if (scrollIsUp(event)) {
-        strokeSlider.value++;
+        strokeSlider.value--;
         showLineHover(event);
     } else {
-        strokeSlider.value--;
+        strokeSlider.value++;
         showLineHover(event);
     }
 }
@@ -276,7 +314,7 @@ function clearCanvas() {
     context.fillRect(0, 0, canvas.width, canvas.height);    
 }
 
-// HELPERS!
+// gets the starting X and Y position of given HTML element. Use this to find top left corner of canvas
 function getElementPosition(element) {
     var xPosition = 0;
     var yPosition = 0;
@@ -292,10 +330,15 @@ function getElementPosition(element) {
     };
 }
 
+// returns the position of the mouse on the canvas since (0, 0) on the cnavas is offset from (0,0) on the overall window
 function getMousePosition(event) {
+
+    // Get the canvas X and Y coordinates so we knwow where to draw
+    let { x, y } = getElementPosition(canvas);
+
     return {
-        mouseX: event.clientX - canvasX,   
-        mouseY: event.clientY - canvasY  
+        mouseX: event.clientX - x,   
+        mouseY: event.clientY - y
     };
 }
 
