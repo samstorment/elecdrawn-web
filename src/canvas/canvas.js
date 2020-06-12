@@ -40,6 +40,8 @@ let startY = 0;
 // Sidebar buttons
 let brushCheck = document.querySelector('#brush-check');
 let rectCheck = document.querySelector('#rect-check');
+let lineCheck = document.querySelector('#line-check');
+let radialCheck = document.querySelector('#radial-check');
 let circleCheck = document.querySelector('#circle-check');
 let fillCheck = document.querySelector('#fill-check');
 let pickerCheck = document.querySelector('#picker-check');
@@ -98,7 +100,7 @@ function startFill(event) {
     // clearPreview();
 }
 
-// TODO
+// TODO: if needed?
 function finishFill(event) {
 
 }
@@ -163,7 +165,7 @@ function drawCircle(event) {
     previewContext.beginPath();
 }
 
-function startLine(event) {
+function startBrush(event) {
     painting = true;
 
     context.beginPath();    // start a new path so we don't draw from old position
@@ -174,11 +176,11 @@ function startLine(event) {
     draw(event);   // this is just for drawing a single dot
 }
 
-function finishLine(event) {
+function finishBrush(event) {
     painting = false;
 }
 
-function drawLine(event) {
+function drawBrush(event) {
     if (!painting) { return; }
     let { mouseX, mouseY } = getMousePosition(event);
 
@@ -191,31 +193,120 @@ function drawLine(event) {
     context.moveTo(mouseX, mouseY);
 }
 
+
+// TODO: Clean up the LINE and RADIAL functions. Lots of duplicate code that could be modularized
+function startLine(event) {
+    painting = true;
+    let { mouseX, mouseY } = getMousePosition(event);
+    startX = mouseX; startY = mouseY;
+
+    // do all this to context and previeContext to set up preview line and final drawing
+    context.beginPath();
+    context.strokeStyle = strokeColor.value;
+    context.lineWidth = strokeSlider.value;
+    context.lineCap = 'round';  // change this and the preview linecap to square to draw a square line
+
+    previewContext.beginPath();
+    previewContext.strokeStyle = strokeColor.value;
+    previewContext.lineWidth = strokeSlider.value;
+    previewContext.lineCap = 'round';
+}
+
+// draw the final line once the mouse releases
+function finishLine(event) {
+    if (!painting) { return; }
+    painting = false;
+    let { mouseX, mouseY } = getMousePosition(event);
+    context.moveTo(startX, startY);
+    context.lineTo(mouseX, mouseY);
+    context.stroke();
+    clearPreview(); // clear the preview after drawing the last line in case we finish the line off canvas
+}
+
+// every fram draw the line to the previewCanvas
+function drawLine(event) {
+    if (!painting) { return; }
+    let { mouseX, mouseY } = getMousePosition(event);
+
+    // clear the preview when the mouse moves
+    clearPreview();
+
+    // move the line start point to (startX, startY) then draw a line to the current mouse position
+    previewContext.moveTo(startX, startY);
+    previewContext.lineTo(mouseX, mouseY);
+    previewContext.stroke();
+
+    // Need these so that the preview just draws a single line each time we move rather than all of them
+    previewContext.beginPath();
+    previewContext.moveTo(mouseX, mouseY);
+}
+
+
+// The RADIAL functions are very similar to the LINE fucntions -- needs fixing
+function startRadialLine(event) {
+    painting = true;
+    let { mouseX, mouseY } = getMousePosition(event);
+    startX = mouseX; startY = mouseY;
+    context.beginPath();
+    context.strokeStyle = strokeColor.value;
+    context.lineWidth = strokeSlider.value;
+    context.lineCap = 'round';
+    draw(event);
+
+}
+
+// we draw to the canvas live, so we don't need to make a final draw to the main canvas
+function finishRadialLine(event) {
+    painting = false;
+}
+
+function drawRadialLine(event) {
+    if (!painting) { return; }
+    let { mouseX, mouseY } = getMousePosition(event);
+
+    // we don't clear the canvas so every line gets drawn from (startX,startY) to current mouse position
+    context.moveTo(startX, startY);
+    context.lineTo(mouseX, mouseY);
+    context.stroke();
+
+    context.beginPath();
+    context.moveTo(mouseX, mouseY);
+}
+
+
+// THIS SHIT IS UGLY AND BAD. How do we do it better???
 // MAIN START, DRAW, FINISH
 function start(event) {
     if (rectCheck.checked)          { startRect(event); }
+    else if (lineCheck.checked)     { startLine(event); }
+    else if (radialCheck.checked)   { startRadialLine(event); }
     else if (circleCheck.checked)   { startCircle(event); }
     else if (fillCheck.checked)     { startFill(event); }
     else if (pickerCheck.checked)   { startPicker(event); }
-    else                            { startLine(event); }
+    else                            { startBrush(event); }
 }
 
 function draw(event) {
     // if we are just hovering over the canvas without holding the mouse, show the hover
     if (!mouseDown)                 { showHoverCursor(event); }
+
     if (rectCheck.checked)          { drawRect(event); } 
+    else if (lineCheck.checked)     { drawLine(event); }
+    else if (radialCheck.checked)   { drawRadialLine(event); }
     else if (circleCheck.checked)   { drawCircle(event); }
     else if (fillCheck.checked)     {  }
     else if (pickerCheck.checked)   {  }
-    else                            { drawLine(event); }
+    else                            { drawBrush(event); }
 }
 
 function finish(event) {
     if (rectCheck.checked)          { finishRect(event); } 
+    else if (lineCheck.checked)     { finishLine(event); }
+    else if (radialCheck.checked)   { finishRadialLine(event); }
     else if (circleCheck.checked)   { finishCircle(event); }
     else if (fillCheck.checked)     { finishFill(event); }
     else if (pickerCheck.checked)   { finishPicker(event); }
-    else                            { finishLine(event); }
+    else                            { finishBrush(event); }
 }
 
 // EVENT LISTENERS
@@ -323,5 +414,4 @@ function getMousePosition(event) {
         mouseY: event.clientY - y
     };
 }
-
 
