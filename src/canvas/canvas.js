@@ -226,14 +226,14 @@ canvas.addEventListener('mouseenter', paintOnEnter);
 canvas.addEventListener('mouseleave', clearOnLeave);
 canvas.addEventListener('wheel', checkScrollDirection);
 
-// this is a bandaid fix, i'd like to make it so that you can keep painting if you leave the window and come back but releasing mouse outside of the window lets you keep painting without mouse held.
+// this is a bandaid fix, i'd like to make it so that you can keep painting if you leave the window and come back. However, releasing mouse outside of the window lets you keep painting without mouse held.
 document.body.onmouseleave = event => { painting = false; mouseDown = false; clearPreview(); }    
 document.body.onmousedown = event => { mouseDown = true; }
 document.body.onmouseup = event => { mouseDown = false; finish(event); }
 
+// TODO
 // this should call some resize function that maintains the canvas state across sizes
 window.addEventListener('resize', initCanvas);
-
 
 
 // Determines if user is still allowed to paint after they leave the canvas

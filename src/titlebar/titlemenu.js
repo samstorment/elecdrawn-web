@@ -4,6 +4,8 @@ const { app } = require('electron');
 const template = [
 {
     label: 'File',
+    sublabel: 'Sublabel',
+    // toolTip: 'COOL!', // this doesn't show on hover?
     submenu: [
     {
         label: 'Open',
@@ -104,7 +106,7 @@ template.unshift({
 }
 
 function saveFile() {
-    console.log('Whoo. Saved it.')
+    console.log('Whoo. Saved it.');
 }
 
 function openFile() {
