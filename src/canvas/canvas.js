@@ -1,4 +1,5 @@
-import Shape from './shape.js';
+import { DrawTool, Rectangle, Circle } from './drawtool.js';
+import { getMousePosition } from './util.js';
 import Fill from './fill.js';
 
 // CANVAS - this is where drawings will show up
@@ -25,8 +26,6 @@ function initCanvas() {
 
 initCanvas();
 
-
-let shape = new Shape();
 let fill = new Fill();
 
 let strokeWeight = 0;
@@ -71,8 +70,11 @@ function finishRect(event) {
     let width = mouseX - startX;
     let height = mouseY - startY;
     
-    shape.drawFillRect(startX, startY, width, height, fillColor.value, context);
-    shape.drawStrokeRect(startX, startY, width, height, strokeSlider.value, strokeColor.value, context);
+    let rect = new Rectangle();
+
+    rect.drawFill(startX, startY, width, height, fillColor.value, context);
+    rect.drawStroke(startX, startY, width, height, strokeSlider.value, strokeColor.value, context);
+
     // only clear the preview canvas if the mouse moved
     if (mouseX !== startX || mouseY !== startY) { clearPreview(); }
 }
@@ -86,8 +88,10 @@ function drawRect(event) {
 
     clearPreview();
 
-    shape.drawFillRect(startX, startY, width, height, fillColor.value, previewContext);
-    shape.drawStrokeRect(startX, startY, width, height, strokeSlider.value, strokeColor.value, previewContext);
+    let rect = new Rectangle();
+
+    rect.drawFill(startX, startY, width, height, fillColor.value, previewContext);
+    rect.drawStroke(startX, startY, width, height, strokeSlider.value, strokeColor.value, previewContext);
 }
 
 function startFill(event) {
@@ -142,8 +146,10 @@ function finishCircle(event) {
     let height = mouseY - startY;
     let radius = Math.sqrt(width*width + height*height);
         
-    shape.drawFillCircle(startX, startY, radius, fillColor.value, context);
-    shape.drawStrokeCircle(startX, startY, radius, strokeSlider.value, strokeColor.value, context);
+    let circle = new Circle();
+
+    circle.drawFill(startX, startY, radius, fillColor.value, context);
+    circle.drawStroke(startX, startY, radius, strokeSlider.value, strokeColor.value, context);
    
     // only clear the preview canvas if the mouse moved
     if (mouseX !== startX || mouseY !== startY) { clearPreview(); }
@@ -158,8 +164,10 @@ function drawCircle(event) {
 
     clearPreview();
 
-    shape.drawFillCircle(startX, startY, radius, fillColor.value, previewContext);
-    shape.drawStrokeCircle(startX, startY, radius, strokeSlider.value, strokeColor.value, previewContext);
+    let circle = new Circle();
+
+    circle.drawFill(startX, startY, radius, fillColor.value, previewContext);
+    circle.drawStroke(startX, startY, radius, strokeSlider.value, strokeColor.value, previewContext);
 
     // this line makes the fill appear over the stroke
     previewContext.beginPath();
@@ -345,13 +353,9 @@ function clearOnLeave() {
 
 // change the stroke weight based on scroll direction
 function checkScrollDirection(event) {
-    if (scrollIsUp(event)) {
-        strokeSlider.value--;
-        showHoverCursor(event);
-    } else {
-        strokeSlider.value++;
-        showHoverCursor(event);
-    }
+    if (scrollIsUp(event))  { strokeSlider.value--; } 
+    else                    { strokeSlider.value++; }
+    showHoverCursor(event);
 }
 
 // returns true if mouse scroll wheel scrolls up
@@ -379,7 +383,13 @@ function showHoverCursor(event) {
     // if rect is checked, make our hover cursor a square
     if (rectCheck.checked) {
         let length = strokeSlider.value;
-        shape.drawFillRect(mouseX-length/2, mouseY-length/2, length, length, strokeColor.value, previewContext);
+
+        let rect = new Rectangle();
+
+        rect.drawFill(mouseX-length/2, mouseY-length/2, length, length, strokeColor.value, previewContext);
+
+
+        // shape.drawFillRect(mouseX-length/2, mouseY-length/2, length, length, strokeColor.value, previewContext);
     } else {
         previewContext.arc(mouseX, mouseY, strokeSlider.value/2, 0, 2 * Math.PI, true);
         previewContext.fillStyle = strokeColor.value;
@@ -387,31 +397,5 @@ function showHoverCursor(event) {
     }
 }
 
-// gets the starting X and Y position of given HTML element. Use this to find top left corner of canvas
-function getElementPosition(element) {
-    var xPosition = 0;
-    var yPosition = 0;
-    
-    while (element) {
-        xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
-        yPosition += (element.offsetTop - element.scrollTop + element.clientTop);
-        element = element.offsetParent;
-    }
-    return {
-        x: xPosition,
-        y: yPosition
-    };
-}
 
-// returns the position of the mouse on the canvas since (0, 0) on the cnavas is offset from (0,0) on the overall window
-function getMousePosition(event) {
-
-    // Get the canvas X and Y coordinates so we knwow where to draw
-    let { x, y } = getElementPosition(canvas);
-
-    return {
-        mouseX: event.clientX - x,   
-        mouseY: event.clientY - y
-    };
-}
 
