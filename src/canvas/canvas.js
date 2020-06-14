@@ -1,4 +1,4 @@
-import { Rectangle, Circle } from './shape.js';
+import { Rectangle, Circle, Polygon, Ellipse } from './shape.js';
 import { getMousePosition } from './util.js';
 import Fill from './fill.js';
 
@@ -53,6 +53,9 @@ clearButton.addEventListener('click', clearCanvas);
 let strokeColor = document.querySelector('#stroke-color');
 let fillColor = document.querySelector('#fill-color');
 let strokeSlider = document.querySelector('#stroke-slider');
+
+let elp = new Ellipse(200, 200, 100, 200, 0, context);
+elp.drawFill("#0ff00f");
 
 
 function startRect(event) {

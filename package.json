@@ -1,6 +1,6 @@
 {
-  "name": "csv-plot",
-  "productName": "csv-plot",
+  "name": "drawing-app",
+  "productName": "drawing-app",
   "version": "1.0.0",
   "description": "My Electron application description",
   "main": "src/index.js",
@@ -24,7 +24,7 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "csv_plot"
+            "name": "drawing-app"
           }
         },
         {
