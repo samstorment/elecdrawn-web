@@ -1,4 +1,4 @@
-import { Rectangle, Circle, Polygon, Ellipse } from './shape.js';
+import { Rectangle, Ellipse, Polygon } from './shape.js';
 import { getMousePosition } from './util.js';
 import Fill from './fill.js';
 
@@ -54,9 +54,6 @@ let strokeColor = document.querySelector('#stroke-color');
 let fillColor = document.querySelector('#fill-color');
 let strokeSlider = document.querySelector('#stroke-slider');
 
-let elp = new Ellipse(200, 200, 100, 200, 0, context);
-elp.drawFill("#0ff00f");
-
 
 function startRect(event) {
     painting = true;
@@ -74,7 +71,7 @@ function drawRect(event) {
 
     clearPreview();
 
-    let rect = new Rectangle(startX, startY, width, height, previewContext);
+    let rect = new Rectangle(previewContext, startX, startY, width, height);
     rect.drawFill(fillColor.value);
     rect.drawStroke(strokeSlider.value, strokeColor.value);
 }
@@ -86,15 +83,12 @@ function finishRect(event) {
     let width = mouseX - startX;
     let height = mouseY - startY;
     
-    let rect = new Rectangle(startX, startY, width, height, context);
+    let rect = new Rectangle(context, startX, startY, width, height);
     rect.drawFill(fillColor.value);
     rect.drawStroke(strokeSlider.value, strokeColor.value);
-
-    // only clear the preview canvas if the mouse moved
-    if (mouseX !== startX || mouseY !== startY) { clearPreview(); }
 }
 
-
+// TODO: implement floodfill
 function startFill(event) {
     painting = true;
     let { mouseX, mouseY } = getMousePosition(event);
@@ -149,13 +143,9 @@ function drawCircle(event) {
 
     clearPreview();
 
-    let circle = new Circle(startX, startY, radius, previewContext);
-
-    circle.drawFill(fillColor.value);
-    circle.drawStroke(strokeSlider.value, strokeColor.value);
-
-    // this line makes the fill appear over the stroke
-    previewContext.beginPath();
+    let ellipse = new Ellipse(previewContext, startX, startY, radius);
+    ellipse.drawFill(fillColor.value);
+    ellipse.drawStroke(strokeSlider.value, strokeColor.value);
 }
 
 function finishCircle(event) {
@@ -167,13 +157,9 @@ function finishCircle(event) {
     let height = mouseY - startY;
     let radius = Math.sqrt(width*width + height*height);
         
-    let circle = new Circle(startX, startY, radius, context);
-
-    circle.drawFill(fillColor.value);
-    circle.drawStroke(strokeSlider.value, strokeColor.value);
-   
-    // only clear the preview canvas if the mouse moved
-    if (mouseX !== startX || mouseY !== startY) { clearPreview(); }
+    let ellipse = new Ellipse(context, startX, startY, radius);
+    ellipse.drawFill(fillColor.value);
+    ellipse.drawStroke(strokeSlider.value, strokeColor.value);
 }
 
 function startBrush(event) {
@@ -390,13 +376,13 @@ function showHoverCursor(event) {
         let length = strokeSlider.value;
         let xStart = mouseX-length/2; let yStart =  mouseY-length/2;
 
-        let rect = new Rectangle(xStart, yStart, length, length, previewContext);
+        let rect = new Rectangle(previewContext, xStart, yStart, length);
         rect.drawFill(strokeColor.value);
 
     } else {
-        previewContext.arc(mouseX, mouseY, strokeSlider.value/2, 0, 2 * Math.PI, true);
-        previewContext.fillStyle = strokeColor.value;
-        previewContext.fill();
+        let radius = strokeSlider.value / 2;
+        let ellipse = new Ellipse(previewContext, mouseX, mouseY, radius);
+        ellipse.drawFill(strokeColor.value);
     }
 }
 

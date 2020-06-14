@@ -1,10 +1,11 @@
 // super class for default shape behaviors
 class Shape {
+    
     // Any shape needs some starting coordinates and a context to draw to
-    constructor(startX, startY, context) {
+    constructor(context, startX, startY) {
+        this.context = context;
         this.startX = startX;
         this.startY = startY;
-        this.context = context;
     }
 
     // any fill will need to set the fill color
@@ -21,10 +22,12 @@ class Shape {
     }
 }
 
+
 export class Rectangle extends Shape {
 
-    constructor(startX, startY, width, height, context) {
-        super(startX, startY, context);
+    // setting height equal to width by default lets us draw squares by just passing a width argument
+    constructor(context, startX, startY, width, height=width) {
+        super(context, startX, startY);
         this.width = width;
         this.height = height;
     }
@@ -40,49 +43,29 @@ export class Rectangle extends Shape {
     }
 }
 
-export class Circle extends Shape {
-
-    constructor(startX, startY, radius, context) {
-        super(startX, startY, context);
-        this.radius = radius;
-    }
-
-    // When params 4 and 5 of context.arc are 0 and 1*pi, we can draw a half circle.
-    // there is also a 6th optional bool param that lets us draw clockwise or counter. Changing this will flip a half circle.
-    drawFill(color) {
-        super.drawFill(color);
-        this.context.arc(this.startX, this.startY, this.radius, 0, 2 * Math.PI, true);
-        this.context.fill();
-    }
-
-    drawStroke(lineWeight, color) {
-        super.drawStroke(lineWeight, color);
-        this.context.arc(this.startX, this.startY, this.radius, 0, 2 * Math.PI, true);
-        this.context.stroke();
-    }
-
-}
-
+// Makes circles and ovals
 export class Ellipse extends Shape {
 
-    constructor(startX, startY, radiusX, radiusY, rotation, context) {
-        super(startX, startY, context);
+    // these default params set us up for drawing a perfect circle
+    constructor(context, startX, startY, radiusX, radiusY=radiusX, rotation=0, startAngle=0, endAngle=2*Math.PI, counterClockwise=false) {
+        super(context, startX, startY);
         this.radiusX = radiusX;
         this.radiusY = radiusY;
         this.rotation = rotation;
+        this.startAngle = startAngle;
+        this.endAngle = endAngle;
+        this.counterClockwise = counterClockwise;
     }
 
-    // When params 4 and 5 of context.arc are 0 and 1*pi, we can draw a half circle.
-    // there is also a 6th optional bool param that lets us draw clockwise or counter. Changing this will flip a half circle.
     drawFill(color) {
         super.drawFill(color);
-        this.context.ellipse(this.startX, this.startY, this.radiusX, this.radiusY, Math.PI / 4, 0, 2 * Math.PI, true);
+        this.context.ellipse(this.startX, this.startY, this.radiusX, this.radiusY, this.rotation, this.startAngle, this.endAngle, this.counterClockwise);
         this.context.fill();
     }
 
     drawStroke(lineWeight, color) {
         super.drawStroke(lineWeight, color);
-        this.context.arc(this.startX, this.startY, this.radius, 0, 2 * Math.PI, true);
+        this.context.ellipse(this.startX, this.startY, this.radiusX, this.radiusY, this.rotation, this.startAngle, this.endAngle, this.counterClockwise);
         this.context.stroke();
     }
 
@@ -93,8 +76,8 @@ export class Polygon extends Shape {
     // startX and startY here are offsets for the origin. 0, 0 will put the points exactly where you want
     // points is an array of objects where vertices would be placed
     // example triangle: [ {x: 200, y: 300}, {x: 300, y: 300}, {x: 250, y: 100} ]
-    constructor(startX, startY, points, context) {
-        super(startX, startY, context);
+    constructor(context, startX, startY, points) {
+        super(context, startX, startY);
         this.points = points;
     }
 
