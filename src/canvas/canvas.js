@@ -162,6 +162,66 @@ function finishCircle(event) {
     ellipse.drawStroke(strokeSlider.value, strokeColor.value);
 }
 
+
+
+
+
+
+function startEllipse(event) {
+    painting = true;
+    
+    let { mouseX, mouseY } = getMousePosition(event);
+    startX = mouseX; startY = mouseY;
+
+    // start a new path so we don't draw from old position, rect doesn't need this because it doesn't use stroke to draw
+    // set the linecaps to round so drawing a small circle fills everything
+    context.beginPath();
+    context.lineCap = 'round';
+    previewContext.beginPath();
+    previewContext.lineCap = 'round';
+}
+
+
+function drawEllipse(event) {
+    if (!painting) { return; }
+    let { mouseX, mouseY } = getMousePosition(event);
+    let width = mouseX - startX;
+    let height = mouseY - startY;
+
+    
+    let offSet = strokeSlider.value / 2;
+
+    clearPreview(); 
+
+    let ellipse = new Ellipse(previewContext, startX + width/2, startY + height/2, Math.abs(width/2), Math.abs(height/2));
+    ellipse.drawFill(fillColor.value);
+    ellipse.drawStroke(strokeSlider.value, strokeColor.value);
+
+    let rectangle = new Rectangle(previewContext, startX, startY, width, height);
+    rectangle.drawStroke(2, "#000000");
+}
+
+function finishEllipse(event) {
+    if (!painting) { return; }
+    painting = false;
+
+    let { mouseX, mouseY } = getMousePosition(event);
+    let width = mouseX - startX;
+    let height = mouseY - startY;
+        
+    let ellipse = new Ellipse(context, startX + width/2, startY + height/2, Math.abs(width/2), Math.abs(height/2));
+    ellipse.drawFill(fillColor.value);
+    ellipse.drawStroke(strokeSlider.value, strokeColor.value);
+}
+
+
+
+
+
+
+
+
+
 function startBrush(event) {
     painting = true;
 
@@ -279,7 +339,7 @@ function start(event) {
     if (rectCheck.checked)          { startRect(event); }
     else if (lineCheck.checked)     { startLine(event); }
     else if (radialCheck.checked)   { startRadialLine(event); }
-    else if (circleCheck.checked)   { startCircle(event); }
+    else if (circleCheck.checked)   { startEllipse(event); }
     else if (fillCheck.checked)     { startFill(event); }
     else if (pickerCheck.checked)   { startPicker(event); }
     else                            { startBrush(event); }
@@ -292,7 +352,7 @@ function draw(event) {
     if (rectCheck.checked)          { drawRect(event); } 
     else if (lineCheck.checked)     { drawLine(event); }
     else if (radialCheck.checked)   { drawRadialLine(event); }
-    else if (circleCheck.checked)   { drawCircle(event); }
+    else if (circleCheck.checked)   { drawEllipse(event); }
     else if (fillCheck.checked)     {  }
     else if (pickerCheck.checked)   {  }
     else                            { drawBrush(event); }
@@ -302,7 +362,7 @@ function finish(event) {
     if (rectCheck.checked)          { finishRect(event); } 
     else if (lineCheck.checked)     { finishLine(event); }
     else if (radialCheck.checked)   { finishRadialLine(event); }
-    else if (circleCheck.checked)   { finishCircle(event); }
+    else if (circleCheck.checked)   { finishEllipse(event); }
     else if (fillCheck.checked)     { finishFill(event); }
     else if (pickerCheck.checked)   { finishPicker(event); }
     else                            { finishBrush(event); }
