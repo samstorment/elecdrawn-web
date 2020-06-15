@@ -1,7 +1,4 @@
 export default class Color {
-    constructor() {
-
-    }
 
     // add a 0 to the front of the hexstring if its length is 1
     hexify(hexString) {

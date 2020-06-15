@@ -1,6 +1,8 @@
 import Color from './color.js'
+import Queue from '../data-structures/queue.js';
 
-let color = new Color;
+
+let color = new Color();
 
 export default class Fill {
 
@@ -35,10 +37,11 @@ export default class Fill {
     // TODO: DEBUG. This currently does not work properly, not sure why yet.
     floodFill(startX, startY, startColor, fillColor, canvas, context) {
 
-        let queue = [];
-        queue.push({x: startX, y: startY})
-        while (queue.length !== 0) {
-            let { x, y } = queue.shift();
+        let queue = new Queue();
+        queue.push({x: startX, y: startY});
+        queue.print();
+        while (!queue.isEmpty()) {
+            let { x, y } = queue.pop();
             this.setPixelColor(x, y, fillColor, context);
 
             if (this.checkValid(x + 1, y, startColor, fillColor, canvas, context)) {

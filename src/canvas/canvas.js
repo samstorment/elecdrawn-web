@@ -195,8 +195,6 @@ function drawEllipse(event) {
     let width = mouseX - startX;
     let height = mouseY - startY;
 
-    
-
     clearPreview(); 
 
     // start points are the direct center of the ellipse
@@ -221,14 +219,6 @@ function finishEllipse(event) {
     ellipse.drawFill(fillColor.value, context);
     ellipse.drawStroke(strokeSlider.value, strokeColor.value, context);
 }
-
-
-
-
-
-
-
-
 
 function startBrush(event) {
     painting = true;
