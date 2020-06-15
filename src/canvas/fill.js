@@ -5,11 +5,11 @@ let color = new Color;
 export default class Fill {
 
     constructor() {
-        this.pixelStack = [];
+        this.pixelqueue = [];
     }
 
     // startX, startY are the mosue coordinates where the paint bucket click started
-    // Recursive flood fill often times causes a stack overflow
+    // Recursive flood fill often times causes a queue overflow
     floodFillRecurse(startX, startY, startColor, fillColor, canvas, context) {
         // BASE CASE - if X or Y are outside of the canvas, return
         if (startX < 0 || startX > canvas.width || startY < 0 || startY > canvas.height) { return; }
@@ -35,23 +35,23 @@ export default class Fill {
     // TODO: DEBUG. This currently does not work properly, not sure why yet.
     floodFill(startX, startY, startColor, fillColor, canvas, context) {
 
-        let stack = [];
-        stack.push({x: startX, y: startY})
-        while (stack.length !== 0) {
-            let { x, y } = stack.pop();
+        let queue = [];
+        queue.push({x: startX, y: startY})
+        while (queue.length !== 0) {
+            let { x, y } = queue.shift();
             this.setPixelColor(x, y, fillColor, context);
 
             if (this.checkValid(x + 1, y, startColor, fillColor, canvas, context)) {
-                stack.push({x: x + 1, y: y});
+                queue.push({x: x + 1, y: y});
             }
             if (this.checkValid(x - 1, y, startColor, fillColor, canvas, context)) {
-                stack.push({x: x - 1, y: y});
+                queue.push({x: x - 1, y: y});
             }
             if (this.checkValid(x, y + 1, startColor, fillColor, canvas, context)) {
-                stack.push({x: x, y: y + 1});
+                queue.push({x: x, y: y + 1});
             }
             if (this.checkValid(x, y - 1, startColor, fillColor, canvas, context)) {
-                stack.push({x: x, y: y - 1});
+                queue.push({x: x, y: y - 1});
             }
         }
     }
@@ -64,7 +64,6 @@ export default class Fill {
         if (pixelColor === fillColor) { return false; }
 
         return true;
-
     }
 
     

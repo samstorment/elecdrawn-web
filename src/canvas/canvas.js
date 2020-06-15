@@ -104,8 +104,8 @@ function startFill(event) {
     let { mouseX, mouseY } = getMousePosition(event);
     let startClr = fill.getPixelColor(mouseX, mouseY, context);
     let fillClr = fillColor.value;
-    fill.floodFillRecurse(mouseX, mouseY, startClr, fillClr, canvas, context);
-    // fill.floodFill(startX, startY, startClr, fillClr, canvas, context);
+    // fill.floodFillRecurse(mouseX, mouseY, startClr, fillClr, canvas, context);
+    fill.floodFill(startX, startY, startClr, fillClr, canvas, context);
 
     // clearPreview();
 }
