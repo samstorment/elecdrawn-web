@@ -6,10 +6,6 @@ let color = new Color();
 
 export default class Fill {
 
-    constructor() {
-        this.pixelqueue = [];
-    }
-
     // startX, startY are the mosue coordinates where the paint bucket click started
     // Recursive flood fill often times causes a queue overflow
     floodFillRecurse(startX, startY, startColor, fillColor, canvas, context) {
@@ -34,42 +30,50 @@ export default class Fill {
         this.floodFillRecurse(startX, startY - 1, startColor, fillColor, canvas, context);
     }
 
-    // TODO: DEBUG. This currently does not work properly, not sure why yet.
+    // TODO: DEBUG. This currently will only fill VERY small regions. There is an unidentified inefficiency.
     floodFill(startX, startY, startColor, fillColor, canvas, context) {
 
         let queue = new Queue();
         queue.push({x: startX, y: startY});
-        queue.print();
+
         while (!queue.isEmpty()) {
+
             let { x, y } = queue.pop();
+
             this.setPixelColor(x, y, fillColor, context);
 
             if (this.checkValid(x + 1, y, startColor, fillColor, canvas, context)) {
+                // console.log('Right');
                 queue.push({x: x + 1, y: y});
             }
             if (this.checkValid(x - 1, y, startColor, fillColor, canvas, context)) {
+                // console.log('Left');
                 queue.push({x: x - 1, y: y});
             }
             if (this.checkValid(x, y + 1, startColor, fillColor, canvas, context)) {
+                // console.log('Up');
                 queue.push({x: x, y: y + 1});
             }
             if (this.checkValid(x, y - 1, startColor, fillColor, canvas, context)) {
+                // console.log('Down');
                 queue.push({x: x, y: y - 1});
             }
         }
     }
 
 
-    checkValid(startX, startY, startColor, fillColor, canvas, context) {
-        if (startX < 0 || startX > canvas.width || startY < 0 || startY > canvas.height) { return false; }
-        let pixelColor = this.getPixelColor(startX, startY, context);
+    checkValid(x, y, startColor, fillColor, canvas, context) {
+
+        if (x < 0 || x > canvas.width || y < 0 || y > canvas.height) { return false; }
+        let pixelColor = this.getPixelColor(x, y, context);
         if (pixelColor !== startColor) { return false; }
         if (pixelColor === fillColor) { return false; }
+
+        console.log(x, y);
 
         return true;
     }
 
-    
 
     getPixelColor(x, y, context) {
         // start at x, y and get data for a single 1x1 pixel
@@ -80,9 +84,8 @@ export default class Fill {
             blue: pixel[2],
             alpha: pixel[3]
         }
-        return color.rbgToHex(pixelColor);
+        return color.rgbToHex(pixelColor);
     }
-
 
     setPixelColor(x, y, fillColor, context) {
         context.fillStyle = fillColor;

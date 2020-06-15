@@ -10,7 +10,7 @@ export default class Queue {
         this.queue.insertBack(data);
     }
 
-    pop(queue) {
+    pop() {
         let poppedItem = this.queue.getFront();
         this.queue.deleteFront();
         return poppedItem;
@@ -21,7 +21,7 @@ export default class Queue {
     }
 
     isEmpty() {
-        return this.length === 0;
+        return this.queue.length === 0;
     }
 
     print() {

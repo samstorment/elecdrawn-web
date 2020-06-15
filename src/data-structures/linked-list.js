@@ -17,6 +17,11 @@ export default class LinkedList {
     
     insertAt(index, data) {
 
+        if (index >= this.length) {
+            console.log(`Index ${index} is out of bounds. Max valid index is ${this.length - 1}`);
+            return; 
+        }
+
         let iter = this.head;
         for (let i = 0; i < index; i++) {
             iter = iter.next;
@@ -51,8 +56,13 @@ export default class LinkedList {
         this.length++;
     }
 
-
     deleteAt(index) {
+
+        if (index >= this.length) { 
+            console.log(`Index ${index} is out of bounds. Max valid index is ${this.length - 1}`);
+            return; 
+        }
+
         let del = this.head;
         for (let i = 0; i <= index; i++) {
             del = del.next;
@@ -67,15 +77,19 @@ export default class LinkedList {
     }
 
     getFront() {
-        return this.head.next.data;
+        if (this.length > 0) {
+            return this.head.next.data;
+        }
     }
 
     getBack() {
-        return this.tail.previous.data;
+        if (this.length > 0) {
+            return this.tail.previous.data;
+        }
     }
 
     deleteFront() {
-        if (this.head.next.data === null) { return; }
+        if (this.length === 0) { return; }
 
         let del = this.head.next;
         let after = del.next;
@@ -87,7 +101,7 @@ export default class LinkedList {
     }
 
     deleteBack() {
-        if (this.tail.previous.data === null) { return; }
+        if (this.length === 0) { return; }
 
         let del = this.tail.previous;
         let before = del.previous;

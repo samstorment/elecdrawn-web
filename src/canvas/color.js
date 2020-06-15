@@ -6,7 +6,7 @@ export default class Color {
         return hexString;
     }
 
-    rbgToHex(rgbaObject) {
+    rgbToHex(rgbaObject) {
         // convert each RGB value to a 2 character hex string
         let red = this.hexify(rgbaObject.red.toString(16));
         let green = this.hexify(rgbaObject.green.toString(16));
