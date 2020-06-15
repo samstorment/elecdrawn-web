@@ -8,8 +8,8 @@
         <title>Wadup</title>
         <link rel="stylesheet" href="index.css">
         <!-- type module makes the script tag defer by default -->
-        <script src="./canvas/canvas.js" type="module"></script>
-        <script src="./titlebar/titlebar.js" type="module"></script>
+        <script defer src="./canvas/canvas.js" type="module"></script>
+        <script defer src="./titlebar/titlebar.js" type="module"></script>
     </head>
     <body>
         <div class="title-bar">
@@ -26,27 +26,27 @@
 
             <div class="sidebar-row">
                 <label for="brush-check">Brush</label>
-                <input type="radio" class="sidebar-checkbox" id="brush-check" name="draw-type" checked="true">
+                <input type="radio" class="sidebar-checkbox default-hover" id="brush-check" name="draw-type" checked="true">
             </div>
 
             <div class="sidebar-row">
                 <label for="line-check">Line</label>
-                <input type="radio" class="sidebar-checkbox" id="line-check" name="draw-type">
+                <input type="radio" class="sidebar-checkbox default-hover" id="line-check" name="draw-type">
             </div>
 
             <div class="sidebar-row">
                 <label for="radial-check">Radial</label>
-                <input type="radio" class="sidebar-checkbox" id="radial-check" name="draw-type">
+                <input type="radio" class="sidebar-checkbox default-hover" id="radial-check" name="draw-type">
             </div>
 
             <div class="sidebar-row">
                 <label for="rect-check">Rectangle</label>
-                <input type="radio" class="sidebar-checkbox" id="rect-check" name="draw-type">
+                <input type="radio" class="sidebar-checkbox default-hover" id="rect-check" name="draw-type">
             </div>
 
             <div class="sidebar-row">
                 <label for="circle-check">Circle</label>
-                <input type="radio" class="sidebar-checkbox" id="circle-check" name="draw-type">
+                <input type="radio" class="sidebar-checkbox default-hover" id="circle-check" name="draw-type">
             </div>
 
             <div class="sidebar-row">

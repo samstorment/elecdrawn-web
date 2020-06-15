@@ -27,7 +27,7 @@ initCanvas();
 
 let fill = new Fill();
 
-let strokeWeight = 0;
+let strokeWeight = 15;
 // checks if the mouse is down (we are painting when the mouse is clicked)
 let painting = false;
 let mouseDown = false;
@@ -42,10 +42,13 @@ let lineCheck = document.querySelector('#line-check');
 let radialCheck = document.querySelector('#radial-check');
 let circleCheck = document.querySelector('#circle-check');
 let fillCheck = document.querySelector('#fill-check');
-let pickerCheck = document.querySelector('#picker-check');
-pickerCheck.addEventListener('click', event => {
+fillCheck.addEventListener('click', () => {
     // set the slider size to 0 so the hover cursor doesn't block our view
-    strokeWeight = strokeSlider.value;
+    strokeSlider.value = 1;
+});
+let pickerCheck = document.querySelector('#picker-check');
+pickerCheck.addEventListener('change', () => {
+    // set the slider size to 0 so the hover cursor doesn't block our view
     strokeSlider.value = 1;
 });
 let clearButton = document.querySelector('#canvas-clear');
@@ -54,6 +57,13 @@ let strokeColor = document.querySelector('#stroke-color');
 let fillColor = document.querySelector('#fill-color');
 let strokeSlider = document.querySelector('#stroke-slider');
 
+
+let checkBoxes = document.querySelectorAll('.default-hover');
+checkBoxes.forEach(element => {
+    element.addEventListener('click', () => {
+        strokeSlider.value = strokeWeight;
+    });
+});
 
 function startRect(event) {
     painting = true;
@@ -71,9 +81,9 @@ function drawRect(event) {
 
     clearPreview();
 
-    let rect = new Rectangle(previewContext, startX, startY, width, height);
-    rect.drawFill(fillColor.value);
-    rect.drawStroke(strokeSlider.value, strokeColor.value);
+    let rect = new Rectangle(startX, startY, width, height);
+    rect.drawFill(fillColor.value, previewContext);
+    rect.drawStroke(strokeSlider.value, strokeColor.value, previewContext);
 }
 
 function finishRect(event) {
@@ -83,9 +93,9 @@ function finishRect(event) {
     let width = mouseX - startX;
     let height = mouseY - startY;
     
-    let rect = new Rectangle(context, startX, startY, width, height);
-    rect.drawFill(fillColor.value);
-    rect.drawStroke(strokeSlider.value, strokeColor.value);
+    let rect = new Rectangle(startX, startY, width, height);
+    rect.drawFill(fillColor.value, context);
+    rect.drawStroke(strokeSlider.value, strokeColor.value, context);
 }
 
 // TODO: implement floodfill
@@ -94,14 +104,10 @@ function startFill(event) {
     let { mouseX, mouseY } = getMousePosition(event);
     let startClr = fill.getPixelColor(mouseX, mouseY, context);
     let fillClr = fillColor.value;
-    fill.floodFill(mouseX, mouseY, startClr, fillClr, canvas, context);
+    fill.floodFillRecurse(mouseX, mouseY, startClr, fillClr, canvas, context);
+    // fill.floodFill(startX, startY, startClr, fillClr, canvas, context);
 
     // clearPreview();
-}
-
-// TODO: if needed?
-function finishFill(event) {
-
 }
 
 function startPicker(event) {
@@ -117,7 +123,6 @@ function finishPicker(event) {
     // return the paint mode to brush, this should actually go back to the last selected mode
     brushCheck.checked = true;
     // change the brush size back to its value before clicking the picker
-    strokeSlider.value = strokeWeight;
 }
 
 function startCircle(event) {
@@ -143,9 +148,9 @@ function drawCircle(event) {
 
     clearPreview();
 
-    let ellipse = new Ellipse(previewContext, startX, startY, radius);
-    ellipse.drawFill(fillColor.value);
-    ellipse.drawStroke(strokeSlider.value, strokeColor.value);
+    let ellipse = new Ellipse(startX, startY, radius);
+    ellipse.drawFill(fillColor.value, previewContext);
+    ellipse.drawStroke(strokeSlider.value, strokeColor.value, previewContext);
 }
 
 function finishCircle(event) {
@@ -157,9 +162,9 @@ function finishCircle(event) {
     let height = mouseY - startY;
     let radius = Math.sqrt(width*width + height*height);
         
-    let ellipse = new Ellipse(context, startX, startY, radius);
-    ellipse.drawFill(fillColor.value);
-    ellipse.drawStroke(strokeSlider.value, strokeColor.value);
+    let ellipse = new Ellipse(startX, startY, radius);
+    ellipse.drawFill(fillColor.value, context);
+    ellipse.drawStroke(strokeSlider.value, strokeColor.value, context);
 }
 
 
@@ -177,6 +182,8 @@ function startEllipse(event) {
     // set the linecaps to round so drawing a small circle fills everything
     context.beginPath();
     context.lineCap = 'round';
+    context.imageSmoothingEnabled = false;
+
     previewContext.beginPath();
     previewContext.lineCap = 'round';
 }
@@ -189,16 +196,17 @@ function drawEllipse(event) {
     let height = mouseY - startY;
 
     
-    let offSet = strokeSlider.value / 2;
 
     clearPreview(); 
 
-    let ellipse = new Ellipse(previewContext, startX + width/2, startY + height/2, Math.abs(width/2), Math.abs(height/2));
-    ellipse.drawFill(fillColor.value);
-    ellipse.drawStroke(strokeSlider.value, strokeColor.value);
+    // start points are the direct center of the ellipse
+    // radii are half the width and half the height of a rectangle
+    let ellipse = new Ellipse(startX + width/2, startY + height/2, Math.abs(width/2), Math.abs(height/2));
+    ellipse.drawFill(fillColor.value, previewContext);
+    ellipse.drawStroke(strokeSlider.value, strokeColor.value, previewContext);
 
-    let rectangle = new Rectangle(previewContext, startX, startY, width, height);
-    rectangle.drawStroke(2, "#000000");
+    let rectangle = new Rectangle(startX, startY, width, height);
+    rectangle.drawStroke(2, "#000000", previewContext);
 }
 
 function finishEllipse(event) {
@@ -209,9 +217,9 @@ function finishEllipse(event) {
     let width = mouseX - startX;
     let height = mouseY - startY;
         
-    let ellipse = new Ellipse(context, startX + width/2, startY + height/2, Math.abs(width/2), Math.abs(height/2));
-    ellipse.drawFill(fillColor.value);
-    ellipse.drawStroke(strokeSlider.value, strokeColor.value);
+    let ellipse = new Ellipse(startX + width/2, startY + height/2, Math.abs(width/2), Math.abs(height/2));
+    ellipse.drawFill(fillColor.value, context);
+    ellipse.drawStroke(strokeSlider.value, strokeColor.value, context);
 }
 
 
@@ -363,7 +371,7 @@ function finish(event) {
     else if (lineCheck.checked)     { finishLine(event); }
     else if (radialCheck.checked)   { finishRadialLine(event); }
     else if (circleCheck.checked)   { finishEllipse(event); }
-    else if (fillCheck.checked)     { finishFill(event); }
+    else if (fillCheck.checked)     {  }
     else if (pickerCheck.checked)   { finishPicker(event); }
     else                            { finishBrush(event); }
 }
@@ -436,13 +444,13 @@ function showHoverCursor(event) {
         let length = strokeSlider.value;
         let xStart = mouseX-length/2; let yStart =  mouseY-length/2;
 
-        let rect = new Rectangle(previewContext, xStart, yStart, length);
-        rect.drawFill(strokeColor.value);
+        let rect = new Rectangle(xStart, yStart, length);
+        rect.drawFill(strokeColor.value, previewContext);
 
     } else {
         let radius = strokeSlider.value / 2;
-        let ellipse = new Ellipse(previewContext, mouseX, mouseY, radius);
-        ellipse.drawFill(strokeColor.value);
+        let ellipse = new Ellipse(mouseX, mouseY, radius);
+        ellipse.drawFill(strokeColor.value, previewContext);
     }
 }
 
