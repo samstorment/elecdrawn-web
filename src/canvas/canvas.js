@@ -112,6 +112,7 @@ function startFill(event) {
 
     fill.floodFill(context, mouseX, mouseY, fillClr, 128);
 
+    context.beginPath();
     // clearPreview();
 }
 

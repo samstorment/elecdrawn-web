@@ -63,7 +63,9 @@ export default class Fill {
         
         // get the color we're filling
         const targetColor = this.getPixel(imageData, x, y);
-        
+
+        if (this.colorsIdentical(targetColor, fillColor)) { return; }
+
         // check we are actually filling a different color
         if (!this.colorsMatch(targetColor, fillColor)) {
         
@@ -112,5 +114,10 @@ export default class Fill {
         const db = a[2] - b[2];
         const da = a[3] - b[3];
         return dr * dr + dg * dg + db * db + da * da < rangeSq;
+    }
+
+
+    colorsIdentical(a, b) {
+        return a[0] == b[0] && a[1] == b[1] && a[2] == b[2] && a[3] == b[3];
     }
 }
