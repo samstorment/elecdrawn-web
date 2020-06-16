@@ -6,6 +6,8 @@
 
 html, body {
     height: 100%;
+    /* this prevents scrolling on oversize canvas */
+    /* overflow: hidden; */
 }
 
 body {

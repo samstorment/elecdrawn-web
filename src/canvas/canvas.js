@@ -337,9 +337,13 @@ document.body.onmouseleave = () => { painting = false; mouseDown = false; clearP
 document.body.onmousedown = () => { mouseDown = true; }
 document.body.onmouseup = event => { mouseDown = false; finish(event); }
 
-// TODO
-// this should call some resize function that maintains the canvas state across sizes
-window.addEventListener('resize', initCanvas);
+// when reducing screen size, any part of the canvas that gets cut off is lost with this approach
+window.addEventListener('resize', e => {
+    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    setCanvasSize();
+    clearCanvas();
+    context.putImageData(imageData, 0, 0);
+});
 
 
 // Determines if user is still allowed to paint after they leave the canvas
