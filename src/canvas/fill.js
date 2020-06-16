@@ -1,4 +1,4 @@
-import Color from './color.js'
+import Color from './color.js';
 import Queue from '../data-structures/queue.js';
 
 
@@ -30,51 +30,8 @@ export default class Fill {
         this.floodFillRecurse(startX, startY - 1, startColor, fillColor, canvas, context);
     }
 
-    // TODO: DEBUG. This currently will only fill VERY small regions. There is an unidentified inefficiency.
-    floodFill(startX, startY, startColor, fillColor, canvas, context) {
-
-        let queue = new Queue();
-        queue.push({x: startX, y: startY});
-
-        while (!queue.isEmpty()) {
-
-            let { x, y } = queue.pop();
-
-            this.setPixelColor(x, y, fillColor, context);
-
-            if (this.checkValid(x + 1, y, startColor, fillColor, canvas, context)) {
-                // console.log('Right');
-                queue.push({x: x + 1, y: y});
-            }
-            if (this.checkValid(x - 1, y, startColor, fillColor, canvas, context)) {
-                // console.log('Left');
-                queue.push({x: x - 1, y: y});
-            }
-            if (this.checkValid(x, y + 1, startColor, fillColor, canvas, context)) {
-                // console.log('Up');
-                queue.push({x: x, y: y + 1});
-            }
-            if (this.checkValid(x, y - 1, startColor, fillColor, canvas, context)) {
-                // console.log('Down');
-                queue.push({x: x, y: y - 1});
-            }
-        }
-    }
-
-
-    checkValid(x, y, startColor, fillColor, canvas, context) {
-
-        if (x < 0 || x > canvas.width || y < 0 || y > canvas.height) { return false; }
-        let pixelColor = this.getPixelColor(x, y, context);
-        if (pixelColor !== startColor) { return false; }
-        if (pixelColor === fillColor) { return false; }
-
-        console.log(x, y);
-
-        return true;
-    }
-
-
+      
+    // OLD -- used in recursion
     getPixelColor(x, y, context) {
         // start at x, y and get data for a single 1x1 pixel
         let pixel = context.getImageData(x, y, 1, 1).data;
@@ -87,8 +44,73 @@ export default class Fill {
         return color.rgbToHex(pixelColor);
     }
 
+    // OLD - used in recursion
     setPixelColor(x, y, fillColor, context) {
         context.fillStyle = fillColor;
         context.fillRect(x, y, 1, 1);
+    }
+
+
+
+    // Iterative fill
+    floodFill(ctx, x, y, fillColor, range = 1) {
+
+        // read the pixels in the canvas
+        const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+        
+        // flags for if we visited a pixel already
+        const visited = new Uint8Array(imageData.width, imageData.height);
+        
+        // get the color we're filling
+        const targetColor = this.getPixel(imageData, x, y);
+        
+        // check we are actually filling a different color
+        if (!this.colorsMatch(targetColor, fillColor)) {
+        
+            const rangeSq = range * range;
+            const pixelsToCheck = [x, y];
+            while (pixelsToCheck.length > 0) {
+                const y = pixelsToCheck.pop();
+                const x = pixelsToCheck.pop();
+                
+                const currentColor = this.getPixel(imageData, x, y);
+
+                if (!visited[y * imageData.width + x] &&
+                    this.colorsMatch(currentColor, targetColor, rangeSq)) {
+                    this.setPixel(imageData, x, y, fillColor);
+                    visited[y * imageData.width + x] = 1;  // mark we were here already
+                    pixelsToCheck.push(x + 1, y);
+                    pixelsToCheck.push(x - 1, y);
+                    pixelsToCheck.push(x, y + 1);
+                    pixelsToCheck.push(x, y - 1);
+                }
+            }
+            ctx.putImageData(imageData, 0, 0);
+        }
+    }
+
+    getPixel(imageData, x, y) {
+        if (x < 0 || y < 0 || x >= imageData.width || y >= imageData.height) {
+            return [-1, -1, -1, -1];  // impossible color
+        } else {
+            const offset = (y * imageData.width + x) * 4;
+            return imageData.data.slice(offset, offset + 4);
+        }
+    }
+      
+    setPixel(imageData, x, y, color) {
+        const offset = (y * imageData.width + x) * 4;
+        imageData.data[offset + 0] = color[0];
+        imageData.data[offset + 1] = color[1];
+        imageData.data[offset + 2] = color[2];
+        imageData.data[offset + 3] = color[3];
+    }
+      
+    colorsMatch(a, b, rangeSq) {
+        const dr = a[0] - b[0];
+        const dg = a[1] - b[1];
+        const db = a[2] - b[2];
+        const da = a[3] - b[3];
+        return dr * dr + dg * dg + db * db + da * da < rangeSq;
     }
 }

@@ -1,5 +1,6 @@
 import { Rectangle, Ellipse, Polygon } from './shape.js';
 import { getMousePosition } from './util.js';
+import Color from './color.js'
 import Fill from './fill.js';
 
 // CANVAS - this is where drawings will show up
@@ -102,10 +103,14 @@ function finishRect(event) {
 function startFill(event) {
     painting = true;
     let { mouseX, mouseY } = getMousePosition(event);
-    let startClr = fill.getPixelColor(mouseX, mouseY, context);
-    let fillClr = fillColor.value;
     // fill.floodFillRecurse(mouseX, mouseY, startClr, fillClr, canvas, context);
-    fill.floodFill(mouseX, mouseY, startClr, fillClr, canvas, context);
+
+    let color = new Color();
+
+    let { red, green, blue, alpha } = color.hexToRGB(fillColor.value);
+    let fillClr = [ red, green, blue, alpha ];
+
+    fill.floodFill(context, mouseX, mouseY, fillClr, 128);
 
     // clearPreview();
 }
@@ -124,53 +129,6 @@ function finishPicker(event) {
     brushCheck.checked = true;
     // change the brush size back to its value before clicking the picker
 }
-
-function startCircle(event) {
-    painting = true;
-    let { mouseX, mouseY } = getMousePosition(event);
-    startX = mouseX; startY = mouseY;
-
-    // start a new path so we don't draw from old position, rect doesn't need this because it doesn't use stroke to draw
-    // set the linecaps to round so drawing a small circle fills everything
-    context.beginPath();
-    context.lineCap = 'round';
-    previewContext.beginPath();
-    previewContext.lineCap = 'round';
-}
-
-
-function drawCircle(event) {
-    if (!painting) { return; }
-    let { mouseX, mouseY } = getMousePosition(event);
-    let width = mouseX - startX;
-    let height = mouseY - startY;
-    let radius = Math.sqrt(width*width + height*height);
-
-    clearPreview();
-
-    let ellipse = new Ellipse(startX, startY, radius);
-    ellipse.drawFill(fillColor.value, previewContext);
-    ellipse.drawStroke(strokeSlider.value, strokeColor.value, previewContext);
-}
-
-function finishCircle(event) {
-    if (!painting) { return; }
-    painting = false;
-
-    let { mouseX, mouseY } = getMousePosition(event);
-    let width = mouseX - startX;
-    let height = mouseY - startY;
-    let radius = Math.sqrt(width*width + height*height);
-        
-    let ellipse = new Ellipse(startX, startY, radius);
-    ellipse.drawFill(fillColor.value, context);
-    ellipse.drawStroke(strokeSlider.value, strokeColor.value, context);
-}
-
-
-
-
-
 
 function startEllipse(event) {
     painting = true;
