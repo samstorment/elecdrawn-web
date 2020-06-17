@@ -383,13 +383,15 @@ function setupContext(ctx = context, strokeStyle = strokeColor.value, lineWidth 
 
 function showHoverCursor(event) {
 
+    // just do nothing if show hover is false
     if (!showHover) { return; }
 
     let { mouseX, mouseY } = getMousePosition(event);
+
     // clear the preview canvas anytime we move, but draw right after
     clearPreview();
-
     previewContext.beginPath();
+
     // if rect is checked, make our hover cursor a square
     if (rectCheck.checked) {
         let length = strokeSlider.value;

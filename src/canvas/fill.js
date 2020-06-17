@@ -35,6 +35,7 @@ export function floodFill(startX, startY, hexFillColor, context, range = 1) {
             const currentColor = getPixel(x, y, imageData); 
 
             // if we haven't already visited this pixel AND the current pixel's color matches the targetColor
+            // colorsMatch() causes a problem when you try to fill a very similiar but slightly different color. colorsIdentical() may be better here
             if (!visited[y * imageData.width + x] && colorsMatch(currentColor, targetColor, rangeSq)) {
                 setPixel(x, y, fillColor, imageData);   // color the pixel at (x, y)
                 visited[y * imageData.width + x] = 1;   // mark that we've visited this pixel
