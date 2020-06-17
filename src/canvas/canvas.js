@@ -367,7 +367,8 @@ document.body.onmouseup = event => { mouseDown = false; } //finish(event); } // 
 window.addEventListener('resize', e => {
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     setCanvasSize();
-    clearCanvas();
+    context.fillStyle = 'white';
+    context.fillRect(0, 0, canvas.width, canvas.height);  
     context.putImageData(imageData, 0, 0);
 });
 
@@ -430,19 +431,16 @@ function pushImage(stack) {
 let undo = () => {
     if (undoStack.length > 0) {
         const imageData = undoStack.pop();
-        // clearCanvas();
         pushImage(redoStack);
         context.putImageData(imageData, 0, 0);
-        // redoQueue.push(currentImage);
-    
     }
 }
 
+// maybe push the contents of the redo stack to the undo stack once we start drawing somehting
 let redo = () => {
     // if (!redoQueue.isEmpty()) {
     if (redoStack.length > 0) {
         const imageData = redoStack.pop();
-        // clearCanvas();
         pushImage(undoStack);
         context.putImageData(imageData, 0, 0);
         
