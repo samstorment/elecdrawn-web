@@ -31,6 +31,7 @@ const createWindow = () => {
             instead these paramters default to the current mouse position at the point of clicking  */        
         menu.popup(mainWindow, 0, 30);
     });
+
 };
 
 // This method will be called when Electron has finished

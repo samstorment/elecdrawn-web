@@ -2,6 +2,17 @@ import { Rectangle, Ellipse, Polygon } from './shape.js';
 import { getMousePosition } from './util.js';
 import { floodFill } from './fill.js';
 import { getPixelColor } from './color.js';
+import Queue from '../data-structures/queue.js'
+const { ipcRenderer } = require('electron');
+
+// starting mouse x and y coordinates when we draw squares, circles, etc 
+let startX = 0;
+let startY = 0;
+let showHover = true;
+let painting = false;
+let mouseDown = false;
+let undoStack = [];
+let redoStack = [];
 
 // CANVAS - this is where drawings will show up
 let canvas = document.querySelector('#canvas');
@@ -20,18 +31,13 @@ function setCanvasSize() {
 
 function initCanvas() {
     setCanvasSize();
-    clearCanvas();
+    context.fillStyle = 'white';
+    context.fillRect(0, 0, canvas.width, canvas.height);  
     clearPreview();
 }
 
 initCanvas();
 
-// starting mouse x and y coordinates when we draw squares, circles, etc 
-let startX = 0;
-let startY = 0;
-let showHover = true;
-let painting = false;
-let mouseDown = false;
 
 // Sidebar buttons
 let brushCheck = document.querySelector('#brush-check');
@@ -48,6 +54,25 @@ let strokePicker = document.querySelector('#stroke-picker');
 let fillPicker = document.querySelector('#fill-picker');
 let fillColor = document.querySelector('#fill-color');
 let strokeSlider = document.querySelector('#stroke-slider');
+let downloadCanvas = document.querySelector('#download-canvas');
+downloadCanvas.addEventListener('click', function (e) {
+    let dataURL = canvas.toDataURL('image/png');
+    downloadCanvas.href = dataURL;
+});
+
+
+
+
+// THIS IS A SLOPPY UNDO AND REDO FOR NOW
+document.onkeydown = function(e) {
+    if (e.ctrlKey) {
+        if (e.key === 'z') { undo(); }
+        if (e.key === 'y') { redo(); }
+    }
+};
+
+
+
 
 // we want to show the hover for the normal hover tools
 let checkBoxes = document.querySelectorAll('.default-hover');
@@ -57,7 +82,7 @@ checkBoxes.forEach(element => {
     });
 });
 
-
+// disable the hover if one of the color pickers is selected
 let colorPickers = document.querySelectorAll('.color-picker');
 colorPickers.forEach(element => {
     element.addEventListener('click', () => {
@@ -69,6 +94,8 @@ colorPickers.forEach(element => {
 // when we start, we need to know the starting coordinates of the shape
 function startRect(event) {
     painting = true;
+    pushImage(undoStack);   // push the current canvas to the undo stack so we can undo
+    redoStack = [];         // reset the redoStack anytime we draw so we can only redo undos
     let { mouseX, mouseY } = getMousePosition(event);
     startX = mouseX;
     startY = mouseY;
@@ -108,6 +135,8 @@ function finishRect(event) {
 // Flood fills the canvas starting at the current mouse position
 function startFill(event) {
 
+    pushImage(undoStack);
+    redoStack = [];
     let { mouseX, mouseY } = getMousePosition(event);
     // pass 128 as the range, seems kinda arbitrary? maybe not
     floodFill(mouseX, mouseY, fillColor.value, context, 128);
@@ -140,7 +169,8 @@ function finishPicker(event) {
 
 function startEllipse(event) {
     painting = true;
-    
+    pushImage(undoStack);
+    redoStack = [];
     let { mouseX, mouseY } = getMousePosition(event);
     startX = mouseX; startY = mouseY;
 
@@ -184,8 +214,10 @@ function finishEllipse(event) {
 
 // set set up the line stroke
 function startBrush(event) {
-    painting = true;
 
+    painting = true;
+    pushImage(undoStack);  
+    redoStack = [];
     setupContext();
 
     draw(event);   // this is just for drawing a single dot
@@ -207,10 +239,13 @@ function drawBrush(event) {
 
 function finishBrush(event) {
     painting = false;
+    // ipcRenderer.send('undo', 'cool');
 }
 
 function startLine(event) {
     painting = true;
+    pushImage(undoStack);
+    redoStack = [];
     let { mouseX, mouseY } = getMousePosition(event);
     startX = mouseX; startY = mouseY;
 
@@ -253,6 +288,8 @@ function finishLine(event) {
 // The RADIAL functions are very similar to the LINE fucntions -- needs fixing
 function startRadialLine(event) {
     painting = true;
+    pushImage(undoStack);
+    redoStack = [];
     let { mouseX, mouseY } = getMousePosition(event);
     startX = mouseX; startY = mouseY;
     setupContext();
@@ -324,7 +361,7 @@ canvas.addEventListener('wheel', checkScrollDirection);
 // this is a bandaid fix, i'd like to make it so that you can keep painting if you leave the window and come back. However, releasing mouse outside of the window lets you keep painting without mouse held.
 document.body.onmouseleave = () => { painting = false; mouseDown = false; clearPreview(); }    
 document.body.onmousedown = () => { mouseDown = true; }
-document.body.onmouseup = event => { mouseDown = false; finish(event); }
+document.body.onmouseup = event => { mouseDown = false; } //finish(event); } // we need to call finish again to draw shapes if mouse goes up off cnavas
 
 // when reducing screen size, any part of the canvas that gets cut off is lost with this approach
 window.addEventListener('resize', e => {
@@ -365,6 +402,7 @@ function scrollIsUp(event) {
 }
 
 function clearCanvas() {
+    pushImage(undoStack);
     context.fillStyle = 'white';
     context.fillRect(0, 0, canvas.width, canvas.height);    
 }
@@ -379,6 +417,36 @@ function setupContext(ctx = context, strokeStyle = strokeColor.value, lineWidth 
     ctx.lineWidth = lineWidth;
     ctx.lineCap = lineCap;
     ctx.fillStyle = fillStyle;
+}
+
+function pushImage(stack) {
+    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    stack.push(imageData);
+}
+
+
+
+// these undo/redos need an upper bound so we don't store infinite undo/redos
+let undo = () => {
+    if (undoStack.length > 0) {
+        const imageData = undoStack.pop();
+        // clearCanvas();
+        pushImage(redoStack);
+        context.putImageData(imageData, 0, 0);
+        // redoQueue.push(currentImage);
+    
+    }
+}
+
+let redo = () => {
+    // if (!redoQueue.isEmpty()) {
+    if (redoStack.length > 0) {
+        const imageData = redoStack.pop();
+        // clearCanvas();
+        pushImage(undoStack);
+        context.putImageData(imageData, 0, 0);
+        
+    }
 }
 
 function showHoverCursor(event) {

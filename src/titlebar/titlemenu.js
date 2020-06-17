@@ -1,4 +1,4 @@
-const { app } = require('electron');
+const { app, ipcMain } = require('electron');
 
 // File button dropdown menu options
 const template = [
@@ -25,7 +25,8 @@ const template = [
     {
         label: 'Undo',
         accelerator: 'CmdOrCtrl+Z',
-        role: 'undo'
+        role: 'undo',
+        click() { undoFunc(); }
     },
     {
         label: 'Redo',
@@ -112,5 +113,10 @@ function saveFile() {
 function openFile() {
     console.log('Hey you clicked the open file button. There\'s nothing to open though');
 }
+
+ipcMain.on('undo', (event, arg) => {
+    console.log('undid');
+});
+
 
 module.exports.template = template;
