@@ -54,19 +54,17 @@
                 <input type="radio" class="sidebar-checkbox" id="fill-check" name="draw-type">
             </div>
 
-            <!-- INSTEAD OF THIS, there should be a picker for both stroke and fill -->
-            <div class="sidebar-row">
-                <label for="picker-check">Picker</label>
-                <input type="radio" class="sidebar-checkbox" id="picker-check" name="draw-type">
-            </div>
+            
 
             <div class="sidebar-row">
-                <label for="stroke-color">Stroke Color</label>
+                <label for="stroke-color">Stroke</label>
+                <input type="radio" class="color-picker" id="stroke-picker" name="draw-type" value="stroke">
                 <input type="color" class="sidebar-button" id="stroke-color" value="#00aadd">
             </div>
 
             <div class="sidebar-row">
-                <label for="fill-color">Fill Color</label>
+                <label for="fill-color">Fill</label>
+                <input type="radio" class="color-picker" id="fill-picker" name="draw-type" value="fill">
                 <input type="color" class="sidebar-button" id="fill-color" value="#ff0034">
             </div>
 

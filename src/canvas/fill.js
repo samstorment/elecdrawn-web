@@ -1,21 +1,21 @@
 import { hexToRGB } from './color.js';
-import Queue from '../data-structures/queue.js';
 
 // Iterative fill
-export function floodFill(ctx, x, y, hexFillColor, range = 1) {
+export function floodFill(startX, startY, hexFillColor, context, range = 1) {
 
     // fillColor needs to be converted to RGB since we get it from color input as a hex val
     let fillColor = hexToRGB(hexFillColor);
 
     // read the pixels in the canvas
-    const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+    const imageData = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
     
     // flags for if we visited a pixel already
     const visited = new Uint8Array(imageData.width, imageData.height);
     
-    // get the color we're filling
-    const targetColor = getPixel(imageData, x, y);
+    // get the color of the first pixel we clicked on
+    const targetColor = getPixel(startX, startY, imageData);
 
+    // if the target color we tried to fill is identical to our fill color, we're done
     if (colorsIdentical(targetColor, fillColor)) { return; }
 
     // check we are actually filling a different color
@@ -23,50 +23,47 @@ export function floodFill(ctx, x, y, hexFillColor, range = 1) {
     
         const rangeSq = range * range;
 
-        // let pixelStack = [ {x: x, y: y} ];
-        let queue = new Queue();
-        queue.push({x: x, y: y});
+        // Stack is a DFS approach. We could also use a queue.
+        let stack = [ {x: startX, y: startY} ];
 
-        // while (pixelStack.length > 0) {
+        while (stack.length > 0) {
 
-        while (!queue.isEmpty()) {
-            // let { x, y } = pixelStack.pop();
-            let { x, y } = queue.pop();
+            // // get the (x, y) coords of pixel at the top of the stack
+            let { x, y } = stack.pop();
             
-            const currentColor = getPixel(imageData, x, y);
+            // get the color data for the pixel at (x, y)
+            const currentColor = getPixel(x, y, imageData); 
 
-            if (!visited[y * imageData.width + x] &&
-                colorsMatch(currentColor, targetColor, rangeSq)) {
-                setPixel(imageData, x, y, fillColor);
-                visited[y * imageData.width + x] = 1;  // mark we were here already
-                // pixelStack.push( { x: x + 1, y: y } );
-                // pixelStack.push( { x: x - 1, y: y } );
-                // pixelStack.push( { x: x, y: y + 1 } );
-                // pixelStack.push( { x: x, y: y - 1 } );
-                queue.push( { x: x + 1, y: y } );
-                queue.push( { x: x - 1, y: y } );
-                queue.push( { x: x, y: y + 1 } );
-                queue.push( { x: x, y: y - 1 } );
+            // if we haven't already visited this pixel AND the current pixel's color matches the targetColor
+            if (!visited[y * imageData.width + x] && colorsMatch(currentColor, targetColor, rangeSq)) {
+                setPixel(x, y, fillColor, imageData);   // color the pixel at (x, y)
+                visited[y * imageData.width + x] = 1;   // mark that we've visited this pixel
+                // push the right, left, top, and bottom pixels to the stack for evaluation
+                stack.push( { x: x + 1, y: y } );       
+                stack.push( { x: x - 1, y: y } );
+                stack.push( { x: x, y: y + 1 } );
+                stack.push( { x: x, y: y - 1 } );
             }
         }
-        ctx.putImageData(imageData, 0, 0);
+        // draw the updated imageData back to the screen
+        context.putImageData(imageData, 0, 0);
     }
 }
 
-
-function getPixel(imageData, x, y) {
-    // if the given x,y are outside of the canvas
+// returns the RGB color array of the pixel at (x, y)
+function getPixel(x, y, imageData) {
+    // if the given (x, y) are outside of the canvas we return an impossible (error) color
     if (x < 0 || y < 0 || x >= imageData.width || y >= imageData.height) {
         return [-1, -1, -1, -1];
     } else {
-        // i'm not 100% sure how the offset works
+        // i'm not 100% sure how the offset works, but it lets us get the RGB array for the single pixel at (x, y)
         const offset = (y * imageData.width + x) * 4;
         return imageData.data.slice(offset, offset + 4);
     }
 }
     
 // set the pixel at the given x,y coordinate to the given color
-function setPixel(imageData, x, y, color) {
+function setPixel(x, y, color, imageData) {
     const offset = (y * imageData.width + x) * 4;
     imageData.data[offset + 0] = color[0];
     imageData.data[offset + 1] = color[1];
@@ -74,16 +71,16 @@ function setPixel(imageData, x, y, color) {
     imageData.data[offset + 3] = color[3];
 }
     
-// returns true if the colors are similiar enough
-function colorsMatch(a, b, rangeSq) {
-    const dr = a[0] - b[0];
-    const dg = a[1] - b[1];
-    const db = a[2] - b[2];
-    const da = a[3] - b[3];
-    return dr * dr + dg * dg + db * db + da * da < rangeSq;
+// returns true if the colors are similiar enough. similiarity is determined by rangeSq
+function colorsMatch(clr1, clr2, rangeSq) {
+    const red = clr1[0] - clr2[0];
+    const green = clr1[1] - clr2[1];
+    const blue = clr1[2] - clr2[2];
+    const alpha = clr1[3] - clr2[3];
+    return red * red + green * green + blue * blue + alpha * alpha < rangeSq;
 }
 
 // returns true if the rgb arrays for both colors are the exact same
-function colorsIdentical(a, b) {
-    return a[0] == b[0] && a[1] == b[1] && a[2] == b[2] && a[3] == b[3];
+function colorsIdentical(clr1, clr2) {
+    return clr1[0] == clr2[0] && clr1[1] == clr2[1] && clr1[2] == clr2[2] && clr1[3] == clr2[3];
 }

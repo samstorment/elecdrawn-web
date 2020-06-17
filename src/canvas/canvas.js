@@ -1,6 +1,7 @@
 import { Rectangle, Ellipse, Polygon } from './shape.js';
 import { getMousePosition } from './util.js';
 import { floodFill } from './fill.js';
+import { getPixelColor } from './color.js';
 
 // CANVAS - this is where drawings will show up
 let canvas = document.querySelector('#canvas');
@@ -25,16 +26,12 @@ function initCanvas() {
 
 initCanvas();
 
-
-
-let showHover = true;
-// let strokeWeight = 15;
-// checks if the mouse is down (we are painting when the mouse is clicked)
-let painting = false;
-let mouseDown = false;
 // starting mouse x and y coordinates when we draw squares, circles, etc 
 let startX = 0;
 let startY = 0;
+let showHover = true;
+let painting = false;
+let mouseDown = false;
 
 // Sidebar buttons
 let brushCheck = document.querySelector('#brush-check');
@@ -44,15 +41,15 @@ let radialCheck = document.querySelector('#radial-check');
 let circleCheck = document.querySelector('#circle-check');
 let fillCheck = document.querySelector('#fill-check');
 fillCheck.addEventListener('click', () => { showHover = false; });
-let pickerCheck = document.querySelector('#picker-check');
-pickerCheck.addEventListener('click', () => { showHover = false; });
 let clearButton = document.querySelector('#canvas-clear');
 clearButton.addEventListener('click', clearCanvas);
 let strokeColor = document.querySelector('#stroke-color');
+let strokePicker = document.querySelector('#stroke-picker');
+let fillPicker = document.querySelector('#fill-picker');
 let fillColor = document.querySelector('#fill-color');
 let strokeSlider = document.querySelector('#stroke-slider');
 
-
+// we want to show the hover for the normal hover tools
 let checkBoxes = document.querySelectorAll('.default-hover');
 checkBoxes.forEach(element => {
     element.addEventListener('click', () => {
@@ -60,6 +57,16 @@ checkBoxes.forEach(element => {
     });
 });
 
+
+let colorPickers = document.querySelectorAll('.color-picker');
+colorPickers.forEach(element => {
+    element.addEventListener('click', () => {
+        showHover = false;
+    });
+});
+
+
+// when we start, we need to know the starting coordinates of the shape
 function startRect(event) {
     painting = true;
     let { mouseX, mouseY } = getMousePosition(event);
@@ -67,6 +74,7 @@ function startRect(event) {
     startY = mouseY;
 }
 
+// draw a rectangle from the start point to whereever the current mouse position is.
 function drawRect(event) {
 
     if (!painting) { return; }
@@ -74,6 +82,7 @@ function drawRect(event) {
     let width = mouseX - startX;
     let height = mouseY - startY;
 
+    // everytime we move our mouse, clear the last rectangle we drew so we only have the most up to date rectangle
     clearPreview();
 
     let rect = new Rectangle(startX, startY, width, height);
@@ -81,9 +90,11 @@ function drawRect(event) {
     rect.drawStroke(strokeSlider.value, strokeColor.value, previewContext);
 }
 
+// do the final draw of the rectangle to the actual canvas from the start coordinates to wherever the mouse was released
 function finishRect(event) {
-    if (!painting) { return; }
-    painting = false;
+    if (!painting) { return; }  // return so we don't draw a rect when we souldn't
+    painting = false;           // when we finish, we are no longer painting
+
     let { mouseX, mouseY } = getMousePosition(event);
     let width = mouseX - startX;
     let height = mouseY - startY;
@@ -93,25 +104,32 @@ function finishRect(event) {
     rect.drawStroke(strokeSlider.value, strokeColor.value, context);
 }
 
-// TODO: implement floodfill
+
+// Flood fills the canvas starting at the current mouse position
 function startFill(event) {
-    painting = true;
+
     let { mouseX, mouseY } = getMousePosition(event);
-    // fill.floodFillRecurse(mouseX, mouseY, startClr, fillClr, canvas, context);
-
-    floodFill(context, mouseX, mouseY, fillColor.value, 128);
-
-    context.beginPath();
-    // clearPreview();
+    // pass 128 as the range, seems kinda arbitrary? maybe not
+    floodFill(mouseX, mouseY, fillColor.value, context, 128);
+    context.beginPath();    // start a new path so we don't mess our other tools don't start at weird spot
 }
 
-function startPicker(event) {
-  // get the color at this specific pixel and use it as the new stroke color
+// changes the 
+function startPicker(event, pickerType) {
+
+    // get the color at this specific pixel and use it as the new stroke color
     let { mouseX, mouseY } = getMousePosition(event);
-    let colorPicked = fill.getPixelColor(mouseX, mouseY, context);
-    strokeColor.value = colorPicked;
-    // update the color of the hover cursor
-    showHoverCursor(event);
+    let colorPicked = getPixelColor(mouseX, mouseY, context);
+
+
+    if (pickerType === 'stroke') { 
+        strokeColor.value = colorPicked; 
+        showHoverCursor(event); // update the color of the hover cursor
+    }
+    else if (pickerType === 'fill') { 
+        fillColor.value = colorPicked; 
+    }
+
 }
 
 function finishPicker(event) {
@@ -126,14 +144,8 @@ function startEllipse(event) {
     let { mouseX, mouseY } = getMousePosition(event);
     startX = mouseX; startY = mouseY;
 
-    // start a new path so we don't draw from old position, rect doesn't need this because it doesn't use stroke to draw
-    // set the linecaps to round so drawing a small circle fills everything
-    context.beginPath();
-    context.lineCap = 'round';
-    context.imageSmoothingEnabled = false;
-
-    previewContext.beginPath();
-    previewContext.lineCap = 'round';
+    setupContext();
+    setupContext(previewContext); 
 }
 
 
@@ -151,10 +163,12 @@ function drawEllipse(event) {
     ellipse.drawFill(fillColor.value, previewContext);
     ellipse.drawStroke(strokeSlider.value, strokeColor.value, previewContext);
 
+    // draw a rectangle around the ellipse so you can see the start and end points
     let rectangle = new Rectangle(startX, startY, width, height);
     rectangle.drawStroke(2, "#000000", previewContext);
 }
 
+// actually draw the final ellipse to the screen
 function finishEllipse(event) {
     if (!painting) { return; }
     painting = false;
@@ -168,17 +182,16 @@ function finishEllipse(event) {
     ellipse.drawStroke(strokeSlider.value, strokeColor.value, context);
 }
 
+// set set up the line stroke
 function startBrush(event) {
     painting = true;
 
-    context.beginPath();    // start a new path so we don't draw from old position
-    context.strokeStyle = strokeColor.value;
-    context.lineWidth = strokeSlider.value;
-    context.lineCap = 'round';
+    setupContext();
 
     draw(event);   // this is just for drawing a single dot
 }
 
+// repeatedly draw a bunch of lines small lines to mimic a single large line
 function drawBrush(event) {
     if (!painting) { return; }
     let { mouseX, mouseY } = getMousePosition(event);
@@ -196,22 +209,13 @@ function finishBrush(event) {
     painting = false;
 }
 
-// TODO: Clean up the LINE and RADIAL functions. Lots of duplicate code that could be modularized
 function startLine(event) {
     painting = true;
     let { mouseX, mouseY } = getMousePosition(event);
     startX = mouseX; startY = mouseY;
 
-    // do all this to context and previeContext to set up preview line and final drawing
-    context.beginPath();
-    context.strokeStyle = strokeColor.value;
-    context.lineWidth = strokeSlider.value;
-    context.lineCap = 'round';  // change this and the preview linecap to square to draw a square line
-
-    previewContext.beginPath();
-    previewContext.strokeStyle = strokeColor.value;
-    previewContext.lineWidth = strokeSlider.value;
-    previewContext.lineCap = 'round';
+    setupContext();
+    setupContext(previewContext);
 }
 
 // every fram draw the line to the previewCanvas
@@ -251,10 +255,7 @@ function startRadialLine(event) {
     painting = true;
     let { mouseX, mouseY } = getMousePosition(event);
     startX = mouseX; startY = mouseY;
-    context.beginPath();
-    context.strokeStyle = strokeColor.value;
-    context.lineWidth = strokeSlider.value;
-    context.lineCap = 'round';
+    setupContext();
     draw(event);
 
 }
@@ -288,7 +289,8 @@ function start(event) {
     else if (radialCheck.checked)   { startRadialLine(event); }
     else if (circleCheck.checked)   { startEllipse(event); }
     else if (fillCheck.checked)     { startFill(event); }
-    else if (pickerCheck.checked)   { startPicker(event); }
+    else if (fillPicker.checked)    { startPicker(event, fillPicker.value); }
+    else if (strokePicker.checked)  { startPicker(event, strokePicker.value); }
 }
 
 function draw(event) {
@@ -308,7 +310,7 @@ function finish(event) {
     else if (lineCheck.checked)     { finishLine(event); }
     else if (radialCheck.checked)   { finishRadialLine(event); }
     else if (circleCheck.checked)   { finishEllipse(event); }
-    else if (pickerCheck.checked)   { finishPicker(event); }
+    else if (fillPicker.checked || strokePicker.checked)   { finishPicker(event); }
 }
 
 // EVENT LISTENERS
@@ -369,6 +371,14 @@ function clearCanvas() {
 
 function clearPreview() {
     previewContext.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+}
+
+function setupContext(ctx = context, strokeStyle = strokeColor.value, lineWidth = strokeSlider.value, lineCap = 'round', fillStyle = fillColor.value) {
+    ctx.beginPath();
+    ctx.strokeStyle = strokeStyle;
+    ctx.lineWidth = lineWidth;
+    ctx.lineCap = lineCap;
+    ctx.fillStyle = fillStyle;
 }
 
 function showHoverCursor(event) {
