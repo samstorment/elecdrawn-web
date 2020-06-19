@@ -2,12 +2,17 @@ import { Rectangle, Ellipse, Polygon } from './shape.js';
 import { getMousePosition } from './util.js';
 import { floodFill } from './fill.js';
 import { getPixelColor } from './color.js';
-import Queue from '../data-structures/queue.js'
-const { ipcRenderer } = require('electron');
 
 // starting mouse x and y coordinates when we draw squares, circles, etc 
 let startX = 0;
 let startY = 0;
+
+let selectDrawn = false;
+let selectedImage;
+let selectRect;
+let drawX = 0;
+let drawY = 0;
+
 let showHover = true;
 let painting = false;
 let mouseDown = false;
@@ -40,6 +45,7 @@ initCanvas();
 
 
 // Sidebar buttons
+let selectCheck = document.querySelector('#select-check');
 let brushCheck = document.querySelector('#brush-check');
 let rectCheck = document.querySelector('#rect-check');
 let lineCheck = document.querySelector('#line-check');
@@ -62,7 +68,6 @@ downloadCanvas.addEventListener('click', function (e) {
 
 
 
-
 // THIS IS A SLOPPY UNDO AND REDO FOR NOW
 document.onkeydown = function(e) {
     if (e.ctrlKey) {
@@ -70,8 +75,6 @@ document.onkeydown = function(e) {
         if (e.key === 'y') { redo(); }
     }
 };
-
-
 
 
 // we want to show the hover for the normal hover tools
@@ -83,12 +86,127 @@ checkBoxes.forEach(element => {
 });
 
 // disable the hover if one of the color pickers is selected
-let colorPickers = document.querySelectorAll('.color-picker');
+let colorPickers = document.querySelectorAll('.no-hover');
 colorPickers.forEach(element => {
     element.addEventListener('click', () => {
         showHover = false;
     });
 });
+
+
+// TODO:    add undo/redo stack to select stuff
+//          fix select so you can start select from any corner
+//          make a background canavs so you don't grab white along with selection
+
+
+function startSelect(event) {
+    painting = true;
+    let { mouseX, mouseY } = getMousePosition(event);
+    startX = mouseX;
+    startY = mouseY;
+
+    // if the select box has been drawn
+    if (selectDrawn) {
+
+         // get the coordinates of the select rectangle
+         let selectStartX = selectRect.startX;
+         let selectStartY = selectRect.startY;
+         let selectEndX = selectStartX + selectRect.width;
+         let selectEndY = selectStartY + selectRect.height;
+ 
+        // if the mouse is not inside the select rect
+        if (!(mouseX > selectStartX && mouseX < selectEndX && mouseY > selectStartY && mouseY < selectEndY)) {
+            selectDrawn = false;
+        }
+
+    }
+   
+}
+
+function drawSelect(event) {
+    if (!painting) { return; }
+    let { mouseX, mouseY } = getMousePosition(event);
+
+    // if the select box is already drawn
+    if (selectDrawn) {
+
+        // get the top left corner coordinates of the select rectangle
+        let selectStartX = selectRect.startX;
+        let selectStartY = selectRect.startY;
+        // subtract the select coords from the initial mouse click coords to set an find the offset from the top left corner
+        let xOffset = startX - selectStartX;
+        let yOffset = startY - selectStartY;
+
+        // we have to draw a white rect at the selectRect's location to prevent creating a duplice. Comment these two lines to see what I mean. We need to add a background canvas layer to solve this.
+        let whiteRect = new Rectangle(selectStartX, selectStartY, selectRect.width, selectRect.height);
+        whiteRect.drawFill('#ffffff', context);
+
+        clearPreview(); // clear preview to update location on each move
+
+        // draw a rect and the selected image at the current mouse position, but account for the initial click's offset
+        let rect = new Rectangle(mouseX - xOffset, mouseY - yOffset, selectRect.width, selectRect.height);
+        rect.drawStroke(2, '#000000', previewContext);
+        previewContext.putImageData(selectedImage, mouseX - xOffset, mouseY - yOffset);
+        
+
+    } else {
+
+        // just draw a preview rect so you know what area you're selecting
+        let width = mouseX - startX;
+        let height = mouseY - startY;
+
+        // everytime we move our mouse, clear the last rectangle we drew so we only have the most up to date rectangle
+        clearPreview();
+
+        let rect = new Rectangle(startX, startY, width, height);
+        rect.drawStroke(1, '#000000', previewContext);
+    }
+}
+
+function finishSelect(event) {
+    if (!painting) { return; }  // return so we don't draw a rect when we souldn't
+    painting = false; 
+    clearPreview();
+
+    let { mouseX, mouseY } = getMousePosition(event);
+    let width = mouseX - startX;
+    let height = mouseY - startY;
+
+    // finish after the initial draw of the select rect
+    if (!selectDrawn) {
+
+        // create a rectangle with the size drawn for the select rect, assing select rect to that rectangle so we can store its attributes.
+        let rect = new Rectangle(startX, startY, width, height);
+        rect.drawStroke(1, '#000000', previewContext);  // we draw the rect to the preview context so the black outline doens't disappear
+        selectRect = rect;
+
+        // some funky stuff going on here. Currently you must have started your select box in the top left corner and finish in the bottom right. I think this accounts for starting anywhere, but else where does not.
+        drawX = startX; drawY = startY;
+        if (startX > mouseX) { drawX = mouseX; }
+        if (startY > mouseY) { drawY = mouseY; }
+
+        // get the image at the selected coords
+        selectedImage = context.getImageData(startX, startY, width, height);
+
+        selectDrawn = true;
+    } 
+    // finish after the select rect has been moved
+    else {
+      
+        // get the top left corner coordinates of the select rectangle
+        let selectStartX = selectRect.startX;
+        let selectStartY = selectRect.startY;
+        // subtract the select coords from the initial mouse click coords to set an find the offset from the top left corner
+        let xOffset = startX - selectStartX;
+        let yOffset = startY - selectStartY;
+
+        // draw the moved rect to the screen
+        context.putImageData(selectedImage, mouseX - xOffset, mouseY - yOffset);
+
+        selectDrawn = false;
+    }
+
+}
 
 
 // when we start, we need to know the starting coordinates of the shape
@@ -321,6 +439,7 @@ function finishRadialLine(event) {
 // MAIN START, DRAW, FINISH
 function start(event) {
     if (brushCheck.checked)         { startBrush(event); }
+    else if (selectCheck.checked)   { startSelect(event); }
     else if (rectCheck.checked)     { startRect(event); }
     else if (lineCheck.checked)     { startLine(event); }
     else if (radialCheck.checked)   { startRadialLine(event); }
@@ -335,6 +454,7 @@ function draw(event) {
     if (!mouseDown)                 { showHoverCursor(event); }
 
     if (brushCheck.checked)         { drawBrush(event); }
+    else if (selectCheck.checked)   { drawSelect(event); }
     else if (rectCheck.checked)     { drawRect(event); } 
     else if (lineCheck.checked)     { drawLine(event); }
     else if (radialCheck.checked)   { drawRadialLine(event); }
@@ -343,6 +463,7 @@ function draw(event) {
 
 function finish(event) {
     if (brushCheck.checked)         { finishBrush(event); }
+    else if (selectCheck.checked)   { finishSelect(event); }
     else if (rectCheck.checked)     { finishRect(event); } 
     else if (lineCheck.checked)     { finishLine(event); }
     else if (radialCheck.checked)   { finishRadialLine(event); }
