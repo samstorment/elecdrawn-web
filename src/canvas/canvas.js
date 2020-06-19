@@ -97,6 +97,8 @@ colorPickers.forEach(element => {
 // TODO:    add undo/redo stack to select stuff
 //          fix select so you can start select from any corner
 //          make a background canavs so you don't grab white along with selection
+//          when selected, clear selection with delete key
+//          keep the select box around selection after we finish moving selection so we can keep moving it if need
 
 
 function startSelect(event) {
