@@ -19,6 +19,9 @@ class Shape {
         context.lineWidth = lineWeight;    
         context.strokeStyle = color;
     }
+
+    // returns true if the given x,y coordinate is inside of the shape
+    isInside(x, y) { }
 }
 
 
@@ -39,6 +42,47 @@ export class Rectangle extends Shape {
     drawStroke(lineWeight, color, context) {
         super.drawStroke(lineWeight, color, context);
         context.strokeRect(this.startX, this.startY, this.width, this.height);
+    }
+
+    // returns the coordinates from top left corner of the rectangle. this is different than normal startX, startY because those could be in any corner
+    getCoords() {
+
+        // assume by default that the rect started in the top left corner
+        let topLeftX = this.startX;
+        let topLeftY = this.startY;
+        let botRightX = this.startX + this.width;
+        let botRightY = this.startY + this.height;
+
+        // if the rectX started to the right
+        if (this.width < 0) { 
+            topLeftX = this.startX + this.width; 
+            botRightX = this.startX;
+        }
+        // if the rect y started to the bottom
+        if (this.height < 0) { 
+            topLeftY = this.startY + this.height; 
+            botRightY = this.startY;
+        }
+
+        // return the normalized coordinates
+        return {
+            topLeftX: topLeftX,
+            topLeftY: topLeftY,
+            botRightX: botRightX,
+            botRightY: botRightY
+        }
+    }
+
+    // returns true if the given (x, y) are inside the rectangle
+    isInside(x, y) { 
+
+        let { topLeftX, topLeftY, botRightX, botRightY } = this.getCoords();
+
+        if (!(x > topLeftX && x < botRightX && y > topLeftY && y < botRightY)) {
+            return false;
+        }
+
+        return true;
     }
 }
 

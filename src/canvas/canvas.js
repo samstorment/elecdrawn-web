@@ -16,6 +16,7 @@ let drawY = 0;
 let showHover = true;
 let painting = false;
 let mouseDown = false;
+let shiftDown = false;
 let undoStack = [];
 let redoStack = [];
 
@@ -69,12 +70,17 @@ downloadCanvas.addEventListener('click', function (e) {
 
 
 // THIS IS A SLOPPY UNDO AND REDO FOR NOW
-document.onkeydown = function(e) {
+document.onkeydown = e => {
     if (e.ctrlKey) {
         if (e.key === 'z') { undo(); }
         if (e.key === 'y') { redo(); }
     }
-};
+    if (e.key === 'Shift') { shiftDown = true; }
+}
+
+document.onkeyup = e => {
+    if (e.key === 'Shift') { shiftDown = false; }
+}
 
 
 // we want to show the hover for the normal hover tools
@@ -95,7 +101,6 @@ colorPickers.forEach(element => {
 
 
 // TODO:    add undo/redo stack to select stuff
-//          fix select so you can start select from any corner
 //          make a background canavs so you don't grab white along with selection
 //          when selected, clear selection with delete key
 //          keep the select box around selection after we finish moving selection so we can keep moving it if need
@@ -107,20 +112,9 @@ function startSelect(event) {
     startX = mouseX;
     startY = mouseY;
 
-    // if the select box has been drawn
-    if (selectDrawn) {
-
-         // get the coordinates of the select rectangle
-         let selectStartX = selectRect.startX;
-         let selectStartY = selectRect.startY;
-         let selectEndX = selectStartX + selectRect.width;
-         let selectEndY = selectStartY + selectRect.height;
- 
-        // if the mouse is not inside the select rect
-        if (!(mouseX > selectStartX && mouseX < selectEndX && mouseY > selectStartY && mouseY < selectEndY)) {
-            selectDrawn = false;
-        }
-
+    // if the select box has been drawn and then we click outside of the select rectangle, the select box is no longer drawn
+    if (selectDrawn && !selectRect.isInside(mouseX, mouseY)) {
+        selectDrawn = false;
     }
    
 }
@@ -132,23 +126,30 @@ function drawSelect(event) {
     // if the select box is already drawn
     if (selectDrawn) {
 
-        // get the top left corner coordinates of the select rectangle
-        let selectStartX = selectRect.startX;
-        let selectStartY = selectRect.startY;
+
+        let { topLeftX, topLeftY, botRightX, botRightY } = selectRect.getCoords();
+
+
+        // we have to get these offsets so we clan click anywhere in the select square to move it.
+        // the rect and image have different offsets because the image always draws from top left and the rect draws from whereever the rect's startX and startY were (which could be any of the four corners)
+
+        // get the top offset from the first mouse click to the rectangle's starting point
+        let rectXOffset = startX - selectRect.startX;
+        let rectYOffset = startY - selectRect.startY;
         // subtract the select coords from the initial mouse click coords to set an find the offset from the top left corner
-        let xOffset = startX - selectStartX;
-        let yOffset = startY - selectStartY;
+        let imageXOffset = startX - topLeftX;
+        let imageYOffset = startY - topLeftY;
 
         // we have to draw a white rect at the selectRect's location to prevent creating a duplice. Comment these two lines to see what I mean. We need to add a background canvas layer to solve this.
-        let whiteRect = new Rectangle(selectStartX, selectStartY, selectRect.width, selectRect.height);
+        let whiteRect = new Rectangle(selectRect.startX, selectRect.startY, selectRect.width, selectRect.height);
         whiteRect.drawFill('#ffffff', context);
 
         clearPreview(); // clear preview to update location on each move
 
         // draw a rect and the selected image at the current mouse position, but account for the initial click's offset
-        let rect = new Rectangle(mouseX - xOffset, mouseY - yOffset, selectRect.width, selectRect.height);
+        let rect = new Rectangle(mouseX - rectXOffset, mouseY - rectYOffset, selectRect.width, selectRect.height);
         rect.drawStroke(2, '#000000', previewContext);
-        previewContext.putImageData(selectedImage, mouseX - xOffset, mouseY - yOffset);
+        previewContext.putImageData(selectedImage, mouseX - imageXOffset, mouseY - imageYOffset);
         
 
     } else {
@@ -195,15 +196,12 @@ function finishSelect(event) {
     // finish after the select rect has been moved
     else {
       
-        // get the top left corner coordinates of the select rectangle
-        let selectStartX = selectRect.startX;
-        let selectStartY = selectRect.startY;
-        // subtract the select coords from the initial mouse click coords to set an find the offset from the top left corner
-        let xOffset = startX - selectStartX;
-        let yOffset = startY - selectStartY;
-
-        // draw the moved rect to the screen
-        context.putImageData(selectedImage, mouseX - xOffset, mouseY - yOffset);
+        // get the coords of the select rect
+        let { topLeftX, topLeftY, botRightX, botRightY } = selectRect.getCoords();
+        // subtract the select coords from the initial mouse click coords to find the offset from the top left corner
+        let imageXOffset = startX - topLeftX;
+        let imageYOffset = startY - topLeftY;
+        context.putImageData(selectedImage, mouseX - imageXOffset, mouseY - imageYOffset);
 
         selectDrawn = false;
     }
@@ -228,6 +226,17 @@ function drawRect(event) {
     let { mouseX, mouseY } = getMousePosition(event);
     let width = mouseX - startX;
     let height = mouseY - startY;
+    
+    // if shift is down wee need to draw a perfect square
+    let maxLength;
+    if (shiftDown) {
+        // get the max value of the width and height. Abs because we want the pure width and height, not relative to the startX,y
+        maxLength = Math.max(Math.abs(width), Math.abs(height));
+        width = maxLength; height = maxLength;
+        // multiply by -1 if the original width/height were negative
+        if (mouseX < startX) { width *= -1; }
+        if (mouseY < startY) { height *= -1; }
+    }
 
     // everytime we move our mouse, clear the last rectangle we drew so we only have the most up to date rectangle
     clearPreview();
@@ -245,6 +254,15 @@ function finishRect(event) {
     let { mouseX, mouseY } = getMousePosition(event);
     let width = mouseX - startX;
     let height = mouseY - startY;
+
+    // if shift is down wee need to draw a perfect square
+    let maxLength;
+    if (shiftDown) {
+        maxLength = Math.max(Math.abs(width), Math.abs(height));
+        width = maxLength; height = maxLength;
+        if (mouseX < startX) { width *= -1; }
+        if (mouseY < startY) { height *= -1; }
+    }
     
     let rect = new Rectangle(startX, startY, width, height);
     rect.drawFill(fillColor.value, context);
@@ -305,6 +323,16 @@ function drawEllipse(event) {
     let width = mouseX - startX;
     let height = mouseY - startY;
 
+
+    // if shift is down wee need to draw a perfect square
+    let maxLength;
+    if (shiftDown) {
+        maxLength = Math.max(Math.abs(width), Math.abs(height));
+        width = maxLength; height = maxLength;
+        if (mouseX < startX) { width *= -1; }
+        if (mouseY < startY) { height *= -1; }
+    }
+
     clearPreview(); 
 
     // start points are the direct center of the ellipse
@@ -327,6 +355,16 @@ function finishEllipse(event) {
     let width = mouseX - startX;
     let height = mouseY - startY;
         
+    
+    // if shift is down wee need to draw a perfect square
+    let maxLength;
+    if (shiftDown) {
+        maxLength = Math.max(Math.abs(width), Math.abs(height));
+        width = maxLength; height = maxLength;
+        if (mouseX < startX) { width *= -1; }
+        if (mouseY < startY) { height *= -1; }
+    }
+
     let ellipse = new Ellipse(startX + width/2, startY + height/2, Math.abs(width/2), Math.abs(height/2));
     ellipse.drawFill(fillColor.value, context);
     ellipse.drawStroke(strokeSlider.value, strokeColor.value, context);
