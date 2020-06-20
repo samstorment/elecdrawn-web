@@ -28,21 +28,18 @@ let context = canvas.getContext('2d');
 let previewCanvas = document.querySelector('#preview-canvas');
 let previewContext = previewCanvas.getContext('2d');
 
+let backgroundCanvas = document.querySelector('#background-canvas');
+let backgroundContext = backgroundCanvas.getContext('2d');
+
+
 function setCanvasSize() {
     canvas.height = window.innerHeight - 70;   // subtract 80 to make room for the margin and the buttons
     canvas.width = window.innerWidth - 200 - 40;     // subtract 200 to make room for the sidebar. subtract 40 for padding-left and right
     previewCanvas.height = window.innerHeight - 70; 
     previewCanvas.width = window.innerWidth - 200 - 40; 
+    backgroundCanvas.height = window.innerHeight - 70; 
+    backgroundCanvas.width = window.innerWidth - 200 - 40; 
 }
-
-function initCanvas() {
-    setCanvasSize();
-    context.fillStyle = 'white';
-    context.fillRect(0, 0, canvas.width, canvas.height);  
-    clearPreview();
-}
-
-initCanvas();
 
 
 // Sidebar buttons
@@ -60,13 +57,32 @@ let strokeColor = document.querySelector('#stroke-color');
 let strokePicker = document.querySelector('#stroke-picker');
 let fillPicker = document.querySelector('#fill-picker');
 let fillColor = document.querySelector('#fill-color');
+let backgroundColor = document.querySelector('#background-color');
+backgroundColor.addEventListener('input', () => {
+    backgroundContext.fillStyle = backgroundColor.value;
+    backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
+});
 let strokeSlider = document.querySelector('#stroke-slider');
 let downloadCanvas = document.querySelector('#download-canvas');
 downloadCanvas.addEventListener('click', function (e) {
-    let dataURL = canvas.toDataURL('image/png');
+    // draw the canvas to the background just when we save so eveything from the canvas shows up
+    backgroundContext.drawImage(canvas, 0, 0);
+    let dataURL = backgroundCanvas.toDataURL('image/png');
     downloadCanvas.href = dataURL;
+    backgroundContext.fillStyle = backgroundColor.value;
+    backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
 });
 
+
+
+function initCanvas() {
+    setCanvasSize();
+    backgroundContext.fillStyle = backgroundColor.value;
+    backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
+    clearPreview();
+}
+
+initCanvas();
 
 
 // THIS IS A SLOPPY UNDO AND REDO FOR NOW
@@ -101,10 +117,9 @@ colorPickers.forEach(element => {
 
 
 // TODO:    add undo/redo stack to select stuff
-//          make a background canavs so you don't grab white along with selection
 //          when selected, clear selection with delete key
 //          keep the select box around selection after we finish moving selection so we can keep moving it if need
-
+//          add a copy paste to selection
 
 function startSelect(event) {
     painting = true;
@@ -140,9 +155,9 @@ function drawSelect(event) {
         let imageXOffset = startX - topLeftX;
         let imageYOffset = startY - topLeftY;
 
-        // we have to draw a white rect at the selectRect's location to prevent creating a duplice. Comment these two lines to see what I mean. We need to add a background canvas layer to solve this.
-        let whiteRect = new Rectangle(selectRect.startX, selectRect.startY, selectRect.width, selectRect.height);
-        whiteRect.drawFill('#ffffff', context);
+
+        context.beginPath();
+        context.clearRect(selectRect.startX, selectRect.startY, selectRect.width, selectRect.height);
 
         clearPreview(); // clear preview to update location on each move
 
@@ -201,7 +216,11 @@ function finishSelect(event) {
         // subtract the select coords from the initial mouse click coords to find the offset from the top left corner
         let imageXOffset = startX - topLeftX;
         let imageYOffset = startY - topLeftY;
-        context.putImageData(selectedImage, mouseX - imageXOffset, mouseY - imageYOffset);
+
+        // put the image to the preview context so the background color data doesnt override the main context. comment the next to lines out to see what i mean. 
+        previewContext.putImageData(selectedImage, mouseX - imageXOffset, mouseY - imageYOffset);
+        // take the selection we just put on the preview context and put it to the main context
+        context.drawImage(previewCanvas, 0, 0);
 
         selectDrawn = false;
     }
@@ -528,8 +547,8 @@ document.body.onmouseup = event => { mouseDown = false; } //finish(event); } // 
 window.addEventListener('resize', e => {
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     setCanvasSize();
-    context.fillStyle = 'white';
-    context.fillRect(0, 0, canvas.width, canvas.height);  
+    backgroundContext.fillStyle = backgroundColor.value;
+    backgroundContext.fillRect(0, 0, canvas.width, canvas.height);  
     context.putImageData(imageData, 0, 0);
 });
 
@@ -565,8 +584,7 @@ function scrollIsUp(event) {
 
 function clearCanvas() {
     pushImage(undoStack);
-    context.fillStyle = 'white';
-    context.fillRect(0, 0, canvas.width, canvas.height);    
+    context.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 function clearPreview() {
@@ -585,7 +603,6 @@ function pushImage(stack) {
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     stack.push(imageData);
 }
-
 
 
 // these undo/redos need an upper bound so we don't store infinite undo/redos
