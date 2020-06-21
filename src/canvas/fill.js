@@ -35,8 +35,9 @@ export function floodFill(startX, startY, hexFillColor, context, range = 1) {
             const currentColor = getPixel(x, y, imageData); 
 
             // if we haven't already visited this pixel AND the current pixel's color matches the targetColor
-            // colorsMatch(currentColor, targetColor, rangeSq) causes a problem when you try to fill a very similiar but slightly different color. colorsIdentical() may be better here
-            if (!visited[y * imageData.width + x] && colorsIdentical(currentColor, targetColor)) {
+            // colorsMatch(currentColor, targetColor, rangeSq) causes a problem when you try to fill a very similiar but slightly different color, not exactly sure how to fix.
+            // this problem also comes up when trying to fill some parts of the empty canvas?? Changing colorsMatch to colorsIdentical solves this but the fill is much uglier
+            if (!visited[y * imageData.width + x] && colorsMatch(currentColor, targetColor, rangeSq)) {
                 setPixel(x, y, fillColor, imageData);   // color the pixel at (x, y)
                 visited[y * imageData.width + x] = 1;   // mark that we've visited this pixel
                 // push the right, left, top, and bottom pixels to the stack for evaluation
@@ -78,6 +79,7 @@ function colorsMatch(clr1, clr2, rangeSq) {
     const green = clr1[1] - clr2[1];
     const blue = clr1[2] - clr2[2];
     const alpha = clr1[3] - clr2[3];
+
     return red * red + green * green + blue * blue + alpha * alpha < rangeSq;
 }
 

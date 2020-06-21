@@ -440,17 +440,26 @@ function drawLine(event) {
     if (!painting) { return; }
     let { mouseX, mouseY } = getMousePosition(event);
 
+    let width = mouseX - startX;    let height = mouseY - startY;
+    let drawToX = mouseX;           let drawToY = mouseY;
+
+    // if shift is down, draw a straight line
+    if (shiftDown) {
+        if (Math.abs(width) > Math.abs(height)) { drawToY = startY; } 
+        else                                    { drawToX = startX; }
+    }
+
     // clear the preview when the mouse moves
     clearPreview();
 
-    // move the line start point to (startX, startY) then draw a line to the current mouse position
+    // move the line start point to (startX, startY) then draw a line to the current drawTo position
     previewContext.moveTo(startX, startY);
-    previewContext.lineTo(mouseX, mouseY);
+    previewContext.lineTo(drawToX, drawToY);
     previewContext.stroke();
 
     // Need these so that the preview just draws a single line each time we move rather than all of them
     previewContext.beginPath();
-    previewContext.moveTo(mouseX, mouseY);
+    previewContext.moveTo(drawToX, drawToY);
 }
 
 // draw the final line once the mouse releases
@@ -458,10 +467,20 @@ function finishLine(event) {
     if (!painting) { return; }
     painting = false;
     let { mouseX, mouseY } = getMousePosition(event);
-    // always draw the line from the start coordinates
+    let width = mouseX - startX;    let height = mouseY - startY;
+    let drawToX = mouseX;           let drawToY = mouseY;
+
+    // if shift is down, draw a straight line
+    if (shiftDown) {
+        if (Math.abs(width) > Math.abs(height)) { drawToY = startY; } 
+        else                                    { drawToX = startX; }
+    }
+
+    // move the line start point to (startX, startY) then draw a line to the current drawTo position
     context.moveTo(startX, startY);
-    context.lineTo(mouseX, mouseY);
+    context.lineTo(drawToX, drawToY);
     context.stroke();
+
     clearPreview(); // clear the preview after drawing the last line in case we finish the line off canvas
 }
 
