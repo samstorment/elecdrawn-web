@@ -8,10 +8,9 @@ let startX = 0;
 let startY = 0;
 
 let selectDrawn = false;
+let selectFinished = false;
 let selectedImage;
 let selectRect;
-let drawX = 0;
-let drawY = 0;
 
 let showHover = true;
 let painting = false;
@@ -85,6 +84,10 @@ function initCanvas() {
 initCanvas();
 
 
+context.font = 'bold 48px serif';
+context.strokeText("Gabby is cool", 200, 200);
+
+
 // THIS IS A SLOPPY UNDO AND REDO FOR NOW
 document.onkeydown = e => {
     if (e.ctrlKey) {
@@ -116,7 +119,7 @@ colorPickers.forEach(element => {
 });
 
 
-// TODO:    add undo/redo stack to select stuff
+// TODO:
 //          when selected, clear selection with delete key
 //          keep the select box around selection after we finish moving selection so we can keep moving it if need
 //          add a copy paste to selection
@@ -130,6 +133,9 @@ function startSelect(event) {
     // if the select box has been drawn and then we click outside of the select rectangle, the select box is no longer drawn
     if (selectDrawn && !selectRect.isInside(mouseX, mouseY)) {
         selectDrawn = false;
+        selectFinished = true;
+        // pop the save we made off of the stack since we didn't do anything with it
+        undoStack.pop();
     }
    
 }
@@ -141,9 +147,7 @@ function drawSelect(event) {
     // if the select box is already drawn
     if (selectDrawn) {
 
-
         let { topLeftX, topLeftY, botRightX, botRightY } = selectRect.getCoords();
-
 
         // we have to get these offsets so we clan click anywhere in the select square to move it.
         // the rect and image have different offsets because the image always draws from top left and the rect draws from whereever the rect's startX and startY were (which could be any of the four corners)
@@ -155,7 +159,7 @@ function drawSelect(event) {
         let imageXOffset = startX - topLeftX;
         let imageYOffset = startY - topLeftY;
 
-
+        // draw a clearRect at the exact spot where we picked up our selection so we dont copy it. Remove these 2 lines and we'll create a copy
         context.beginPath();
         context.clearRect(selectRect.startX, selectRect.startY, selectRect.width, selectRect.height);
 
@@ -198,13 +202,12 @@ function finishSelect(event) {
         rect.drawStroke(1, '#000000', previewContext);  // we draw the rect to the preview context so the black outline doens't disappear
         selectRect = rect;
 
-        // some funky stuff going on here. Currently you must have started your select box in the top left corner and finish in the bottom right. I think this accounts for starting anywhere, but else where does not.
-        drawX = startX; drawY = startY;
-        if (startX > mouseX) { drawX = mouseX; }
-        if (startY > mouseY) { drawY = mouseY; }
-
         // get the image at the selected coords
         selectedImage = context.getImageData(startX, startY, width, height);
+
+        // push the current canvas state to the stack
+        pushImage(undoStack);
+        redoStack = [];
 
         selectDrawn = true;
     } 
@@ -221,7 +224,9 @@ function finishSelect(event) {
         previewContext.putImageData(selectedImage, mouseX - imageXOffset, mouseY - imageYOffset);
         // take the selection we just put on the preview context and put it to the main context
         context.drawImage(previewCanvas, 0, 0);
-
+        
+        clearPreview(); // clear the preview so the selection we made doesn't linger
+        
         selectDrawn = false;
     }
 
@@ -564,9 +569,9 @@ function paintOnEnter() {
     }
 }
 
-// when we leave the canvas, clear the preview hover unless we are still painting
+// when we leave the canvas, clear the preview hover unless we are still painting. select drawn becomes false so we can't select and move an invisible selection
 function clearOnLeave() {
-    if (!painting) { clearPreview(); } 
+    if (!painting) { clearPreview(); selectDrawn = false; } 
 }
 
 // change the stroke weight based on scroll direction
