@@ -253,19 +253,18 @@ function startLasso(event) {
     redoStack = [];
 
     let { mouseX, mouseY } = getMousePosition(event);
+    startX = mouseX; startY = mouseY;
 
+    setupContext(context, 'black', 1);  // draw a thin black line for the lasso
+    
     // seems like this conditional is correct only for the first click
-    if (lassoDrawn)  {
-        if (!context.isPointInPath(mouseX, mouseY)) {
-            console.log("You clicked outside the lasso dog");
-            // lassoDrawn = false;
-            // return;
-        }
+    if (lassoDrawn && !context.isPointInPath(mouseX, mouseY))  {
+        lassoDrawn = false;
+        return;
     }
 
     // context.save(); // save the current context since clip changes the context to only the area inside the clip
 
-    setupContext(context, 'black', .5);  // draw a thin black line for the lasso
 }
 
 // repeatedly draw a bunch of lines small lines to mimic a single large line
@@ -273,7 +272,6 @@ function drawLasso(event) {
     if (!painting) { return; }
     if (lassoDrawn) { return; }     // testing
 
-    console.log('drawing');
     let { mouseX, mouseY } = getMousePosition(event);
 
     // Normal brush draw from last path position to current position
@@ -282,21 +280,24 @@ function drawLasso(event) {
 }
 
 function finishLasso(event) {
-    if (lassoDrawn) { return; } // testing
+    if (!painting) { return; }
     painting = false;
 
-    console.log('finished');
+    if (!lassoDrawn) {  // testing
 
-    // draw the final line from last position back to the start
-    context.closePath();
-    context.stroke();
-    // clip the area inside of our drawn line
-    context.clip();
+        // draw the final line from last position back to the start
+        context.closePath();
+        context.stroke();
+        // clip the area inside of our drawn line
+        context.clip();
 
-    lassoDrawn = true;
+        lassoDrawn = true;
 
-    // this line should be called when we are done with our lasso tool. Need to make lasso tool like selection tool so we can drag lasso selection
-    // context.restore();   
+        // this line should be called when we are done with our lasso tool. Need to make lasso tool like selection tool so we can drag lasso selection
+        // context.restore();   
+    } else {
+        lassoDrawn = false;
+    }
 }
 
 
