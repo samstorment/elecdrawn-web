@@ -8,9 +8,10 @@ let startX = 0;
 let startY = 0;
 
 let selectDrawn = false;
-let selectFinished = false;
 let selectedImage;
 let selectRect;
+
+let lassoDrawn = false;
 
 let showHover = true;
 let painting = false;
@@ -43,6 +44,7 @@ function setCanvasSize() {
 
 // Sidebar buttons
 let selectCheck = document.querySelector('#select-check');
+let lassoCheck = document.querySelector('#lasso-check');
 let brushCheck = document.querySelector('#brush-check');
 let rectCheck = document.querySelector('#rect-check');
 let lineCheck = document.querySelector('#line-check');
@@ -88,13 +90,20 @@ context.font = 'bold 48px serif';
 context.strokeText("Gabby is cool", 200, 200);
 
 
-// THIS IS A SLOPPY UNDO AND REDO FOR NOW
+// THIS Sloppy keboard shortcuts for now
 document.onkeydown = e => {
     if (e.ctrlKey) {
         if (e.key === 'z') { undo(); }
         if (e.key === 'y') { redo(); }
     }
     if (e.key === 'Shift') { shiftDown = true; }
+    if (e.key === 'Delete') { 
+        if (selectDrawn) { 
+            context.clearRect(selectRect.startX, selectRect.startY, selectRect.width, selectRect.height); 
+            clearPreview();
+            selectDrawn = false;
+        }
+    }
 }
 
 document.onkeyup = e => {
@@ -120,9 +129,10 @@ colorPickers.forEach(element => {
 
 
 // TODO:
-//          when selected, clear selection with delete key
 //          keep the select box around selection after we finish moving selection so we can keep moving it if need
 //          add a copy paste to selection
+//          add a rotate tool to selection
+//          add a scale tool to selection
 
 function startSelect(event) {
     painting = true;
@@ -133,7 +143,6 @@ function startSelect(event) {
     // if the select box has been drawn and then we click outside of the select rectangle, the select box is no longer drawn
     if (selectDrawn && !selectRect.isInside(mouseX, mouseY)) {
         selectDrawn = false;
-        selectFinished = true;
         // pop the save we made off of the stack since we didn't do anything with it
         undoStack.pop();
     }
@@ -231,6 +240,70 @@ function finishSelect(event) {
     }
 
 }
+
+
+
+// TODO:
+//      end lasso when click outside of lasso area. maybe do something like if (mouseX, mouse)
+//      
+function startLasso(event) {
+
+    painting = true;
+    pushImage(undoStack);  
+    redoStack = [];
+
+    let { mouseX, mouseY } = getMousePosition(event);
+
+    // seems like this conditional is correct only for the first click
+    if (lassoDrawn)  {
+        if (!context.isPointInPath(mouseX, mouseY)) {
+            console.log("You clicked outside the lasso dog");
+            // lassoDrawn = false;
+            // return;
+        }
+    }
+
+    // context.save(); // save the current context since clip changes the context to only the area inside the clip
+
+    setupContext(context, 'black', .5);  // draw a thin black line for the lasso
+}
+
+// repeatedly draw a bunch of lines small lines to mimic a single large line
+function drawLasso(event) {
+    if (!painting) { return; }
+    if (lassoDrawn) { return; }     // testing
+
+    console.log('drawing');
+    let { mouseX, mouseY } = getMousePosition(event);
+
+    // Normal brush draw from last path position to current position
+    context.lineTo(mouseX, mouseY);
+    context.stroke();
+}
+
+function finishLasso(event) {
+    if (lassoDrawn) { return; } // testing
+    painting = false;
+
+    console.log('finished');
+
+    // draw the final line from last position back to the start
+    context.closePath();
+    context.stroke();
+    // clip the area inside of our drawn line
+    context.clip();
+
+    lassoDrawn = true;
+
+    // this line should be called when we are done with our lasso tool. Need to make lasso tool like selection tool so we can drag lasso selection
+    // context.restore();   
+}
+
+
+
+
+
+
 
 
 // when we start, we need to know the starting coordinates of the shape
@@ -523,6 +596,7 @@ function finishRadialLine(event) {
 function start(event) {
     if (brushCheck.checked)         { startBrush(event); }
     else if (selectCheck.checked)   { startSelect(event); }
+    else if (lassoCheck.checked)    { startLasso(event); }
     else if (rectCheck.checked)     { startRect(event); }
     else if (lineCheck.checked)     { startLine(event); }
     else if (radialCheck.checked)   { startRadialLine(event); }
@@ -538,6 +612,7 @@ function draw(event) {
 
     if (brushCheck.checked)         { drawBrush(event); }
     else if (selectCheck.checked)   { drawSelect(event); }
+    else if (lassoCheck.checked)    { drawLasso(event); }
     else if (rectCheck.checked)     { drawRect(event); } 
     else if (lineCheck.checked)     { drawLine(event); }
     else if (radialCheck.checked)   { drawRadialLine(event); }
@@ -547,6 +622,7 @@ function draw(event) {
 function finish(event) {
     if (brushCheck.checked)         { finishBrush(event); }
     else if (selectCheck.checked)   { finishSelect(event); }
+    else if (lassoCheck.checked)    { finishLasso(event); }
     else if (rectCheck.checked)     { finishRect(event); } 
     else if (lineCheck.checked)     { finishLine(event); }
     else if (radialCheck.checked)   { finishRadialLine(event); }
