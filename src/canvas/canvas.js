@@ -11,7 +11,14 @@ let selectDrawn = false;
 let selectedImage;
 let selectRect;
 
+let clips = [];
 let lassoDrawn = false;
+let lassoCoords = {
+    topLeftX: 100000,
+    topLeftY: 100000,
+    botRightX: 100000,
+    botRightY: 1000000
+}
 
 let showHover = true;
 let painting = false;
@@ -245,7 +252,7 @@ function finishSelect(event) {
 
 // TODO:
 //      end lasso when click outside of lasso area. maybe do something like if (mouseX, mouse)
-//      
+//      make lasso selectable
 function startLasso(event) {
 
     painting = true;
@@ -256,10 +263,10 @@ function startLasso(event) {
     startX = mouseX; startY = mouseY;
 
     setupContext(context, 'black', 1);  // draw a thin black line for the lasso
-    
+
     // seems like this conditional is correct only for the first click
     if (lassoDrawn && !context.isPointInPath(mouseX, mouseY))  {
-        lassoDrawn = false;
+        // lassoDrawn = false;
         return;
     }
 
@@ -270,13 +277,36 @@ function startLasso(event) {
 // repeatedly draw a bunch of lines small lines to mimic a single large line
 function drawLasso(event) {
     if (!painting) { return; }
-    if (lassoDrawn) { return; }     // testing
 
     let { mouseX, mouseY } = getMousePosition(event);
 
-    // Normal brush draw from last path position to current position
-    context.lineTo(mouseX, mouseY);
-    context.stroke();
+    if (lassoDrawn) {  
+
+        // clearPreview();
+
+        let { topLeftX, topLeftY, botRightX, botRightY } = lassoCoords;
+
+        // subtract the select coords from the initial mouse click coords to set an find the offset from the top left corner
+        let imageXOffset = startX - topLeftX;
+        let imageYOffset = startY - topLeftY;
+
+        // this does seem to draw the clipped image, but it keeps updating and draws over itself. Tried to draw the canvas to the preview but that gets things even outside of the clip
+        drawClippedImgAtXY(canvas, clips, mouseX - imageXOffset, mouseY - imageYOffset);
+        
+    } else {
+        clips.push( {x: mouseX, y: mouseY} );
+
+        // this finds the lowest and highest y and y values in our lasso
+        if (mouseX < lassoCoords.topLeftX) { lassoCoords.topLeftX = mouseX; }
+        if (mouseX > lassoCoords.botRightX) { lassoCoords.botRightX = mouseX; }
+        if (mouseY < lassoCoords.topLeftY) { lassoCoords.topLeftY = mouseY; }
+        if (mouseY > lassoCoords.botRightY) { lassoCoords.botRightY = mouseY; }
+    
+        // Normal brush draw from last path position to current position
+        context.lineTo(mouseX, mouseY);
+        context.stroke();
+    }
+
 }
 
 function finishLasso(event) {
@@ -288,7 +318,7 @@ function finishLasso(event) {
         // draw the final line from last position back to the start
         context.closePath();
         context.stroke();
-        // clip the area inside of our drawn line
+        // clip the area inside of our drawn line. remove this line to draw the clip anywhere on canvas.
         context.clip();
 
         lassoDrawn = true;
@@ -299,6 +329,38 @@ function finishLasso(event) {
         lassoDrawn = false;
     }
 }
+
+
+// this does draw the clipped area at the 
+function drawClippedImgAtXY(img, clipPts, x ,y) {
+
+    // var minX=10000000;
+    // var minY=10000000;
+
+    // for(var i = 0; i < clipPts.length; i++){
+    //     var pt=clipPts[i];
+    //     if(pt.x<minX){minX=pt.x;}
+    //     if(pt.y<minY){minY=pt.y;}
+    // }
+
+    let minX = lassoCoords.topLeftX;
+    let minY = lassoCoords.topLeftY;
+
+    context.save();
+    context.translate(-minX + x, -minY + y);
+    context.moveTo(clipPts[0].x,clipPts[0].y);
+
+    for(var i=1;i<clipPts.length;i++){
+        context.lineTo(clipPts[i].x,clipPts[i].y);
+    }
+
+    context.clip();
+    context.drawImage(img,0,0);
+    context.restore();  
+}
+
+
+
 
 
 
