@@ -87,7 +87,7 @@ function initCanvas() {
     setCanvasSize();
     backgroundContext.fillStyle = backgroundColor.value;
     backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
-    clearPreview();
+    clearContext(previewContext);
 }
 
 initCanvas();
@@ -107,7 +107,7 @@ document.onkeydown = e => {
     if (e.key === 'Delete') { 
         if (selectDrawn) { 
             context.clearRect(selectRect.startX, selectRect.startY, selectRect.width, selectRect.height); 
-            clearPreview();
+            clearContext(previewContext);
             selectDrawn = false;
         }
     }
@@ -179,7 +179,7 @@ function drawSelect(event) {
         context.beginPath();
         context.clearRect(selectRect.startX, selectRect.startY, selectRect.width, selectRect.height);
 
-        clearPreview(); // clear preview to update location on each move
+        clearContext(previewContext); // clear preview to update location on each move
 
         // draw a rect and the selected image at the current mouse position, but account for the initial click's offset
         let rect = new Rectangle(mouseX - rectXOffset, mouseY - rectYOffset, selectRect.width, selectRect.height);
@@ -194,7 +194,7 @@ function drawSelect(event) {
         let height = mouseY - startY;
 
         // everytime we move our mouse, clear the last rectangle we drew so we only have the most up to date rectangle
-        clearPreview();
+        clearContext(previewContext);
 
         let rect = new Rectangle(startX, startY, width, height);
         rect.drawStroke(1, '#000000', previewContext);
@@ -204,7 +204,7 @@ function drawSelect(event) {
 function finishSelect(event) {
     if (!painting) { return; }  // return so we don't draw a rect when we souldn't
     painting = false; 
-    clearPreview();
+    clearContext(previewContext);
 
     let { mouseX, mouseY } = getMousePosition(event);
     let width = mouseX - startX;
@@ -241,7 +241,7 @@ function finishSelect(event) {
         // take the selection we just put on the preview context and put it to the main context
         context.drawImage(previewCanvas, 0, 0);
         
-        clearPreview(); // clear the preview so the selection we made doesn't linger
+        clearContext(previewContext); // clear the preview so the selection we made doesn't linger
         
         selectDrawn = false;
     }
@@ -251,8 +251,8 @@ function finishSelect(event) {
 
 
 // TODO:
-//      end lasso when click outside of lasso area. maybe do something like if (mouseX, mouse)
-//      make lasso selectable
+//      end lasso when click outside of lasso area.
+//      clear the initial lasso selection when we start moving the selection
 function startLasso(event) {
 
     painting = true;
@@ -262,15 +262,16 @@ function startLasso(event) {
     let { mouseX, mouseY } = getMousePosition(event);
     startX = mouseX; startY = mouseY;
 
-    setupContext(context, 'black', 1);  // draw a thin black line for the lasso
+    setupContext(previewContext, 'black', 1);
+    setupContext(context, 'black', 1);
 
-    // seems like this conditional is correct only for the first click
-    if (lassoDrawn && !context.isPointInPath(mouseX, mouseY))  {
-        // lassoDrawn = false;
-        return;
-    }
+    // save the state of the main canvas before we draw the lasso line. This lets us restore the canvas without the lasso line
+    // At this point we should probably move the canvas to a ghost canvas so we can pull drawImage from the ghost canvas and clear the main cnavas on each draw frame. (Like the selection tool)
+    if (!lassoDrawn) { selectedImage = context.getImageData(0, 0, canvas.width, canvas.height); }
 
-    // context.save(); // save the current context since clip changes the context to only the area inside the clip
+    // we need some conditional to here to actually check if the click is in the clipped area
+    // if (lassoDrawn && !previewContext.isPointInPath(mouseX, mouseY))  { lassoDrawn = false; }
+  
 
 }
 
@@ -282,17 +283,19 @@ function drawLasso(event) {
 
     if (lassoDrawn) {  
 
-        // clearPreview();
+        // clear the preview on each frame we draw
+        clearContext(previewContext);
 
+        // get the coords of the rectangle surrounding the lasso'd selection
         let { topLeftX, topLeftY, botRightX, botRightY } = lassoCoords;
 
         // subtract the select coords from the initial mouse click coords to set an find the offset from the top left corner
         let imageXOffset = startX - topLeftX;
         let imageYOffset = startY - topLeftY;
 
-        // this does seem to draw the clipped image, but it keeps updating and draws over itself. Tried to draw the canvas to the preview but that gets things even outside of the clip
-        drawClippedImgAtXY(canvas, clips, mouseX - imageXOffset, mouseY - imageYOffset);
-        
+        // draw the clipped image of the canvas to the given the current mouse positions - offsets
+        drawClippedImgAtXY(canvas, previewContext, clips, mouseX - imageXOffset, mouseY - imageYOffset);
+
     } else {
         clips.push( {x: mouseX, y: mouseY} );
 
@@ -312,51 +315,65 @@ function drawLasso(event) {
 function finishLasso(event) {
     if (!painting) { return; }
     painting = false;
+    let { mouseX, mouseY } = getMousePosition(event);
 
-    if (!lassoDrawn) {  // testing
+    // line draw
+    if (!lassoDrawn) {
 
-        // draw the final line from last position back to the start
+        // close the path and draw the final line to the start point
         context.closePath();
-        context.stroke();
-        // clip the area inside of our drawn line. remove this line to draw the clip anywhere on canvas.
-        context.clip();
-
+        context.stroke();    
+        
         lassoDrawn = true;
+    } 
+    // the select and drag
+    else {
 
-        // this line should be called when we are done with our lasso tool. Need to make lasso tool like selection tool so we can drag lasso selection
-        // context.restore();   
-    } else {
+        // reset the context to the point before we drew a lasso line
+        context.putImageData(selectedImage, 0, 0);
+
+        // do one more DRAW call (from above) so we draw the clipped canvas without the lasso line
+        clearContext(previewContext);
+        let { topLeftX, topLeftY, botRightX, botRightY } = lassoCoords;
+        let imageXOffset = startX - topLeftX;
+        let imageYOffset = startY - topLeftY;
+        drawClippedImgAtXY(canvas, previewContext, clips, mouseX - imageXOffset, mouseY - imageYOffset);
+
+        // draw the lasso selection that we've stored on the previewCanvas to the main canvas
+        context.drawImage(previewCanvas, 0, 0);
+        
+        // clear the preview so the selection we made doesn't double up (1 on the canvas, 1 on the preview canvas)
+        clearContext(previewContext); 
+
+        // clear the array of clip points so we dont redraw all of the clipping points - just the current ones
+        clips = [];
+
         lassoDrawn = false;
     }
 }
 
 
 // this does draw the clipped area at the 
-function drawClippedImgAtXY(img, clipPts, x ,y) {
-
-    // var minX=10000000;
-    // var minY=10000000;
-
-    // for(var i = 0; i < clipPts.length; i++){
-    //     var pt=clipPts[i];
-    //     if(pt.x<minX){minX=pt.x;}
-    //     if(pt.y<minY){minY=pt.y;}
-    // }
+function drawClippedImgAtXY(img, ctx, clipPts, x ,y) {
 
     let minX = lassoCoords.topLeftX;
     let minY = lassoCoords.topLeftY;
 
-    context.save();
-    context.translate(-minX + x, -minY + y);
-    context.moveTo(clipPts[0].x,clipPts[0].y);
+    ctx.beginPath();
 
-    for(var i=1;i<clipPts.length;i++){
-        context.lineTo(clipPts[i].x,clipPts[i].y);
+    ctx.save();
+    ctx.translate(-minX + x, -minY + y);
+    ctx.moveTo(clipPts[0].x, clipPts[0].y);
+
+    for(let i = 1; i < clipPts.length; i++) {
+        ctx.lineTo(clipPts[i].x,clipPts[i].y);
     }
 
-    context.clip();
-    context.drawImage(img,0,0);
-    context.restore();  
+    ctx.clip();
+    ctx.drawImage(img, 0, 0);
+    ctx.restore();  
+    ctx.closePath();
+
 }
 
 
@@ -399,7 +416,7 @@ function drawRect(event) {
     }
 
     // everytime we move our mouse, clear the last rectangle we drew so we only have the most up to date rectangle
-    clearPreview();
+    clearContext(previewContext);
 
     let rect = new Rectangle(startX, startY, width, height);
     rect.drawFill(fillColor.value, previewContext);
@@ -493,7 +510,7 @@ function drawEllipse(event) {
         if (mouseY < startY) { height *= -1; }
     }
 
-    clearPreview(); 
+    clearContext(previewContext); 
 
     // start points are the direct center of the ellipse
     // radii are half the width and half the height of a rectangle
@@ -586,7 +603,7 @@ function drawLine(event) {
     }
 
     // clear the preview when the mouse moves
-    clearPreview();
+    clearContext(previewContext);
 
     // move the line start point to (startX, startY) then draw a line to the current drawTo position
     previewContext.moveTo(startX, startY);
@@ -617,7 +634,7 @@ function finishLine(event) {
     context.lineTo(drawToX, drawToY);
     context.stroke();
 
-    clearPreview(); // clear the preview after drawing the last line in case we finish the line off canvas
+    clearContext(previewContext); // clear the preview after drawing the last line in case we finish the line off canvas
 }
 
 
@@ -702,7 +719,7 @@ canvas.addEventListener('mouseleave', clearOnLeave);
 canvas.addEventListener('wheel', checkScrollDirection);
 
 // this is a bandaid fix, i'd like to make it so that you can keep painting if you leave the window and come back. However, releasing mouse outside of the window lets you keep painting without mouse held.
-document.body.onmouseleave = () => { painting = false; mouseDown = false; clearPreview(); }    
+document.body.onmouseleave = () => { painting = false; mouseDown = false; clearContext(previewContext); }    
 document.body.onmousedown = () => { mouseDown = true; }
 document.body.onmouseup = event => { mouseDown = false; } //finish(event); } // we need to call finish again to draw shapes if mouse goes up off cnavas
 
@@ -729,7 +746,7 @@ function paintOnEnter() {
 
 // when we leave the canvas, clear the preview hover unless we are still painting. select drawn becomes false so we can't select and move an invisible selection
 function clearOnLeave() {
-    if (!painting) { clearPreview(); selectDrawn = false; } 
+    if (!painting) { clearContext(previewContext); selectDrawn = false; } 
 }
 
 // change the stroke weight based on scroll direction
@@ -750,8 +767,8 @@ function clearCanvas() {
     context.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-function clearPreview() {
-    previewContext.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+function clearContext(context) {
+    context.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
 }
 
 function setupContext(ctx = context, strokeStyle = strokeColor.value, lineWidth = strokeSlider.value, lineCap = 'round', fillStyle = fillColor.value) {
@@ -796,7 +813,7 @@ function showHoverCursor(event) {
     let { mouseX, mouseY } = getMousePosition(event);
 
     // clear the preview canvas anytime we move, but draw right after
-    clearPreview();
+    clearContext(previewContext);
     previewContext.beginPath();
 
     // if rect is checked, make our hover cursor a square

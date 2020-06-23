@@ -138,4 +138,14 @@ export class Polygon extends Shape {
         // actually put the lines on screen
         context.stroke();
     }
+
+    drawClip(context) {
+        this.points.forEach(element => {
+            context.lineTo(this.startX + element.x, this.startY + element.y);
+        });
+
+        context.closePath();
+        context.clip();
+        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+    }
 }
