@@ -61,6 +61,8 @@ let rectCheck = document.querySelector('#rect-check');
 let lineCheck = document.querySelector('#line-check');
 let radialCheck = document.querySelector('#radial-check');
 let circleCheck = document.querySelector('#circle-check');
+let polygonCheck = document.querySelector('#polygon-check');
+let polygonSides = document.querySelector('#polygon-sides');
 let fillCheck = document.querySelector('#fill-check');
 fillCheck.addEventListener('click', () => { showHover = false; });
 let clearButton = document.querySelector('#canvas-clear');
@@ -415,16 +417,6 @@ function drawClippedImgAtXY(img, ctx, clipPts, x ,y) {
 
 }
 
-
-
-
-
-
-
-
-
-
-
 // when we start, we need to know the starting coordinates of the shape
 function startRect(event) {
     painting = true;
@@ -433,6 +425,8 @@ function startRect(event) {
     let { mouseX, mouseY } = getMousePosition(event);
     startX = mouseX;
     startY = mouseY;
+
+    console.log(startX, startY);
 }
 
 // draw a rectangle from the start point to whereever the current mouse position is.
@@ -586,6 +580,66 @@ function finishEllipse(event) {
     ellipse.drawStroke(strokeSlider.value, strokeColor.value, context);
 }
 
+// this is IDENTICAL to start circle, and probably others. NEED to modularize
+function startPolygon(event) {
+    painting = true;
+    pushImage(undoStack);
+    redoStack = [];
+    let { mouseX, mouseY } = getMousePosition(event);
+    startX = mouseX; startY = mouseY;
+
+    setupContext();
+    setupContext(previewContext); 
+}
+
+function drawPolygon(event) {
+    if (!painting) { return; }
+    let { mouseX, mouseY } = getMousePosition(event);
+    let width = mouseX - startX;
+    let height = mouseY - startY;
+
+    // because we are drawing a PERFECT square around the polygon, width and height will be the same (max of the actual width and height)
+    width = height = Math.max(Math.abs(width), Math.abs(height));
+    // if width or height is actually negative, lets account for that
+    if (mouseX < startX) { width *= -1; }
+    if (mouseY < startY) { height *= -1; }
+    // the radius is half the width (diameter). This will let the polygon flip when we cross the x axis of the start origin
+    let radius = width / 2;
+    
+    // clear on each draw frame
+    clearContext(previewContext); 
+
+    // draw a new polygon originating from the center of the rectangle
+    let poly = new Polygon(startX + width/2, startY + height/2);
+    poly.drawStrokeRegular(polygonSides.value, radius, strokeSlider.value, strokeColor.value, previewContext);
+
+    // draw the outline rectangle
+    let rectangle = new Rectangle(startX, startY, width, height);
+    rectangle.drawStroke(2, "#000000", previewContext);
+}
+
+
+
+function finishPolygon(event) {
+    if (!painting) { return; }
+    painting = false;
+
+    let { mouseX, mouseY } = getMousePosition(event);
+    let width = mouseX - startX;
+    let height = mouseY - startY;
+        
+    width = height = Math.max(Math.abs(width), Math.abs(height));
+    if (mouseX < startX) { width *= -1; }
+    if (mouseY < startY) { height *= -1; }
+    let radius = width / 2;
+
+    let poly = new Polygon(startX + width/2, startY + height/2);
+    poly.drawStrokeRegular(polygonSides.value, radius, strokeSlider.value, strokeColor.value, context);
+}
+
+
+
+
 // set set up the line stroke
 function startBrush(event) {
 
@@ -720,6 +774,7 @@ function start(event) {
     else if (lineCheck.checked)     { startLine(event); }
     else if (radialCheck.checked)   { startRadialLine(event); }
     else if (circleCheck.checked)   { startEllipse(event); }
+    else if (polygonCheck.checked)  { startPolygon(event); }
     else if (fillCheck.checked)     { startFill(event); }
     else if (fillPicker.checked)    { startPicker(event, fillPicker.value); }
     else if (strokePicker.checked)  { startPicker(event, strokePicker.value); }
@@ -736,6 +791,7 @@ function draw(event) {
     else if (lineCheck.checked)     { drawLine(event); }
     else if (radialCheck.checked)   { drawRadialLine(event); }
     else if (circleCheck.checked)   { drawEllipse(event); }
+    else if (polygonCheck.checked)  { drawPolygon(event); }
 }
 
 function finish(event) {
@@ -746,6 +802,7 @@ function finish(event) {
     else if (lineCheck.checked)     { finishLine(event); }
     else if (radialCheck.checked)   { finishRadialLine(event); }
     else if (circleCheck.checked)   { finishEllipse(event); }
+    else if (polygonCheck.checked)  { finishPolygon(event); }
     else if (fillPicker.checked || strokePicker.checked)   { finishPicker(event); }
 }
 

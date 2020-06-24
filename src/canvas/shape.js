@@ -119,7 +119,7 @@ export class Polygon extends Shape {
     // startX and startY here are offsets for the origin. 0, 0 will put the points exactly where you want
     // points is an array of objects where vertices would be placed
     // example triangle: [ {x: 200, y: 300}, {x: 300, y: 300}, {x: 250, y: 100} ]
-    constructor(startX, startY, points) {
+    constructor(startX, startY, points=[]) {
         super(startX, startY);
         this.points = points;
     }
@@ -139,6 +139,7 @@ export class Polygon extends Shape {
         context.stroke();
     }
 
+    // this will clip the regio inside the given set of points, then clear everything inside that region
     drawClip(context) {
         this.points.forEach(element => {
             context.lineTo(this.startX + element.x, this.startY + element.y);
@@ -147,5 +148,23 @@ export class Polygon extends Shape {
         context.closePath();
         context.clip();
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+    }
+
+    // draw the stroke for a REGULAR polygon. One with equilateral side lengths and equiangular interior/exterior angles
+    // radius is the distance from the polygon's center to any of the polygon's vertices
+    drawStrokeRegular(numSides, radius, lineWeight, color, context) {
+        let points = [];
+
+        // find each vertex point for 
+        for (let i = 0; i < numSides; i++) {
+            // find each vertex point for a regular polygon with numSides sides
+            let x = radius * Math.cos(2 * Math.PI * i / numSides);
+            let y = radius * Math.sin(2 * Math.PI * i / numSides);
+            points.push({x: x, y: y});
+        }
+
+        this.points = points;
+
+        this.drawStroke(lineWeight, color, context);
     }
 }

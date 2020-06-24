@@ -106,6 +106,10 @@ body {
     margin: 0px 2px;
 }
 
+.sidebar-number {
+    width: 40px;
+}
+
 .sidebar-slider {
     width: 100px;
 }
