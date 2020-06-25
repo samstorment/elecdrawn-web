@@ -611,7 +611,9 @@ function drawPolygon(event) {
 
     // draw a new polygon originating from the center of the rectangle
     let poly = new Polygon(startX + width/2, startY + height/2);
-    poly.drawStrokeRegular(polygonSides.value, radius, strokeSlider.value, strokeColor.value, previewContext);
+    let points = poly.getRegularPolygon(polygonSides.value, radius);
+    poly.points = points;
+    poly.drawStroke(strokeSlider.value, strokeColor.value, previewContext);
 
     // draw the outline rectangle
     let rectangle = new Rectangle(startX, startY, width, height);
@@ -633,8 +635,11 @@ function finishPolygon(event) {
     if (mouseY < startY) { height *= -1; }
     let radius = height / 2;
 
+    // draw a new polygon originating from the center of the rectangle
     let poly = new Polygon(startX + width/2, startY + height/2);
-    poly.drawStrokeRegular(polygonSides.value, radius, strokeSlider.value, strokeColor.value, context);
+    let points = poly.getRegularPolygon(polygonSides.value, radius);
+    poly.points = points;
+    poly.drawStroke(strokeSlider.value, strokeColor.value, context);
 }
 
 

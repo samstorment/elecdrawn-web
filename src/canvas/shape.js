@@ -150,30 +150,27 @@ export class Polygon extends Shape {
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
     }
 
-    // draw the stroke for a REGULAR polygon. One with equilateral side lengths and equiangular interior/exterior angles
+    // return the points for a REGULAR polygon. One with equilateral side lengths and equiangular interior/exterior angles
     // radius is the distance from the polygon's center to any of the polygon's vertices
-    drawStrokeRegular(numSides, radius, lineWeight, color, context) {
+    getRegularPolygon(numSides, radius) {
         let points = [];
 
-        // find each vertex point for 
         for (let i = 0; i < numSides; i++) {
             // find each vertex point for a regular polygon with numSides sides
             let x = radius * Math.cos(2 * Math.PI * i / numSides) ;
             let y = radius * Math.sin(2 * Math.PI * i / numSides) ;
 
-            // get the interior angle degrees and rotate by 90 - this angle. Think this only works for odd number of side shapes
+            // calculate a rotation for each point so we draw triangles, pentagons, etc with the flat side down
             let interiorAngle = ((numSides - 2) * 180) / numSides;
             let rotationAngle = 90 - interiorAngle;
             let rotatedPoint = this.rotatePoint(x, y, rotationAngle * Math.PI / 180);
             points.push(rotatedPoint);
         }
 
-        this.points = points;
-
-        this.drawStroke(lineWeight, color, context);
+        return points;
     }
 
-    // (x, y) is the point we want to rotate. (cx, cy) is the point we rotate around
+    // return a set of points with a rotation applied
     rotatePoint(x, y, angle){
 
         let s = Math.sin(angle); // angle is in radians
