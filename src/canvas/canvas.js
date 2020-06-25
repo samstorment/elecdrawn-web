@@ -604,7 +604,7 @@ function drawPolygon(event) {
     if (mouseX < startX) { width *= -1; }
     if (mouseY < startY) { height *= -1; }
     // the radius is half the width (diameter). This will let the polygon flip when we cross the x axis of the start origin
-    let radius = width / 2;
+    let radius = height / 2;
     
     // clear on each draw frame
     clearContext(previewContext); 
@@ -631,7 +631,7 @@ function finishPolygon(event) {
     width = height = Math.max(Math.abs(width), Math.abs(height));
     if (mouseX < startX) { width *= -1; }
     if (mouseY < startY) { height *= -1; }
-    let radius = width / 2;
+    let radius = height / 2;
 
     let poly = new Polygon(startX + width/2, startY + height/2);
     poly.drawStrokeRegular(polygonSides.value, radius, strokeSlider.value, strokeColor.value, context);

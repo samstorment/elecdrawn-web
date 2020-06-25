@@ -158,13 +158,31 @@ export class Polygon extends Shape {
         // find each vertex point for 
         for (let i = 0; i < numSides; i++) {
             // find each vertex point for a regular polygon with numSides sides
-            let x = radius * Math.cos(2 * Math.PI * i / numSides);
-            let y = radius * Math.sin(2 * Math.PI * i / numSides);
-            points.push({x: x, y: y});
+            let x = radius * Math.cos(2 * Math.PI * i / numSides) ;
+            let y = radius * Math.sin(2 * Math.PI * i / numSides) ;
+
+            // get the interior angle degrees and rotate by 90 - this angle. Think this only works for odd number of side shapes
+            let interiorAngle = ((numSides - 2) * 180) / numSides;
+            let rotationAngle = 90 - interiorAngle;
+            let rotatedPoint = this.rotatePoint(x, y, rotationAngle * Math.PI / 180);
+            points.push(rotatedPoint);
         }
 
         this.points = points;
 
         this.drawStroke(lineWeight, color, context);
+    }
+
+    // (x, y) is the point we want to rotate. (cx, cy) is the point we rotate around
+    rotatePoint(x, y, angle){
+
+        let s = Math.sin(angle); // angle is in radians
+        let c = Math.cos(angle); // angle is in radians
+
+        // counter-clockwise rotation
+        let xnew = x * c - y * s;
+        let ynew = x * s + y * c;
+
+        return {x: xnew, y: ynew };
     }
 }
