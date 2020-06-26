@@ -157,13 +157,27 @@ function startSelect(event) {
         selectDrawn = false;
         // pop the save we made off of the stack since we didn't do anything with it
         undoStack.pop();
+    } else if (selectDrawn && selectRect.isInside(mouseX, mouseY)) {
+        canvas.style.cursor = 'pointer';
     }
    
 }
 
 function drawSelect(event) {
-    if (!painting) { return; }
+
     let { mouseX, mouseY } = getMousePosition(event);
+
+    // temporary testing for scale tool
+    if (selectDrawn) {
+        let { topLeftX, topLeftY, botRightX, botRightY } = selectRect.getCoords();
+        let scaleTopLeftCorner = new Rectangle(topLeftX - 3, topLeftY - 3, 10, 10);
+        scaleTopLeftCorner.drawFill('red', previewContext);
+        if (scaleTopLeftCorner.isInside(mouseX, mouseY)) { canvas.style.cursor = 'nw-resize'; }
+        else {  canvas.style.cursor = 'default'; }
+    }
+
+
+    if (!painting) { return; }
 
     // if the select box is already drawn
     if (selectDrawn) {
@@ -249,8 +263,9 @@ function finishSelect(event) {
         clearContext(previewContext); // clear the preview so the selection we made doesn't linger
         
         selectDrawn = false;
-    }
 
+        canvas.style.cursor = 'default';
+    }
 }
 
 
@@ -613,6 +628,7 @@ function drawPolygon(event) {
     let poly = new Polygon(startX + width/2, startY + height/2);
     let points = poly.getRegularPolygon(polygonSides.value, radius);
     poly.points = points;
+    poly.drawFill(fillColor.value, previewContext);
     poly.drawStroke(strokeSlider.value, strokeColor.value, previewContext);
 
     // draw the outline rectangle
@@ -639,6 +655,7 @@ function finishPolygon(event) {
     let poly = new Polygon(startX + width/2, startY + height/2);
     let points = poly.getRegularPolygon(polygonSides.value, radius);
     poly.points = points;
+    poly.drawFill(fillColor.value, context);
     poly.drawStroke(strokeSlider.value, strokeColor.value, context);
 }
 

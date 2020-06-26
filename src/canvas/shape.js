@@ -124,30 +124,32 @@ export class Polygon extends Shape {
         this.points = points;
     }
 
-    // can be used to draw a shape with any number of sides
+    drawFill(color, context) {
+        super.drawFill(color, context);
+
+        // draw a line to each point in the array. add the startX and Y to the point for an offset 
+        this.points.forEach(point => {
+            context.lineTo(this.startX + point.x, this.startY + point.y);
+        });
+        
+        // finish the path by drawing a line from end-point of last line to start-point of first line (where we began path)
+        context.closePath()
+        // actually put the lines on screen
+        context.fill();
+    }
+
     drawStroke(lineWeight, color, context) {
         super.drawStroke(lineWeight, color, context);
 
-        // draw a line to each point in the array
-        this.points.forEach(element => {
-            context.lineTo(this.startX + element.x, this.startY + element.y);
+        // draw a line to each point in the array. add the startX and Y to the point for an offset 
+        this.points.forEach(point => {
+            context.lineTo(this.startX + point.x, this.startY + point.y);
         });
         
         // finish the path by drawing a line from end-point of last line to start-point of first line (where we began path)
         context.closePath()
         // actually put the lines on screen
         context.stroke();
-    }
-
-    // this will clip the regio inside the given set of points, then clear everything inside that region
-    drawClip(context) {
-        this.points.forEach(element => {
-            context.lineTo(this.startX + element.x, this.startY + element.y);
-        });
-
-        context.closePath();
-        context.clip();
-        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
     }
 
     // return the points for a REGULAR polygon. One with equilateral side lengths and equiangular interior/exterior angles
@@ -162,7 +164,8 @@ export class Polygon extends Shape {
 
             // calculate a rotation for each point so we draw triangles, pentagons, etc with the flat side down
             let interiorAngle = ((numSides - 2) * 180) / numSides;
-            let rotationAngle = 90 - interiorAngle;
+            let rotationAngle = 90 - interiorAngle;;
+
             let rotatedPoint = this.rotatePoint(x, y, rotationAngle * Math.PI / 180);
             points.push(rotatedPoint);
         }
