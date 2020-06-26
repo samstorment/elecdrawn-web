@@ -10,6 +10,7 @@ let startY = 0;
 let selectDrawn = false;
 let selectedImage;
 let selectRect;
+let scaleClicked = false;
 
 let clips = [];
 let lassoDrawn = false;
@@ -152,14 +153,23 @@ function startSelect(event) {
     startX = mouseX;
     startY = mouseY;
 
-    // if the select box has been drawn and then we click outside of the select rectangle, the select box is no longer drawn
-    if (selectDrawn && !selectRect.isInside(mouseX, mouseY)) {
+    // JUST THIS IF IS NEW SCALE STUFF
+    if (selectDrawn) {
+        // the mouse went down in the red scale rect, lets grab the selected image and prepare to scale it
+        let { topLeftX, topLeftY, botRightX, botRightY } = selectRect.getCoords();
+        let scaleBotRight = new Rectangle(botRightX - 7, botRightY - 7, 10, 10);
+        scaleBotRight.drawFill('red', previewContext);
+        if (scaleBotRight.isInside(mouseX, mouseY)) { 
+            ghostContext.putImageData(selectedImage, topLeftX, topLeftY);
+            scaleClicked = true;
+        }
+    }
+    // if the select box has been drawn and then we click outside of the select rectangle, the select box is no longer drawn 
+    else if (selectDrawn && !selectRect.isInside(mouseX, mouseY)) {
         selectDrawn = false;
         // pop the save we made off of the stack since we didn't do anything with it
         undoStack.pop();
-    } else if (selectDrawn && selectRect.isInside(mouseX, mouseY)) {
-        canvas.style.cursor = 'pointer';
-    }
+    } 
    
 }
 
@@ -167,14 +177,29 @@ function drawSelect(event) {
 
     let { mouseX, mouseY } = getMousePosition(event);
 
-    // temporary testing for scale tool
-    if (selectDrawn) {
+    // SCALE STUFF
+    if (!scaleClicked && selectDrawn) {
+        //  if the mouse is in the red square (the scale area) change the cursor to the scale cursor
         let { topLeftX, topLeftY, botRightX, botRightY } = selectRect.getCoords();
-        let scaleTopLeftCorner = new Rectangle(topLeftX - 3, topLeftY - 3, 10, 10);
-        scaleTopLeftCorner.drawFill('red', previewContext);
-        if (scaleTopLeftCorner.isInside(mouseX, mouseY)) { canvas.style.cursor = 'nw-resize'; }
-        else {  canvas.style.cursor = 'default'; }
+        let scaleBotRight = new Rectangle(botRightX - 7, botRightY - 7, 10, 10);
+        scaleBotRight.drawFill('red', previewContext);
+        if (scaleBotRight.isInside(mouseX, mouseY)) { 
+            canvas.style.cursor = 'se-resize';
+        } else {
+            canvas.style.cursor = 'default';
+        }
     }
+    // if we started our click in the in the scale area, draw the scaled image. this doesnt work!!!!!!
+    if (scaleClicked) {
+        let { topLeftX, topLeftY, botRightX, botRightY } = selectRect.getCoords();
+        console.log('We scalin');
+        clearContext(previewContext);
+        selectRect = new Rectangle(topLeftX, topLeftY, mouseX - topLeftX , mouseY - topLeftY);
+        selectRect.drawStroke(1, 'black', previewContext);
+        previewContext.drawImage(ghostCanvas, topLeftX, topLeftY, canvas.width + mouseX - topLeftX , canvas.height + mouseY - topLeftY);
+        return;
+    }
+    // END SCALE STUFF
 
 
     if (!painting) { return; }
@@ -237,6 +262,13 @@ function finishSelect(event) {
         rect.drawStroke(1, '#000000', previewContext);  // we draw the rect to the preview context so the black outline doens't disappear
         selectRect = rect;
 
+        let { topLeftX, topLeftY, botRightX, botRightY } = selectRect.getCoords();
+
+        // SCALE STUFF
+        let scaleBotRight = new Rectangle(botRightX - 7, botRightY - 7, 10, 10);
+        scaleBotRight.drawFill('red', previewContext);
+        // END
+
         // get the image at the selected coords
         selectedImage = context.getImageData(startX, startY, width, height);
 
@@ -261,9 +293,10 @@ function finishSelect(event) {
         context.drawImage(previewCanvas, 0, 0);
         
         clearContext(previewContext); // clear the preview so the selection we made doesn't linger
-        
         selectDrawn = false;
-
+        
+        // SCALE STUFF
+        scaleClicked = false;
         canvas.style.cursor = 'default';
     }
 }
