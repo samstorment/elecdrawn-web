@@ -153,24 +153,23 @@ function startSelect(event) {
     startX = mouseX;
     startY = mouseY;
 
-    // JUST THIS IF IS NEW SCALE STUFF
+ 
+    // if the select box has been drawn and then we click outside of the select rectangle, the select box is no longer drawn 
     if (selectDrawn) {
-        // the mouse went down in the red scale rect, lets grab the selected image and prepare to scale it
-        let { topLeftX, topLeftY, botRightX, botRightY } = selectRect.getCoords();
-        let scaleBotRight = new Rectangle(botRightX - 7, botRightY - 7, 10, 10);
-        scaleBotRight.drawFill('red', previewContext);
-        if (scaleBotRight.isInside(mouseX, mouseY)) { 
-            ghostContext.putImageData(selectedImage, topLeftX, topLeftY);
+
+        let { topLeft, topRight, botLeft, botRight } = getAnchors(selectRect, 15, 15);
+        let inAnchor = topLeft.isInside(mouseX, mouseY) || topRight.isInside(mouseX, mouseY) || botLeft.isInside(mouseX, mouseY) || botRight.isInside(mouseX, mouseY);
+
+        if (!selectRect.isInside(mouseX, mouseY) && !inAnchor) {
+            console.log('outside');
+            selectDrawn = false;
+            // pop the save we made off of the stack since we didn't do anything with it
+            undoStack.pop();
+        }
+        else if (inAnchor) {
             scaleClicked = true;
         }
-    }
-    // if the select box has been drawn and then we click outside of the select rectangle, the select box is no longer drawn 
-    else if (selectDrawn && !selectRect.isInside(mouseX, mouseY)) {
-        selectDrawn = false;
-        // pop the save we made off of the stack since we didn't do anything with it
-        undoStack.pop();
     } 
-   
 }
 
 function drawSelect(event) {
@@ -179,25 +178,22 @@ function drawSelect(event) {
 
     // SCALE STUFF
     if (!scaleClicked && selectDrawn) {
-        //  if the mouse is in the red square (the scale area) change the cursor to the scale cursor
-        let { topLeftX, topLeftY, botRightX, botRightY } = selectRect.getCoords();
-        let scaleBotRight = new Rectangle(botRightX - 7, botRightY - 7, 10, 10);
-        scaleBotRight.drawFill('red', previewContext);
-        if (scaleBotRight.isInside(mouseX, mouseY)) { 
-            canvas.style.cursor = 'se-resize';
-        } else {
+        let { topLeft, topRight, botLeft, botRight } = getAnchors(selectRect, 15, 15);
+
+        if (topLeft.isInside(mouseX, mouseY) || botRight.isInside(mouseX, mouseY)) {
+            canvas.style.cursor = 'nw-resize';
+        }
+        else if (topRight.isInside(mouseX, mouseY) || botLeft.isInside(mouseX, mouseY)) {
+            canvas.style.cursor = 'ne-resize';
+        }
+        else {
             canvas.style.cursor = 'default';
         }
     }
-    // if we started our click in the in the scale area, draw the scaled image. this doesnt work!!!!!!
+    // if we started our click in the in the scale area, draw the scaled image. THIS IS WHERE we would do scale logic
     if (scaleClicked) {
-        let { topLeftX, topLeftY, botRightX, botRightY } = selectRect.getCoords();
-        console.log('We scalin');
-        clearContext(previewContext);
-        selectRect = new Rectangle(topLeftX, topLeftY, mouseX - topLeftX , mouseY - topLeftY);
-        selectRect.drawStroke(1, 'black', previewContext);
-        previewContext.drawImage(ghostCanvas, topLeftX, topLeftY, canvas.width + mouseX - topLeftX , canvas.height + mouseY - topLeftY);
-        return;
+
+        // return;
     }
     // END SCALE STUFF
 
@@ -262,11 +258,10 @@ function finishSelect(event) {
         rect.drawStroke(1, '#000000', previewContext);  // we draw the rect to the preview context so the black outline doens't disappear
         selectRect = rect;
 
-        let { topLeftX, topLeftY, botRightX, botRightY } = selectRect.getCoords();
-
+      
         // SCALE STUFF
-        let scaleBotRight = new Rectangle(botRightX - 7, botRightY - 7, 10, 10);
-        scaleBotRight.drawFill('red', previewContext);
+        let anchors = getAnchors(selectRect, 15, 15);
+        for (let anchor in anchors) { anchors[anchor].drawFill('red', previewContext); }
         // END
 
         // get the image at the selected coords
@@ -301,6 +296,17 @@ function finishSelect(event) {
     }
 }
 
+
+function getAnchors(rectangle, width, height) {
+    let { topLeftX, topLeftY, botRightX, botRightY } = rectangle.getCoords();
+
+    let topLeft = new Rectangle(topLeftX - width / 2, topLeftY - height / 2, width, height);
+    let topRight = new Rectangle(botRightX - width / 2, topLeftY - height / 2, width, height);
+    let botLeft = new Rectangle(topLeftX - width / 2, botRightY - height / 2, width, height);
+    let botRight = new Rectangle(botRightX - width / 2, botRightY - height / 2, width, height);
+
+    return { topLeft: topLeft, topRight: topRight, botLeft: botLeft, botRight: botRight };
+}
 
 // TODO:
 //      Fx behavior when performing one click with no movement. If you haven't lassod yet, this prevents your next lasso from clearing the canvas when you start moving it. If you have lassod, this draws a duplicate directly on tp of the current canvas, making the lines thicker
