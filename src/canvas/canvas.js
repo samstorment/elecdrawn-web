@@ -158,7 +158,8 @@ function startSelect(event) {
     if (selectDrawn) {
 
         let { topLeft, topRight, botLeft, botRight } = getAnchors(selectRect, 15, 15);
-        let inAnchor = topLeft.isInside(mouseX, mouseY) || topRight.isInside(mouseX, mouseY) || botLeft.isInside(mouseX, mouseY) || botRight.isInside(mouseX, mouseY);
+        let tl = topLeft.isInside(mouseX, mouseY), tr = topRight.isInside(mouseX, mouseY), bl = botLeft.isInside(mouseX, mouseY), br = botRight.isInside(mouseX, mouseY);
+        let inAnchor = tl || tr || bl || br;
 
         if (!selectRect.isInside(mouseX, mouseY) && !inAnchor) {
             console.log('outside');
@@ -168,6 +169,14 @@ function startSelect(event) {
         }
         else if (inAnchor) {
             scaleClicked = true;
+            let { topLeftX, topLeftY, botRightX, botRightY } = selectRect.getCoords();
+            if (tl) { startX = botRightX; startY = botRightY; }
+            else if (tr) { startX = topLeftX; startY = botRightY; }
+            else if (bl) { startX = botRightX; startY = topLeftY; }
+            else if (br) { startX = topLeftX; startY = topLeftY; }
+            ghostCanvas.width = selectedImage.width;
+            ghostCanvas.height = selectedImage.height;
+            ghostContext.putImageData(selectedImage, 0, 0);
         }
     } 
 }
@@ -175,10 +184,12 @@ function startSelect(event) {
 function drawSelect(event) {
 
     let { mouseX, mouseY } = getMousePosition(event);
+    let width = mouseX - startX;
+    let height = mouseY - startY;
 
     // SCALE STUFF
     if (!scaleClicked && selectDrawn) {
-        let { topLeft, topRight, botLeft, botRight } = getAnchors(selectRect, 15, 15);
+        let { topLeft, topRight, botLeft, botRight } = getAnchors(selectRect, 10, 10);
 
         if (topLeft.isInside(mouseX, mouseY) || botRight.isInside(mouseX, mouseY)) {
             canvas.style.cursor = 'nw-resize';
@@ -190,10 +201,29 @@ function drawSelect(event) {
             canvas.style.cursor = 'default';
         }
     }
-    // if we started our click in the in the scale area, draw the scaled image. THIS IS WHERE we would do scale logic
+    // if we started our click in the in the scale area, draw the scaled image.
     if (scaleClicked) {
 
-        // return;
+        // clear the preview each time we re-draw the scaled select rect
+        clearContext(previewContext);
+
+        // clear the context where the select rect was if we start moving
+        context.beginPath();
+        context.clearRect(selectRect.startX, selectRect.startY, selectRect.width, selectRect.height);
+        
+        // draw the scaled select rect image starting from the anchor that we selected
+        previewContext.drawImage(ghostCanvas, startX, startY, width, height);
+        
+        // draw the scale rect
+        let rect = new Rectangle(startX, startY, width, height);
+        rect.drawStroke(1, '#000000', previewContext);
+
+        // draw anchors onto the scale rect
+        let anchors = getAnchors(rect, 10, 10);
+        for (let anchor in anchors) { anchors[anchor].drawFill('red', previewContext); }
+
+        // need to return so we don't reach the code below to drag
+        return;
     }
     // END SCALE STUFF
 
@@ -229,10 +259,6 @@ function drawSelect(event) {
 
     } else {
 
-        // just draw a preview rect so you know what area you're selecting
-        let width = mouseX - startX;
-        let height = mouseY - startY;
-
         // everytime we move our mouse, clear the last rectangle we drew so we only have the most up to date rectangle
         clearContext(previewContext);
 
@@ -242,6 +268,7 @@ function drawSelect(event) {
 }
 
 function finishSelect(event) {
+
     if (!painting) { return; }  // return so we don't draw a rect when we souldn't
     painting = false; 
     clearContext(previewContext);
@@ -249,6 +276,22 @@ function finishSelect(event) {
     let { mouseX, mouseY } = getMousePosition(event);
     let width = mouseX - startX;
     let height = mouseY - startY;
+
+    // if we're dragging the scale
+    if (scaleClicked) {
+        // draw the ghost canvas into the scale rect
+        context.drawImage(ghostCanvas, startX, startY, width, height);
+        // we're finished scaling and selecting
+        scaleClicked = false;
+        selectDrawn = false;
+        // reset cursor, ghost canvas size, and ghost context to default
+        canvas.style.cursor = 'default';
+        ghostCanvas.height = window.innerHeight - 70; 
+        ghostCanvas.width = window.innerWidth - 200 - 40;
+        clearContext(ghostContext);
+        // return so below code is not reached
+        return;
+    }
 
     // finish after the initial draw of the select rect
     if (!selectDrawn) {
@@ -258,11 +301,9 @@ function finishSelect(event) {
         rect.drawStroke(1, '#000000', previewContext);  // we draw the rect to the preview context so the black outline doens't disappear
         selectRect = rect;
 
-      
-        // SCALE STUFF
-        let anchors = getAnchors(selectRect, 15, 15);
+        // draw the red anchor squares onto the the select rect
+        let anchors = getAnchors(selectRect, 10, 10);
         for (let anchor in anchors) { anchors[anchor].drawFill('red', previewContext); }
-        // END
 
         // get the image at the selected coords
         selectedImage = context.getImageData(startX, startY, width, height);
@@ -289,10 +330,6 @@ function finishSelect(event) {
         
         clearContext(previewContext); // clear the preview so the selection we made doesn't linger
         selectDrawn = false;
-        
-        // SCALE STUFF
-        scaleClicked = false;
-        canvas.style.cursor = 'default';
     }
 }
 
