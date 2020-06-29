@@ -25,3 +25,22 @@ export function getMousePosition(event) {
         mouseY: event.clientY - y
     };
 }
+
+// this is a copy paste of above but lets us use any element to get the x and y
+export function getMouse(event, element) {
+
+    // Get the canvas X and Y coordinates so we knwow where to draw
+    let { x, y } = getElementPosition(element);
+
+    return {
+        mouseX: event.clientX - x,   
+        mouseY: event.clientY - y
+    };
+}
+
+// we should move this stuff elsewhere
+export let redoStack = [];
+export let undoStack = [];
+export function clearRedoStack() {
+    redoStack = [];
+}

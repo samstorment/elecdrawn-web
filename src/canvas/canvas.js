@@ -1,7 +1,8 @@
 import { Rectangle, Ellipse, Polygon } from './shape.js';
-import { getMousePosition } from './util.js';
+import { getMousePosition, undoStack, redoStack, clearRedoStack } from './util.js';
 import { floodFill } from './fill.js';
 import { getPixelColor } from './color.js';
+import Brush from '../draw-tools/brush.js';
 
 // starting mouse x and y coordinates when we draw squares, circles, etc 
 let startX = 0;
@@ -25,8 +26,6 @@ let showHover = true;
 let painting = false;
 let mouseDown = false;
 let shiftDown = false;
-let undoStack = [];
-let redoStack = [];
 
 // CANVAS - this is where drawings will show up
 let canvas = document.querySelector('#canvas');
@@ -102,6 +101,10 @@ initCanvas();
 
 context.font = 'bold 48px serif';
 context.strokeText("Gabby is cool", 200, 200);
+
+
+
+let brush = new Brush(context);
 
 
 // THIS Sloppy keboard shortcuts for now
@@ -310,7 +313,7 @@ function finishSelect(event) {
 
         // push the current canvas state to the stack
         pushImage(undoStack);
-        redoStack = [];
+        clearRedoStack();
 
         selectDrawn = true;
     } 
@@ -352,7 +355,7 @@ function startLasso(event) {
 
     painting = true;
     pushImage(undoStack);  
-    redoStack = [];
+    clearRedoStack();
 
     let { mouseX, mouseY } = getMousePosition(event);
     startX = mouseX; startY = mouseY;
@@ -448,7 +451,7 @@ function finishLasso(event) {
         // This lets us draw only inside the clipped region of the canvas (the area we lasso'd). We can clear this area when we begin to move the lasso'd region, without clearing the whole canvas.
         context.clip();
 
-        redoStack = [];
+        clearRedoStack();
         lassoDrawn = true;
     } 
     // the select and drag
@@ -512,7 +515,7 @@ function drawClippedImgAtXY(img, ctx, clipPts, x ,y) {
 function startRect(event) {
     painting = true;
     pushImage(undoStack);   // push the current canvas to the undo stack so we can undo
-    redoStack = [];         // reset the redoStack anytime we draw so we can only redo undos
+    clearRedoStack();         // reset the redoStack anytime we draw so we can only redo undos
     let { mouseX, mouseY } = getMousePosition(event);
     startX = mouseX;
     startY = mouseY;
@@ -575,7 +578,7 @@ function finishRect(event) {
 function startFill(event) {
 
     pushImage(undoStack);
-    redoStack = [];
+    clearRedoStack();
     let { mouseX, mouseY } = getMousePosition(event);
     // pass 128 as the range, seems kinda arbitrary? maybe not
     floodFill(mouseX, mouseY, fillColor.value, context, 128);
@@ -609,7 +612,7 @@ function finishPicker(event) {
 function startEllipse(event) {
     painting = true;
     pushImage(undoStack);
-    redoStack = [];
+    clearRedoStack();
     let { mouseX, mouseY } = getMousePosition(event);
     startX = mouseX; startY = mouseY;
 
@@ -675,7 +678,7 @@ function finishEllipse(event) {
 function startPolygon(event) {
     painting = true;
     pushImage(undoStack);
-    redoStack = [];
+    clearRedoStack();
     let { mouseX, mouseY } = getMousePosition(event);
     startX = mouseX; startY = mouseY;
 
@@ -741,37 +744,42 @@ function finishPolygon(event) {
 // set set up the line stroke
 function startBrush(event) {
 
-    painting = true;
-    pushImage(undoStack);  
-    redoStack = [];
-    setupContext();
+    // painting = true;
+    // pushImage(undoStack);  
+    // clearRedoStack();
+    // setupContext();
 
-    draw(event);   // this is just for drawing a single dot
+    // draw(event);   // this is just for drawing a single dot
+
+    brush.start(event);
+
 }
 
 // repeatedly draw a bunch of lines small lines to mimic a single large line
 function drawBrush(event) {
-    if (!painting) { return; }
-    let { mouseX, mouseY } = getMousePosition(event);
+    // if (!painting) { return; }
+    // let { mouseX, mouseY } = getMousePosition(event);
 
-    // draw a line from your last painting point to your current mouse position
-    context.lineTo(mouseX, mouseY);
-    context.stroke();
+    // // draw a line from your last painting point to your current mouse position
+    // context.lineTo(mouseX, mouseY);
+    // context.stroke();
 
-    // these two lines should make the line less pixelated
-    context.beginPath();
-    context.moveTo(mouseX, mouseY);
+    // // these two lines should make the line less pixelated
+    // context.beginPath();
+    // context.moveTo(mouseX, mouseY);
+
+    brush.draw(event);
 }
 
 function finishBrush(event) {
-    painting = false;
-    // ipcRenderer.send('undo', 'cool');
+    // painting = false;
+    brush.finish(event);
 }
 
 function startLine(event) {
     painting = true;
     pushImage(undoStack);
-    redoStack = [];
+    clearRedoStack();
     let { mouseX, mouseY } = getMousePosition(event);
     startX = mouseX; startY = mouseY;
 
@@ -834,7 +842,7 @@ function finishLine(event) {
 function startRadialLine(event) {
     painting = true;
     pushImage(undoStack);
-    redoStack = [];
+    clearRedoStack();
     let { mouseX, mouseY } = getMousePosition(event);
     startX = mouseX; startY = mouseY;
     setupContext();
@@ -865,7 +873,7 @@ function finishRadialLine(event) {
 // THIS SHIT IS UGLY AND BAD. How do we do it better???
 // MAIN START, DRAW, FINISH
 function start(event) {
-    if (brushCheck.checked)         { startBrush(event); }
+    if (brushCheck.checked)         { brush.start(event, strokeSlider.value, strokeColor.value); }
     else if (selectCheck.checked)   { startSelect(event); }
     else if (lassoCheck.checked)    { startLasso(event); }
     else if (rectCheck.checked)     { startRect(event); }
@@ -882,7 +890,7 @@ function draw(event) {
     // if we are just hovering over the canvas without holding the mouse, show the hover
     if (!mouseDown)                 { showHoverCursor(event); }
 
-    if (brushCheck.checked)         { drawBrush(event); }
+    if (brushCheck.checked)         { brush.draw(event); }
     else if (selectCheck.checked)   { drawSelect(event); }
     else if (lassoCheck.checked)    { drawLasso(event); }
     else if (rectCheck.checked)     { drawRect(event); } 
@@ -893,7 +901,7 @@ function draw(event) {
 }
 
 function finish(event) {
-    if (brushCheck.checked)         { finishBrush(event); }
+    if (brushCheck.checked)         { brush.finish(event); }
     else if (selectCheck.checked)   { finishSelect(event); }
     else if (lassoCheck.checked)    { finishLasso(event); }
     else if (rectCheck.checked)     { finishRect(event); } 
@@ -1004,6 +1012,8 @@ let redo = () => {
 }
 
 function showHoverCursor(event) {
+
+    console.log('wtf');
 
     // just do nothing if show hover is false
     if (!showHover) { return; }
