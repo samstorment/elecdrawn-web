@@ -2,7 +2,11 @@ import { Rectangle, Ellipse, Polygon } from './shape.js';
 import { getMousePosition, undoStack, redoStack, clearRedoStack } from './util.js';
 import { floodFill } from './fill.js';
 import { getPixelColor } from './color.js';
-import Brush from '../draw-tools/brush.js';
+import CanvasState from '../canvas/canvas-state.js';
+import BrushTool from '../draw-tools/brush.js';
+import RectangleTool from '../draw-tools/rectangle.js';
+import EllipseTool from '../draw-tools/ellipse.js';
+import LineTool from '../draw-tools/line.js';
 
 // starting mouse x and y coordinates when we draw squares, circles, etc 
 let startX = 0;
@@ -103,15 +107,18 @@ context.font = 'bold 48px serif';
 context.strokeText("Gabby is cool", 200, 200);
 
 
-
-let brush = new Brush(context);
+// these are the draw tools that have been moved to separate files
+let brush = new BrushTool(context);
+let rect = new RectangleTool(context);
+let ell = new EllipseTool(context);
+let line = new LineTool(context);
 
 
 // THIS Sloppy keboard shortcuts for now
 document.onkeydown = e => {
     if (e.ctrlKey) {
-        if (e.key === 'z') { undo(); }
-        if (e.key === 'y') { redo(); }
+        if (e.key === 'z') { CanvasState.undo(context); }
+        if (e.key === 'y') { CanvasState.redo(context); }
     }
     if (e.key === 'Shift') { shiftDown = true; }
     if (e.key === 'Delete') { 
@@ -511,69 +518,6 @@ function drawClippedImgAtXY(img, ctx, clipPts, x ,y) {
 
 }
 
-// when we start, we need to know the starting coordinates of the shape
-function startRect(event) {
-    painting = true;
-    pushImage(undoStack);   // push the current canvas to the undo stack so we can undo
-    clearRedoStack();         // reset the redoStack anytime we draw so we can only redo undos
-    let { mouseX, mouseY } = getMousePosition(event);
-    startX = mouseX;
-    startY = mouseY;
-
-    console.log(startX, startY);
-}
-
-// draw a rectangle from the start point to whereever the current mouse position is.
-function drawRect(event) {
-
-    if (!painting) { return; }
-    let { mouseX, mouseY } = getMousePosition(event);
-    let width = mouseX - startX;
-    let height = mouseY - startY;
-    
-    // if shift is down wee need to draw a perfect square
-    let maxLength;
-    if (shiftDown) {
-        // get the max value of the width and height. Abs because we want the pure width and height, not relative to the startX,y
-        maxLength = Math.max(Math.abs(width), Math.abs(height));
-        width = maxLength; height = maxLength;
-        // multiply by -1 if the original width/height were negative
-        if (mouseX < startX) { width *= -1; }
-        if (mouseY < startY) { height *= -1; }
-    }
-
-    // everytime we move our mouse, clear the last rectangle we drew so we only have the most up to date rectangle
-    clearContext(previewContext);
-
-    let rect = new Rectangle(startX, startY, width, height);
-    rect.drawFill(fillColor.value, previewContext);
-    rect.drawStroke(strokeSlider.value, strokeColor.value, previewContext);
-}
-
-// do the final draw of the rectangle to the actual canvas from the start coordinates to wherever the mouse was released
-function finishRect(event) {
-    if (!painting) { return; }  // return so we don't draw a rect when we souldn't
-    painting = false;           // when we finish, we are no longer painting
-
-    let { mouseX, mouseY } = getMousePosition(event);
-    let width = mouseX - startX;
-    let height = mouseY - startY;
-
-    // if shift is down wee need to draw a perfect square
-    let maxLength;
-    if (shiftDown) {
-        maxLength = Math.max(Math.abs(width), Math.abs(height));
-        width = maxLength; height = maxLength;
-        if (mouseX < startX) { width *= -1; }
-        if (mouseY < startY) { height *= -1; }
-    }
-    
-    let rect = new Rectangle(startX, startY, width, height);
-    rect.drawFill(fillColor.value, context);
-    rect.drawStroke(strokeSlider.value, strokeColor.value, context);
-}
-
-
 // Flood fills the canvas starting at the current mouse position
 function startFill(event) {
 
@@ -607,71 +551,6 @@ function finishPicker(event) {
     // return the paint mode to brush, this should actually go back to the last selected mode
     brushCheck.checked = true;
     showHover = true;
-}
-
-function startEllipse(event) {
-    painting = true;
-    pushImage(undoStack);
-    clearRedoStack();
-    let { mouseX, mouseY } = getMousePosition(event);
-    startX = mouseX; startY = mouseY;
-
-    setupContext();
-    setupContext(previewContext); 
-}
-
-
-function drawEllipse(event) {
-    if (!painting) { return; }
-    let { mouseX, mouseY } = getMousePosition(event);
-    let width = mouseX - startX;
-    let height = mouseY - startY;
-
-
-    // if shift is down wee need to draw a perfect square
-    let maxLength;
-    if (shiftDown) {
-        maxLength = Math.max(Math.abs(width), Math.abs(height));
-        width = maxLength; height = maxLength;
-        if (mouseX < startX) { width *= -1; }
-        if (mouseY < startY) { height *= -1; }
-    }
-
-    clearContext(previewContext); 
-
-    // start points are the direct center of the ellipse
-    // radii are half the width and half the height of a rectangle
-    let ellipse = new Ellipse(startX + width/2, startY + height/2, Math.abs(width/2), Math.abs(height/2));
-    ellipse.drawFill(fillColor.value, previewContext);
-    ellipse.drawStroke(strokeSlider.value, strokeColor.value, previewContext);
-
-    // draw a rectangle around the ellipse so you can see the start and end points
-    let rectangle = new Rectangle(startX, startY, width, height);
-    rectangle.drawStroke(2, "#000000", previewContext);
-}
-
-// actually draw the final ellipse to the screen
-function finishEllipse(event) {
-    if (!painting) { return; }
-    painting = false;
-
-    let { mouseX, mouseY } = getMousePosition(event);
-    let width = mouseX - startX;
-    let height = mouseY - startY;
-        
-    
-    // if shift is down wee need to draw a perfect square
-    let maxLength;
-    if (shiftDown) {
-        maxLength = Math.max(Math.abs(width), Math.abs(height));
-        width = maxLength; height = maxLength;
-        if (mouseX < startX) { width *= -1; }
-        if (mouseY < startY) { height *= -1; }
-    }
-
-    let ellipse = new Ellipse(startX + width/2, startY + height/2, Math.abs(width/2), Math.abs(height/2));
-    ellipse.drawFill(fillColor.value, context);
-    ellipse.drawStroke(strokeSlider.value, strokeColor.value, context);
 }
 
 // this is IDENTICAL to start circle, and probably others. NEED to modularize
@@ -736,44 +615,6 @@ function finishPolygon(event) {
     poly.points = points;
     poly.drawFill(fillColor.value, context);
     poly.drawStroke(strokeSlider.value, strokeColor.value, context);
-}
-
-
-
-
-// set set up the line stroke
-function startBrush(event) {
-
-    // painting = true;
-    // pushImage(undoStack);  
-    // clearRedoStack();
-    // setupContext();
-
-    // draw(event);   // this is just for drawing a single dot
-
-    brush.start(event);
-
-}
-
-// repeatedly draw a bunch of lines small lines to mimic a single large line
-function drawBrush(event) {
-    // if (!painting) { return; }
-    // let { mouseX, mouseY } = getMousePosition(event);
-
-    // // draw a line from your last painting point to your current mouse position
-    // context.lineTo(mouseX, mouseY);
-    // context.stroke();
-
-    // // these two lines should make the line less pixelated
-    // context.beginPath();
-    // context.moveTo(mouseX, mouseY);
-
-    brush.draw(event);
-}
-
-function finishBrush(event) {
-    // painting = false;
-    brush.finish(event);
 }
 
 function startLine(event) {
@@ -876,10 +717,10 @@ function start(event) {
     if (brushCheck.checked)         { brush.start(event, strokeSlider.value, strokeColor.value); }
     else if (selectCheck.checked)   { startSelect(event); }
     else if (lassoCheck.checked)    { startLasso(event); }
-    else if (rectCheck.checked)     { startRect(event); }
-    else if (lineCheck.checked)     { startLine(event); }
+    else if (rectCheck.checked)     { rect.start(event, strokeSlider.value, strokeColor.value, fillColor.value); }
+    else if (lineCheck.checked)     { line.start(event, strokeSlider.value, strokeColor.value); }
     else if (radialCheck.checked)   { startRadialLine(event); }
-    else if (circleCheck.checked)   { startEllipse(event); }
+    else if (circleCheck.checked)   { ell.start(event, strokeSlider.value, strokeColor.value, fillColor.value); }
     else if (polygonCheck.checked)  { startPolygon(event); }
     else if (fillCheck.checked)     { startFill(event); }
     else if (fillPicker.checked)    { startPicker(event, fillPicker.value); }
@@ -893,10 +734,10 @@ function draw(event) {
     if (brushCheck.checked)         { brush.draw(event); }
     else if (selectCheck.checked)   { drawSelect(event); }
     else if (lassoCheck.checked)    { drawLasso(event); }
-    else if (rectCheck.checked)     { drawRect(event); } 
-    else if (lineCheck.checked)     { drawLine(event); }
+    else if (rectCheck.checked)     { rect.draw(event); } 
+    else if (lineCheck.checked)     { line.draw(event); }
     else if (radialCheck.checked)   { drawRadialLine(event); }
-    else if (circleCheck.checked)   { drawEllipse(event); }
+    else if (circleCheck.checked)   { ell.draw(event); }
     else if (polygonCheck.checked)  { drawPolygon(event); }
 }
 
@@ -904,10 +745,10 @@ function finish(event) {
     if (brushCheck.checked)         { brush.finish(event); }
     else if (selectCheck.checked)   { finishSelect(event); }
     else if (lassoCheck.checked)    { finishLasso(event); }
-    else if (rectCheck.checked)     { finishRect(event); } 
-    else if (lineCheck.checked)     { finishLine(event); }
+    else if (rectCheck.checked)     { rect.finish(event); } 
+    else if (lineCheck.checked)     { line.finish(event); }
     else if (radialCheck.checked)   { finishRadialLine(event); }
-    else if (circleCheck.checked)   { finishEllipse(event); }
+    else if (circleCheck.checked)   { ell.finish(event); }
     else if (polygonCheck.checked)  { finishPolygon(event); }
     else if (fillPicker.checked || strokePicker.checked)   { finishPicker(event); }
 }
@@ -985,35 +826,8 @@ function setupContext(ctx = context, strokeStyle = strokeColor.value, lineWidth 
     ctx.fillStyle = fillStyle;
 }
 
-function pushImage(stack) {
-    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-    stack.push(imageData);
-}
-
-
-// these undo/redos need an upper bound so we don't store infinite undo/redos
-let undo = () => {
-    if (undoStack.length > 0) {
-        const imageData = undoStack.pop();
-        pushImage(redoStack);
-        context.putImageData(imageData, 0, 0);
-    }
-}
-
-// maybe push the contents of the redo stack to the undo stack once we start drawing somehting
-let redo = () => {
-    // if (!redoQueue.isEmpty()) {
-    if (redoStack.length > 0) {
-        const imageData = redoStack.pop();
-        pushImage(undoStack);
-        context.putImageData(imageData, 0, 0);
-        
-    }
-}
 
 function showHoverCursor(event) {
-
-    console.log('wtf');
 
     // just do nothing if show hover is false
     if (!showHover) { return; }

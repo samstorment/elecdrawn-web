@@ -84,6 +84,16 @@ export class Rectangle extends Shape {
 
         return true;
     }
+
+    setStart(startX, startY) {
+        this.startX = startX;
+        this.startY = startY;
+    }
+
+    setSize(width, height) {
+        this.width = width;
+        this.height = height;
+    }
 }
 
 // Makes circles and ovals
@@ -112,6 +122,15 @@ export class Ellipse extends Shape {
         context.stroke();
     }
 
+    setStart(startX, startY) {
+        this.startX = startX;
+        this.startY = startY;
+    }
+
+    setSize(radiusX, radiusY) {
+        this.radiusX = radiusX;
+        this.radiusY = radiusY;
+    }
 }
 
 

@@ -1,7 +1,7 @@
 import Tool from './tool.js';
 import { getMouse } from '../canvas/util.js';
 
-export default class Brush extends Tool {
+export default class BrushTool extends Tool {
 
     constructor(context) {
         super(context);
