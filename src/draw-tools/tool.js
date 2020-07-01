@@ -6,8 +6,6 @@ export default class Tool {
     constructor(context) {
         this.context = context;
         this.painting = false;
-        this.startX = -1;
-        this.startY = -1;
     }
 
     // painting is true once we start using a tool. Push the current canvas state to the undo stack since we will be modifying it right after

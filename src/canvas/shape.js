@@ -204,4 +204,5 @@ export class Polygon extends Shape {
 
         return {x: xnew, y: ynew };
     }
+
 }

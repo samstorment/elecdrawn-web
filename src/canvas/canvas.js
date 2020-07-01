@@ -3,10 +3,14 @@ import { getMousePosition, undoStack, redoStack, clearRedoStack } from './util.j
 import { floodFill } from './fill.js';
 import { getPixelColor } from './color.js';
 import CanvasState from '../canvas/canvas-state.js';
+
 import BrushTool from '../draw-tools/brush.js';
 import RectangleTool from '../draw-tools/rectangle.js';
 import EllipseTool from '../draw-tools/ellipse.js';
 import LineTool from '../draw-tools/line.js';
+import RadialTool from '../draw-tools/radial.js';
+import PolygonTool from '../draw-tools/polygon.js';
+import SelectTool from '../draw-tools/select.js';
 
 // starting mouse x and y coordinates when we draw squares, circles, etc 
 let startX = 0;
@@ -112,6 +116,9 @@ let brush = new BrushTool(context);
 let rect = new RectangleTool(context);
 let ell = new EllipseTool(context);
 let line = new LineTool(context);
+let radial = new RadialTool(context);
+let poly = new PolygonTool(context);
+let select = new SelectTool(context);
 
 
 // THIS Sloppy keboard shortcuts for now
@@ -521,8 +528,9 @@ function drawClippedImgAtXY(img, ctx, clipPts, x ,y) {
 // Flood fills the canvas starting at the current mouse position
 function startFill(event) {
 
-    pushImage(undoStack);
-    clearRedoStack();
+    let imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    CanvasState.pushUndoStack(imageData);
+    CanvasState.resetRedoStack();
     let { mouseX, mouseY } = getMousePosition(event);
     // pass 128 as the range, seems kinda arbitrary? maybe not
     floodFill(mouseX, mouseY, fillColor.value, context, 128);
@@ -553,175 +561,18 @@ function finishPicker(event) {
     showHover = true;
 }
 
-// this is IDENTICAL to start circle, and probably others. NEED to modularize
-function startPolygon(event) {
-    painting = true;
-    pushImage(undoStack);
-    clearRedoStack();
-    let { mouseX, mouseY } = getMousePosition(event);
-    startX = mouseX; startY = mouseY;
-
-    setupContext();
-    setupContext(previewContext); 
-}
-
-function drawPolygon(event) {
-    if (!painting) { return; }
-    let { mouseX, mouseY } = getMousePosition(event);
-    let width = mouseX - startX;
-    let height = mouseY - startY;
-
-    // because we are drawing a PERFECT square around the polygon, width and height will be the same (max of the actual width and height)
-    width = height = Math.max(Math.abs(width), Math.abs(height));
-    // if width or height is actually negative, lets account for that
-    if (mouseX < startX) { width *= -1; }
-    if (mouseY < startY) { height *= -1; }
-    // the radius is half the width (diameter). This will let the polygon flip when we cross the x axis of the start origin
-    let radius = height / 2;
-    
-    // clear on each draw frame
-    clearContext(previewContext); 
-
-    // draw a new polygon originating from the center of the rectangle
-    let poly = new Polygon(startX + width/2, startY + height/2);
-    let points = poly.getRegularPolygon(polygonSides.value, radius);
-    poly.points = points;
-    poly.drawFill(fillColor.value, previewContext);
-    poly.drawStroke(strokeSlider.value, strokeColor.value, previewContext);
-
-    // draw the outline rectangle
-    let rectangle = new Rectangle(startX, startY, width, height);
-    rectangle.drawStroke(2, "#000000", previewContext);
-}
-
-
-
-function finishPolygon(event) {
-    if (!painting) { return; }
-    painting = false;
-
-    let { mouseX, mouseY } = getMousePosition(event);
-    let width = mouseX - startX;
-    let height = mouseY - startY;
-        
-    width = height = Math.max(Math.abs(width), Math.abs(height));
-    if (mouseX < startX) { width *= -1; }
-    if (mouseY < startY) { height *= -1; }
-    let radius = height / 2;
-
-    // draw a new polygon originating from the center of the rectangle
-    let poly = new Polygon(startX + width/2, startY + height/2);
-    let points = poly.getRegularPolygon(polygonSides.value, radius);
-    poly.points = points;
-    poly.drawFill(fillColor.value, context);
-    poly.drawStroke(strokeSlider.value, strokeColor.value, context);
-}
-
-function startLine(event) {
-    painting = true;
-    pushImage(undoStack);
-    clearRedoStack();
-    let { mouseX, mouseY } = getMousePosition(event);
-    startX = mouseX; startY = mouseY;
-
-    setupContext();
-    setupContext(previewContext);
-}
-
-// every fram draw the line to the previewCanvas
-function drawLine(event) {
-    if (!painting) { return; }
-    let { mouseX, mouseY } = getMousePosition(event);
-
-    let width = mouseX - startX;    let height = mouseY - startY;
-    let drawToX = mouseX;           let drawToY = mouseY;
-
-    // if shift is down, draw a straight line
-    if (shiftDown) {
-        if (Math.abs(width) > Math.abs(height)) { drawToY = startY; } 
-        else                                    { drawToX = startX; }
-    }
-
-    // clear the preview when the mouse moves
-    clearContext(previewContext);
-
-    // move the line start point to (startX, startY) then draw a line to the current drawTo position
-    previewContext.moveTo(startX, startY);
-    previewContext.lineTo(drawToX, drawToY);
-    previewContext.stroke();
-
-    // Need these so that the preview just draws a single line each time we move rather than all of them
-    previewContext.beginPath();
-    previewContext.moveTo(drawToX, drawToY);
-}
-
-// draw the final line once the mouse releases
-function finishLine(event) {
-    if (!painting) { return; }
-    painting = false;
-    let { mouseX, mouseY } = getMousePosition(event);
-    let width = mouseX - startX;    let height = mouseY - startY;
-    let drawToX = mouseX;           let drawToY = mouseY;
-
-    // if shift is down, draw a straight line
-    if (shiftDown) {
-        if (Math.abs(width) > Math.abs(height)) { drawToY = startY; } 
-        else                                    { drawToX = startX; }
-    }
-
-    // move the line start point to (startX, startY) then draw a line to the current drawTo position
-    context.moveTo(startX, startY);
-    context.lineTo(drawToX, drawToY);
-    context.stroke();
-
-    clearContext(previewContext); // clear the preview after drawing the last line in case we finish the line off canvas
-}
-
-
-
-// The RADIAL functions are very similar to the LINE fucntions -- needs fixing
-function startRadialLine(event) {
-    painting = true;
-    pushImage(undoStack);
-    clearRedoStack();
-    let { mouseX, mouseY } = getMousePosition(event);
-    startX = mouseX; startY = mouseY;
-    setupContext();
-    draw(event);
-
-}
-
-function drawRadialLine(event) {
-    if (!painting) { return; }
-    let { mouseX, mouseY } = getMousePosition(event);
-
-    // we don't clear the canvas so every line gets drawn from (startX,startY) to current mouse position
-    context.moveTo(startX, startY);
-    context.lineTo(mouseX, mouseY);
-    context.stroke();
-
-    context.beginPath();
-    context.moveTo(mouseX, mouseY);
-}
-
-// we draw to the canvas live, so we don't need to make a final draw to the main canvas
-function finishRadialLine(event) {
-    painting = false;
-}
-
-
 
 // THIS SHIT IS UGLY AND BAD. How do we do it better???
 // MAIN START, DRAW, FINISH
 function start(event) {
     if (brushCheck.checked)         { brush.start(event, strokeSlider.value, strokeColor.value); }
-    else if (selectCheck.checked)   { startSelect(event); }
+    else if (selectCheck.checked)   { select.start(event, 15); }
     else if (lassoCheck.checked)    { startLasso(event); }
     else if (rectCheck.checked)     { rect.start(event, strokeSlider.value, strokeColor.value, fillColor.value); }
     else if (lineCheck.checked)     { line.start(event, strokeSlider.value, strokeColor.value); }
-    else if (radialCheck.checked)   { startRadialLine(event); }
+    else if (radialCheck.checked)   { radial.start(event, strokeSlider.value, strokeColor.value); }
     else if (circleCheck.checked)   { ell.start(event, strokeSlider.value, strokeColor.value, fillColor.value); }
-    else if (polygonCheck.checked)  { startPolygon(event); }
+    else if (polygonCheck.checked)  { poly.start(event, polygonSides.value, strokeSlider.value, strokeColor.value, fillColor.value); }
     else if (fillCheck.checked)     { startFill(event); }
     else if (fillPicker.checked)    { startPicker(event, fillPicker.value); }
     else if (strokePicker.checked)  { startPicker(event, strokePicker.value); }
@@ -732,24 +583,24 @@ function draw(event) {
     if (!mouseDown)                 { showHoverCursor(event); }
 
     if (brushCheck.checked)         { brush.draw(event); }
-    else if (selectCheck.checked)   { drawSelect(event); }
+    else if (selectCheck.checked)   { select.draw(event); }
     else if (lassoCheck.checked)    { drawLasso(event); }
     else if (rectCheck.checked)     { rect.draw(event); } 
     else if (lineCheck.checked)     { line.draw(event); }
-    else if (radialCheck.checked)   { drawRadialLine(event); }
+    else if (radialCheck.checked)   { radial.draw(event); }
     else if (circleCheck.checked)   { ell.draw(event); }
-    else if (polygonCheck.checked)  { drawPolygon(event); }
+    else if (polygonCheck.checked)  { poly.draw(event); }
 }
 
 function finish(event) {
     if (brushCheck.checked)         { brush.finish(event); }
-    else if (selectCheck.checked)   { finishSelect(event); }
+    else if (selectCheck.checked)   { select.finish(event); }
     else if (lassoCheck.checked)    { finishLasso(event); }
     else if (rectCheck.checked)     { rect.finish(event); } 
     else if (lineCheck.checked)     { line.finish(event); }
-    else if (radialCheck.checked)   { finishRadialLine(event); }
+    else if (radialCheck.checked)   { radial.finish(event); }
     else if (circleCheck.checked)   { ell.finish(event); }
-    else if (polygonCheck.checked)  { finishPolygon(event); }
+    else if (polygonCheck.checked)  { poly.finish(event); }
     else if (fillPicker.checked || strokePicker.checked)   { finishPicker(event); }
 }
 
@@ -810,7 +661,8 @@ function scrollIsUp(event) {
 }
 
 function clearCanvas() {
-    pushImage(undoStack);
+    let imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    CanvasState.pushUndoStack(imageData);
     context.clearRect(0, 0, canvas.width, canvas.height);
 }
 

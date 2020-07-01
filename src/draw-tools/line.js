@@ -24,7 +24,7 @@ export default class LineTool extends Tool {
         this.previewContext.beginPath();
         this.previewContext.lineWidth = lineWidth;
         this.previewContext.strokeStyle = strokeStyle;
-        this.previewContext.lineCap = lineCap
+        this.previewContext.lineCap = lineCap;
       
         // we'll use a rectangle to track our line's start and size
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
@@ -51,14 +51,14 @@ export default class LineTool extends Tool {
 
         // clear the preview context before each draw so we don't stack rectangles
         this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
-
-
+        
+        // draw the preview line to each time we move the mouse
         this.previewContext.moveTo(this.rectangle.startX, this.rectangle.startY);
         this.previewContext.lineTo(this.rectangle.startX + width, this.rectangle.startY + height);
         this.previewContext.stroke();
-
+        
+        // reset the path - get rid of this for the radial
         this.previewContext.beginPath();
-        this.previewContext.moveTo(this.rectangle.startX + width, this.rectangle.startY + height);
     }
 
     finish(event) {
