@@ -9,11 +9,12 @@ export default class SelectTool extends Tool {
         super(context);
         // init a sizeless rect, get the preview context
         this.selectDrawn = false;
-        this.anchorSize = 0;
         this.select = new Rectangle(0, 0, 0);
+        this.anchor = 0;
         this.selectedImage = {};
         this.mouseStart = { x: 0, y: 0 };
         this.previewContext = document.querySelector("#preview-canvas").getContext('2d');
+        this.ghostContext = document.createElement("canvas").getContext('2d');
     }
 
     start(event, anchorSize) {
@@ -22,7 +23,6 @@ export default class SelectTool extends Tool {
         this.painting = true;
 
         this.context.beginPath();
-        this.anchorSize = anchorSize;
       
         // set the start point of the rectangle to the position of the first mouse click
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
@@ -30,12 +30,23 @@ export default class SelectTool extends Tool {
         this.mouseStart.y = mouseY;
 
         if (this.selectDrawn) {
-            // if we click outside of the select rectangle, end the selection and clear the rectangle
-            if (!this.select.isInside(mouseX, mouseY)) {
+
+            // get the anchor we clicked inside of. Will be 0 (false) if we didn't click in one
+            this.anchor = this.anchors.getAnchor(mouseX, mouseY);
+
+            // if we click outside of the select rectangle and the anchors, end the selection and clear the rectangle
+            if (!this.select.isInside(mouseX, mouseY) && !this.anchor) {
                 this.selectDrawn = false;
                 this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
-                // remove the canvas state that we popped needlessly
+                // remove the canvas state that we pushed needlessly since we didn't move the selection
                 CanvasState.popUndoStack();
+            } else if (this.anchor) {
+                let { x, y } = this.anchors.getOppositeAnchor(this.anchor);
+                this.mouseStart.x = x;
+                this.mouseStart.y = y;
+                this.ghostContext.canvas.width = this.selectedImage.width;
+                this.ghostContext.canvas.height = this.selectedImage.height;
+                this.ghostContext.putImageData(this.selectedImage, 0, 0);
             }
         }
     }
@@ -84,6 +95,11 @@ export default class SelectTool extends Tool {
             this.selectDrawn = false;
         } else {
 
+            // create the draggable corner anchors for scaling the rectangle
+            this.anchors = new Anchors(this.select, 15);
+            this.anchors.drawAnchors(this.previewContext, 'red');
+
+            // get the image data inside the selection rectangle that was drawn
             this.selectedImage = this.context.getImageData(this.mouseStart.x, this.mouseStart.y, this.select.width, this.select.height);
 
             // push the current canvas state to the stack
@@ -120,7 +136,6 @@ export default class SelectTool extends Tool {
         rect.drawStroke(3, '#000000', this.previewContext);
 
         this.previewContext.putImageData(this.selectedImage, mouseX - imageXOffset, mouseY - imageYOffset);
-
     }
 
     drawSelectRect(width, height) {
@@ -128,4 +143,57 @@ export default class SelectTool extends Tool {
         this.select = new Rectangle(this.mouseStart.x, this.mouseStart.y, width, height);
         this.select.drawStroke(1, '#000000', this.previewContext);
     }
+}
+
+class Anchors {
+
+    constructor(rectangle, anchorSize) {
+        this.rectangle = rectangle;
+        this.createAnchors(anchorSize);
+    }
+
+    // creates the 4 rectangular anchors on the base rectangle's corners
+    createAnchors(anchorSize) {
+        let { topLeftX, topLeftY, botRightX, botRightY } = this.rectangle.getCoords();
+
+        this.topLeft = new Rectangle(topLeftX - anchorSize / 2, topLeftY - anchorSize / 2, anchorSize);
+        this.topRight = new Rectangle(botRightX - anchorSize / 2, topLeftY - anchorSize / 2, anchorSize);
+        this.botLeft = new Rectangle(topLeftX - anchorSize / 2, botRightY - anchorSize / 2, anchorSize);
+        this.botRight = new Rectangle(botRightX - anchorSize / 2, botRightY - anchorSize / 2, anchorSize);
+    }
+
+    // draws the 4 rectangles with the chosen color
+    drawAnchors(context, color) {
+        this.topLeft.drawFill(color, context);
+        this.topRight.drawFill(color, context);
+        this.botLeft.drawFill(color, context);
+        this.botRight.drawFill(color, context);
+    }
+
+    // returns a number corresponding to the anchor that the mouse is inside. returns 0 if mouse is in no anchor
+    getAnchor(mouseX, mouseY) {
+
+        if (this.topLeft.isInside(mouseX, mouseY))  { return 1; }
+        if (this.topRight.isInside(mouseX, mouseY)) { return 2; }
+        if (this.botLeft.isInside(mouseX, mouseY))  { return 3; }
+        if (this.botRight.isInside(mouseX, mouseY)) { return 4; }
+
+        return 0;
+    }
+
+    // returns the x, y coords of the diagonal opposite anchor
+    getOppositeAnchor(anchorNum) {
+        let { topLeftX, topLeftY, botRightX, botRightY } = this.rectangle.getCoords();
+        switch(anchorNum) {
+            case 1:
+                return {x: botRightX, y: botRightY };
+            case 2:
+                return {x: topLeftX, y: botRightY };
+            case 3:
+                return {x: botRightX, y: topLeftY };
+            case 4:
+                return {x: topLeftY, y: topLeftY };
+        } 
+    }
+
 }
