@@ -219,14 +219,15 @@ export default class SelectTool extends Tool {
         }
     }
 
+    // this is causing problems with pressing ctrl+shift+i 
     setDeleteListener() {
         let del = getKey("Delete");
         del.press = () => {
             if (this.selectDrawn) {
                 this.context.clearRect(this.select.startX, this.select.startY, this.select.width, this.select.height);
                 this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
-                this.selectDrawn = false;
                 this.context.canvas.style.cursor = 'default';
+                this.selectDrawn = false;
             }
         }
     }

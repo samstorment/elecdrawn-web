@@ -23,7 +23,7 @@ const createWindow = () => {
     mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
     // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
 
     ipcMain.on('display-app-menu', () => {
         let menu = Menu.buildFromTemplate(template);
