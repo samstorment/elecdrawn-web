@@ -3,21 +3,27 @@ import { getMouse } from '../canvas/util.js';
 import CanvasState from '../canvas/canvas-state.js';
 import { Rectangle } from '../canvas/shape.js';
 
+// TODO:
+//          keep the select box around selection after we finish moving selection so we can keep moving it if need
+//          add a copy paste to selection
+//          add a rotate tool to selection
+//          add a delete tool for selection
 export default class SelectTool extends Tool {
 
     constructor(context) {
         super(context);
         // init a sizeless rect, get the preview context
         this.selectDrawn = false;
+        this.scaleClicked = false;
         this.select = new Rectangle(0, 0, 0);
-        this.anchor = 0;
+        // this.delete = {};
         this.selectedImage = {};
         this.mouseStart = { x: 0, y: 0 };
         this.previewContext = document.querySelector("#preview-canvas").getContext('2d');
         this.ghostContext = document.createElement("canvas").getContext('2d');
     }
 
-    start(event, anchorSize) {
+    start(event) {
         
         // we don't call super.start because we don't want to save the canvas state to the undo stack immeditaely
         this.painting = true;
@@ -32,34 +38,61 @@ export default class SelectTool extends Tool {
         if (this.selectDrawn) {
 
             // get the anchor we clicked inside of. Will be 0 (false) if we didn't click in one
-            this.anchor = this.anchors.getAnchor(mouseX, mouseY);
+            let anchor = this.anchors.getAnchor(mouseX, mouseY);
 
             // if we click outside of the select rectangle and the anchors, end the selection and clear the rectangle
-            if (!this.select.isInside(mouseX, mouseY) && !this.anchor) {
+            if (!this.select.isInside(mouseX, mouseY) && !anchor) {
                 this.selectDrawn = false;
                 this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
                 // remove the canvas state that we pushed needlessly since we didn't move the selection
                 CanvasState.popUndoStack();
-            } else if (this.anchor) {
-                let { x, y } = this.anchors.getOppositeAnchor(this.anchor);
+            } else if (anchor) {
+                let { x, y } = this.anchors.getOppositeAnchor(anchor);
                 this.mouseStart.x = x;
                 this.mouseStart.y = y;
                 this.ghostContext.canvas.width = this.selectedImage.width;
                 this.ghostContext.canvas.height = this.selectedImage.height;
                 this.ghostContext.putImageData(this.selectedImage, 0, 0);
+                this.scaleClicked = true;
             }
         }
     }
 
     draw(event) { 
-        // if painting is false, the mouse isn't clicked so we shouldn't draw
-        if (!this.painting) { return; }
 
-        // get the current mouse coordinates on the canvas
+        // get the mouse position on the canvas
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
         let width = mouseX - this.mouseStart.x;
         let height = mouseY - this.mouseStart.y;
-
+        
+        // update the scale cursor if we hover an anchor, do this regardless of if we are painting
+        this.updateScaleCursor(mouseX, mouseY);
+        
+        // if painting is false, the mouse isn't clicked so we shouldn't draw
+        
+        if (this.scaleClicked) {
+            this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+            
+            // clear the context at the inital point where the select rect was drawn
+            this.context.beginPath();
+            this.context.clearRect(this.select.startX, this.select.startY, this.select.width, this.select.height);
+            
+            // draw the scaled select rect image from the ghost canvas to the preview to update the scaled image
+            this.previewContext.drawImage(this.ghostContext.canvas, this.mouseStart.x, this.mouseStart.y, width, height)
+        
+            // draw the black outline of the changing scale rect
+            let scaleRect = new Rectangle(this.mouseStart.x, this.mouseStart.y, width, height);
+            scaleRect.drawStroke(1, '#000000', this.previewContext);
+            
+            // draw the anchors as we move the scale rect
+            let anchors = new Anchors(scaleRect, 15);
+            anchors.drawAnchors(this.previewContext, 'red');
+            
+            return;
+        }
+        
+        if (!this.painting) { return; }
+        
         // if the select rectangle is drawn we want to drag it, otherwise we need to draw the select rect
         if (this.selectDrawn) {
             this.dragSelectedImage(mouseX, mouseY);
@@ -72,9 +105,33 @@ export default class SelectTool extends Tool {
         if (!this.painting) { return; }
         super.finish(event);
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
+        let width = mouseX - this.mouseStart.x;
+        let height = mouseY - this.mouseStart.y;
 
-        // if we clicked and never moved out mouse, do nothing
+        // if we clicked and never moved our mouse, do nothing
         if (this.mouseStart.x === mouseX && this.mouseStart.y === mouseY) { return; }
+
+        // if we are scaling the selected rect
+        if (this.scaleClicked) {
+
+            // clear the preview context so the scale rect/anchors disappear when we end
+            this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+
+            // draw the scaled up ghost context image to the main context
+            this.context.drawImage(this.ghostContext.canvas, this.mouseStart.x, this.mouseStart.y, width, height);
+            
+            // reset the cursor and the ghost canvas back to their default states
+            this.context.canvas.style.cursor = 'default';
+            this.ghostContext.canvas.height = window.innerHeight - 70;
+            this.ghostContext.canvas.width = window.innerWidth - 200 - 40;
+            this.ghostContext.clearRect(0, 0, this.ghostContext.canvas.width, this.ghostContext.canvas.height);
+            
+            // end the scale and the selection
+            this.scaleClicked = false;
+            this.selectDrawn = false;
+
+            return;
+        }
 
         if (this.selectDrawn) {
 
@@ -84,11 +141,13 @@ export default class SelectTool extends Tool {
             let imageXOffset = this.mouseStart.x - topLeftX;
             let imageYOffset = this.mouseStart.y - topLeftY;
 
+            // clear the preview context so the we putImageData below to an empty canvas
             this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
 
             // put the image to the preview context so the background color data doesnt override the main context. comment the next to lines out to see what i mean. 
             this.previewContext.putImageData(this.selectedImage, mouseX - imageXOffset, mouseY - imageYOffset);
 
+            // draw the image data from the preview context onto the main canvas, then reset the preview context
             this.context.drawImage(this.previewContext.canvas, 0, 0);
             this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height); // clear the preview so the selection we made doesn't linger
             
@@ -107,10 +166,12 @@ export default class SelectTool extends Tool {
             CanvasState.pushUndoStack(imageData);
             CanvasState.resetRedoStack();
 
+            // we have just finished drawing the selection box
             this.selectDrawn = true;
         }
     }
 
+    // drag the selected image around the screen
     dragSelectedImage(mouseX, mouseY) {
 
         let { topLeftX, topLeftY, botRightX, botRightY } = this.select.getCoords();
@@ -138,10 +199,21 @@ export default class SelectTool extends Tool {
         this.previewContext.putImageData(this.selectedImage, mouseX - imageXOffset, mouseY - imageYOffset);
     }
 
+    // draw the thin black selection box to the preview context
     drawSelectRect(width, height) {
         this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
         this.select = new Rectangle(this.mouseStart.x, this.mouseStart.y, width, height);
         this.select.drawStroke(1, '#000000', this.previewContext);
+    }
+
+    // if the select rect is drawn, check if the cursor is hovering over a scale anchor and change the cursor to a scale cursor if it is
+    updateScaleCursor(mouseX, mouseY) {
+        if (this.selectDrawn) {
+            let anchor = this.anchors.getAnchor(mouseX, mouseY);
+            if (anchor === 1 || anchor === 4) { this.context.canvas.style.cursor = 'nw-resize'; }
+            else if (anchor === 2 || anchor === 3) { this.context.canvas.style.cursor = 'ne-resize'; }
+            else { this.context.canvas.style.cursor = 'default'; }
+        }
     }
 }
 
@@ -192,8 +264,7 @@ class Anchors {
             case 3:
                 return {x: botRightX, y: topLeftY };
             case 4:
-                return {x: topLeftY, y: topLeftY };
+                return {x: topLeftX, y: topLeftY };
         } 
     }
-
 }
