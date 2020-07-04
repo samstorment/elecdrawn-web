@@ -1,6 +1,7 @@
 import Tool from './tool.js';
-import { getMouse } from '../canvas/util.js';
 import CanvasState from '../canvas/canvas-state.js';
+import { getKey } from '../canvas/util.js';
+import { getMouse } from '../canvas/util.js';
 import { Rectangle } from '../canvas/shape.js';
 
 // TODO:
@@ -16,11 +17,10 @@ export default class SelectTool extends Tool {
         this.selectDrawn = false;
         this.scaleClicked = false;
         this.select = new Rectangle(0, 0, 0);
-        // this.delete = {};
+        this.setDeleteListener();
         this.selectedImage = {};
         this.mouseStart = { x: 0, y: 0 };
         this.previewContext = document.querySelector("#preview-canvas").getContext('2d');
-        this.ghostContext = document.createElement("canvas").getContext('2d');
     }
 
     start(event) {
@@ -29,14 +29,16 @@ export default class SelectTool extends Tool {
         this.painting = true;
 
         this.context.beginPath();
-      
+        
         // set the start point of the rectangle to the position of the first mouse click
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
         this.mouseStart.x = mouseX;
         this.mouseStart.y = mouseY;
 
+        
         if (this.selectDrawn) {
-
+            
+            this.ghostContext = document.createElement("canvas").getContext('2d');
             // get the anchor we clicked inside of. Will be 0 (false) if we didn't click in one
             let anchor = this.anchors.getAnchor(mouseX, mouseY);
 
@@ -122,9 +124,9 @@ export default class SelectTool extends Tool {
             
             // reset the cursor and the ghost canvas back to their default states
             this.context.canvas.style.cursor = 'default';
-            this.ghostContext.canvas.height = window.innerHeight - 70;
-            this.ghostContext.canvas.width = window.innerWidth - 200 - 40;
-            this.ghostContext.clearRect(0, 0, this.ghostContext.canvas.width, this.ghostContext.canvas.height);
+        
+            // remove the ghost context because we are done with it
+            this.ghostContext.canvas.remove();
             
             // end the scale and the selection
             this.scaleClicked = false;
@@ -208,11 +210,24 @@ export default class SelectTool extends Tool {
 
     // if the select rect is drawn, check if the cursor is hovering over a scale anchor and change the cursor to a scale cursor if it is
     updateScaleCursor(mouseX, mouseY) {
-        if (this.selectDrawn) {
+        // only check the anchors if the select rect is drawn. If scale is clicked we don't check because we'd then instantly set cursor back to default
+        if (this.selectDrawn && !this.scaleClicked) {
             let anchor = this.anchors.getAnchor(mouseX, mouseY);
             if (anchor === 1 || anchor === 4) { this.context.canvas.style.cursor = 'nw-resize'; }
             else if (anchor === 2 || anchor === 3) { this.context.canvas.style.cursor = 'ne-resize'; }
             else { this.context.canvas.style.cursor = 'default'; }
+        }
+    }
+
+    setDeleteListener() {
+        let del = getKey("Delete");
+        del.press = () => {
+            if (this.selectDrawn) {
+                this.context.clearRect(this.select.startX, this.select.startY, this.select.width, this.select.height);
+                this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+                this.selectDrawn = false;
+                this.context.canvas.style.cursor = 'default';
+            }
         }
     }
 }
