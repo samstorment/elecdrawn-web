@@ -6,20 +6,15 @@ export default class RadialTool extends Tool {
     constructor(context) {
         super(context);
         // get the preview context, get the start point of the first mouse click
-        this.previewContext = document.querySelector("#preview-canvas").getContext('2d');
         this.mouseStart = { x: 0, y: 0 };
     }
 
-    start(event, lineWidth=2, strokeStyle='#000000', lineCap='round') {
+    start(event) {
 
         super.start(event);
 
-        // we need some method to initialize contexts
         this.context.beginPath();
-        this.context.lineWidth = lineWidth;
-        this.context.strokeStyle = strokeStyle;
-        this.context.lineCap = lineCap;
-      
+       
         // we'll use a rectangle to track our line's start coords
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
         this.mouseStart.x = mouseX;
@@ -27,6 +22,7 @@ export default class RadialTool extends Tool {
     }
 
     draw(event) { 
+        super.draw(event);
         // if painting is false, the mouse isn't clicked so we shouldn't draw
         if (!this.painting) { return; }
 

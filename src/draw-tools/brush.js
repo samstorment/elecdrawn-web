@@ -11,14 +11,13 @@ export default class BrushTool extends Tool {
     start(event, lineWidth=2, strokeStyle='#000000', lineCap='round') {
         super.start(event);
         this.context.beginPath();
-        this.context.lineWidth = lineWidth;
-        this.context.strokeStyle = strokeStyle;
-        this.context.lineCap = lineCap;
         // call draw once to draw a single dot
         this.draw(event);
     }
 
     draw(event) { 
+
+        super.draw(event);
         // if painting is false, the mouse isn't clicked so we shouldn't draw
         if (!this.painting) { return; }
 

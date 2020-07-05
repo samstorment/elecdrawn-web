@@ -14,7 +14,6 @@ export default class LassoTool extends Tool {
         this.mouseStart = { x: 0, y: 0 };
         this.lassoCoords = { topLeftX: 100000, topLeftY: 100000, botRightX: -100000, botRightY: -100000 };
         this.selectedImage = {};
-        this.previewContext = document.querySelector("#preview-canvas").getContext('2d');
     
     }
 

@@ -20,7 +20,6 @@ export default class SelectTool extends Tool {
         this.setDeleteListener();
         this.selectedImage = {};
         this.mouseStart = { x: 0, y: 0 };
-        this.previewContext = document.querySelector("#preview-canvas").getContext('2d');
     }
 
     start(event) {
@@ -87,7 +86,7 @@ export default class SelectTool extends Tool {
             scaleRect.drawStroke(1, '#000000', this.previewContext);
             
             // draw the anchors as we move the scale rect
-            let anchors = new Anchors(scaleRect, 15);
+            let anchors = new Anchors(scaleRect, 10);
             anchors.drawAnchors(this.previewContext, 'red');
             
             return;
@@ -157,7 +156,7 @@ export default class SelectTool extends Tool {
         } else {
 
             // create the draggable corner anchors for scaling the rectangle
-            this.anchors = new Anchors(this.select, 15);
+            this.anchors = new Anchors(this.select, 10);
             this.anchors.drawAnchors(this.previewContext, 'red');
 
             // get the image data inside the selection rectangle that was drawn

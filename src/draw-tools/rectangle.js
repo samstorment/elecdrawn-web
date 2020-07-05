@@ -8,23 +8,21 @@ export default class RectangleTool extends Tool {
         super(context);
         // init a sizeless rect, get the preview context, and get the shift key
         this.rectangle = new Rectangle(0, 0, 0);
-        this.previewContext = document.querySelector("#preview-canvas").getContext('2d');
         this.shift = getKey('Shift');
     }
 
-    start(event, lineWidth=2, strokeStyle='#000000', fillStyle='#ff0000') {
+    start(event) {
         super.start(event);
         this.context.beginPath();
-        this.context.lineWidth = lineWidth;
-        this.context.strokeStyle = strokeStyle;
-        this.context.fillStyle = fillStyle;
-      
+     
         // set the start point of the rectangle to the position of the first mouse click
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
         this.rectangle.setStart(mouseX, mouseY);
     }
 
     draw(event) { 
+
+        super.draw(event);
         // if painting is false, the mouse isn't clicked so we shouldn't draw
         if (!this.painting) { return; }
 
@@ -55,5 +53,22 @@ export default class RectangleTool extends Tool {
         // draw a rectangle with a stroke border on top of a filled rectangle
         this.rectangle.drawFill(this.context.fillStyle, this.context);
         this.rectangle.drawStroke(this.context.lineWidth, this.context.strokeStyle, this.context);
+    }
+
+
+    drawHoverCursor(event) {
+        let { mouseX, mouseY } = getMouse(event, this.context.canvas);
+
+        // clear the preview canvas anytime we move, but draw right after
+        this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+        this.previewContext.beginPath();
+        
+        // draw a rect the size of the stroke wherever the cursor is
+        let length = this.context.lineWidth;
+        let xStart = mouseX-length/2; 
+        let yStart =  mouseY-length/2;
+
+        let rect = new Rectangle(xStart, yStart, length);
+        rect.drawFill(this.context.strokeStyle, this.previewContext);
     }
 }

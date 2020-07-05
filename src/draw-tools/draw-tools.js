@@ -6,6 +6,7 @@ import RadialTool from '../draw-tools/radial.js';
 import PolygonTool from '../draw-tools/polygon.js';
 import SelectTool from '../draw-tools/select.js';
 import LassoTool from '../draw-tools/lasso.js';
+import BucketTool from '../draw-tools/bucket.js';
 
 // manager for all drawing tools
 export class DrawTool {
@@ -25,6 +26,7 @@ export class DrawTool {
             polygon: new PolygonTool(context),
             select: new SelectTool(context),
             lasso: new LassoTool(context),
+            bucket: new BucketTool(context),
         }
 
         this.selectedTool = this.tools.brush;

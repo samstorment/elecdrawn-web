@@ -8,17 +8,12 @@ export default class PolygonTool extends Tool {
         super(context);
         // init a sizeless rect, get the preview context, and get the shift key
         this.rectangle = new Rectangle(0, 0, 0);
-        this.previewContext = document.querySelector("#preview-canvas").getContext('2d');
         this.numSides = 0;
     }
 
-    start(event, numSides, lineWidth=2, strokeStyle='#000000', fillStyle='#ff0000') {
+    start(event) {
         super.start(event);
         this.context.beginPath();
-        this.context.lineWidth = lineWidth;
-        this.context.strokeStyle = strokeStyle;
-        this.context.fillStyle = fillStyle;
-        this.numSides = numSides;
       
         // set the start point of the rectangle to the position of the first mouse click
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
@@ -26,6 +21,9 @@ export default class PolygonTool extends Tool {
     }
 
     draw(event) { 
+
+        super.draw(event);
+
         if (!this.painting) { return; }
         
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);

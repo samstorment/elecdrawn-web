@@ -7,24 +7,16 @@ export default class LineTool extends Tool {
     constructor(context) {
         super(context);
         // init a sizeless rect, get the preview context, and get the shift key
-        this.previewContext = document.querySelector("#preview-canvas").getContext('2d');
         this.shift = getKey('Shift');
         this.rectangle = new Rectangle(0, 0, 0);
     }
 
-    start(event, lineWidth=2, strokeStyle='#000000', lineCap='round') {
+    start(event) {
 
         super.start(event);
 
-        // we need some method to initialize contexts
         this.context.beginPath();
-        this.context.lineWidth = lineWidth;
-        this.context.strokeStyle = strokeStyle;
-        this.context.lineCap = lineCap;
         this.previewContext.beginPath();
-        this.previewContext.lineWidth = lineWidth;
-        this.previewContext.strokeStyle = strokeStyle;
-        this.previewContext.lineCap = lineCap;
       
         // we'll use a rectangle to track our line's start and size
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
@@ -32,6 +24,7 @@ export default class LineTool extends Tool {
     }
 
     draw(event) { 
+        super.draw(event);
         // if painting is false, the mouse isn't clicked so we shouldn't draw
         if (!this.painting) { return; }
 

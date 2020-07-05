@@ -9,16 +9,12 @@ export default class EllipseTool extends Tool {
         // init a sizeless rect and ellipse, get the preview context, and get the shift key
         this.rectangle = new Rectangle(0, 0, 0);
         this.ellipse = new Ellipse(0, 0, 0);
-        this.previewContext = document.querySelector("#preview-canvas").getContext('2d');
         this.shift = getKey('Shift');
     }
 
-    start(event, lineWidth=2, strokeStyle='#000000', fillStyle='#ff0000') {
+    start(event) {
         super.start(event);
         this.context.beginPath();
-        this.context.lineWidth = lineWidth;
-        this.context.strokeStyle = strokeStyle;
-        this.context.fillStyle = fillStyle;
       
         // set the start point of the rectangle to the position of the first mouse click
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
@@ -26,6 +22,7 @@ export default class EllipseTool extends Tool {
     }
 
     draw(event) { 
+        super.draw(event);
         // if painting is false, the mouse isn't clicked so we shouldn't draw
         if (!this.painting) { return; }
 
