@@ -4,14 +4,7 @@ import { floodFill } from './fill.js';
 import { getPixelColor } from './color.js';
 import CanvasState from '../canvas/canvas-state.js';
 
-import BrushTool from '../draw-tools/brush.js';
-import RectangleTool from '../draw-tools/rectangle.js';
-import EllipseTool from '../draw-tools/ellipse.js';
-import LineTool from '../draw-tools/line.js';
-import RadialTool from '../draw-tools/radial.js';
-import PolygonTool from '../draw-tools/polygon.js';
-import SelectTool from '../draw-tools/select.js';
-import LassoTool from '../draw-tools/lasso.js';
+import { DrawTool } from '../draw-tools/draw-tools.js';
 
 let showHover = true;
 let painting = false;
@@ -84,15 +77,8 @@ initCanvas();
 context.font = 'bold 48px serif';
 context.strokeText("Gabby is cool", 200, 200);
 
-// these are the draw tools that have been moved to separate files
-let brush = new BrushTool(context);
-let rect = new RectangleTool(context);
-let ell = new EllipseTool(context);
-let line = new LineTool(context);
-let radial = new RadialTool(context);
-let poly = new PolygonTool(context);
-let select = new SelectTool(context);
-let lasso = new LassoTool(context);
+// all the draw tools
+let drawTools = new DrawTool(context);
 
 
 // // THIS Sloppy keboard shortcuts for now
@@ -157,14 +143,14 @@ function finishPicker(event) {
 
 // THIS SHIT IS UGLY AND BAD. How do we do it better???
 function start(event) {
-    if (brushCheck.checked)         { brush.start(event, strokeSlider.value, strokeColor.value); }
-    else if (selectCheck.checked)   { select.start(event, 15); }
-    else if (lassoCheck.checked)    { lasso.start(event); }
-    else if (rectCheck.checked)     { rect.start(event, strokeSlider.value, strokeColor.value, fillColor.value); }
-    else if (lineCheck.checked)     { line.start(event, strokeSlider.value, strokeColor.value); }
-    else if (radialCheck.checked)   { radial.start(event, strokeSlider.value, strokeColor.value); }
-    else if (circleCheck.checked)   { ell.start(event, strokeSlider.value, strokeColor.value, fillColor.value); }
-    else if (polygonCheck.checked)  { poly.start(event, polygonSides.value, strokeSlider.value, strokeColor.value, fillColor.value); }
+    if (brushCheck.checked)         { drawTools.tools.brush.start(event, strokeSlider.value, strokeColor.value); }
+    else if (selectCheck.checked)   { drawTools.tools.select.start(event, 15); }
+    else if (lassoCheck.checked)    { drawTools.tools.lasso.start(event); }
+    else if (rectCheck.checked)     { drawTools.tools.rectangle.start(event, strokeSlider.value, strokeColor.value, fillColor.value); }
+    else if (lineCheck.checked)     { drawTools.tools.line.start(event, strokeSlider.value, strokeColor.value); }
+    else if (radialCheck.checked)   { drawTools.tools.radial.start(event, strokeSlider.value, strokeColor.value); }
+    else if (circleCheck.checked)   { drawTools.tools.ellipse.start(event, strokeSlider.value, strokeColor.value, fillColor.value); }
+    else if (polygonCheck.checked)  { drawTools.tools.polygon.start(event, polygonSides.value, strokeSlider.value, strokeColor.value, fillColor.value); }
     else if (fillCheck.checked)     { startFill(event); }
     else if (fillPicker.checked)    { startPicker(event, fillPicker.value); }
     else if (strokePicker.checked)  { startPicker(event, strokePicker.value); }
@@ -174,25 +160,25 @@ function draw(event) {
     // if we are just hovering over the canvas without holding the mouse, show the hover
     if (!mouseDown)                 { showHoverCursor(event); }
 
-    if (brushCheck.checked)         { brush.draw(event); }
-    else if (selectCheck.checked)   { select.draw(event); }
-    else if (lassoCheck.checked)    { lasso.draw(event); }
-    else if (rectCheck.checked)     { rect.draw(event); } 
-    else if (lineCheck.checked)     { line.draw(event); }
-    else if (radialCheck.checked)   { radial.draw(event); }
-    else if (circleCheck.checked)   { ell.draw(event); }
-    else if (polygonCheck.checked)  { poly.draw(event); }
+    if (brushCheck.checked)         { drawTools.tools.brush.draw(event); }
+    else if (selectCheck.checked)   { drawTools.tools.select.draw(event); }
+    else if (lassoCheck.checked)    { drawTools.tools.lasso.draw(event); }
+    else if (rectCheck.checked)     { drawTools.tools.rectangle.draw(event); } 
+    else if (lineCheck.checked)     { drawTools.tools.line.draw(event); }
+    else if (radialCheck.checked)   { drawTools.tools.radial.draw(event); }
+    else if (circleCheck.checked)   { drawTools.tools.ellipse.draw(event); }
+    else if (polygonCheck.checked)  { drawTools.tools.polygon.draw(event); }
 }
 
 function finish(event) {
-    if (brushCheck.checked)         { brush.finish(event); }
-    else if (selectCheck.checked)   { select.finish(event); }
-    else if (lassoCheck.checked)    { lasso.finish(event); }
-    else if (rectCheck.checked)     { rect.finish(event); } 
-    else if (lineCheck.checked)     { line.finish(event); }
-    else if (radialCheck.checked)   { radial.finish(event); }
-    else if (circleCheck.checked)   { ell.finish(event); }
-    else if (polygonCheck.checked)  { poly.finish(event); }
+    if (brushCheck.checked)         { drawTools.tools.brush.finish(event); }
+    else if (selectCheck.checked)   { drawTools.tools.select.finish(event); }
+    else if (lassoCheck.checked)    { drawTools.tools.lasso.finish(event); }
+    else if (rectCheck.checked)     { drawTools.tools.rectangle.finish(event); } 
+    else if (lineCheck.checked)     { drawTools.tools.line.finish(event); }
+    else if (radialCheck.checked)   { drawTools.tools.radial.finish(event); }
+    else if (circleCheck.checked)   { drawTools.tools.ellipse.finish(event); }
+    else if (polygonCheck.checked)  { drawTools.tools.polygon.finish(event); }
     else if (fillPicker.checked || strokePicker.checked)   { finishPicker(event); }
 }
 
