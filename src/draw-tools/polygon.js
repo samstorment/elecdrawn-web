@@ -6,9 +6,9 @@ export default class PolygonTool extends Tool {
 
     constructor(context) {
         super(context);
-        // init a sizeless rect, get the preview context, and get the shift key
+        // init a sizeless rect for tracking the bounds of the polygon
         this.rectangle = new Rectangle(0, 0, 0);
-        this.numSides = 0;
+        this.setSides();
     }
 
     start(event) {
@@ -76,5 +76,13 @@ export default class PolygonTool extends Tool {
         poly.points = points;
         poly.drawFill(this.context.fillStyle, this.context);
         poly.drawStroke(this.context.lineWidth, this.context.strokeStyle, this.context);
+    }
+
+    setSides() {
+        let polygonSides = document.querySelector('#polygon-sides');
+        this.numSides = polygonSides.value;
+        polygonSides.addEventListener('input', () => {
+            this.numSides = polygonSides.value;
+        });
     }
 }

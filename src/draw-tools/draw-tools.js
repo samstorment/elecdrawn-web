@@ -7,6 +7,7 @@ import PolygonTool from '../draw-tools/polygon.js';
 import SelectTool from '../draw-tools/select.js';
 import LassoTool from '../draw-tools/lasso.js';
 import BucketTool from '../draw-tools/bucket.js';
+import PickerTool from '../draw-tools/picker.js';
 
 // manager for all drawing tools
 export class DrawTool {
@@ -27,6 +28,9 @@ export class DrawTool {
             select: new SelectTool(context),
             lasso: new LassoTool(context),
             bucket: new BucketTool(context),
+            strokePicker: new PickerTool(context, 'stroke'),
+            fillPicker: new PickerTool(context, 'fill'),
+
         }
 
         this.selectedTool = this.tools.brush;

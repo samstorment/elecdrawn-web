@@ -1,16 +1,37 @@
+import Tool from './tool.js';
 import { getMouse } from '../canvas/util.js';
+import { getPixelColor } from '../canvas/color.js';
 
 // super class for drawing tools
-export default class Tool {
+export default class PickerTool extends Tool {
 
-    constructor(context) {
+    constructor(context, pickerType) {
         super(context);
+        this.pickerType = pickerType;
     }
 
-    // painting is true once we start using a tool. Push the current canvas state to the undo stack since we will be modifying it right after
     start(event) {
-        super(start);
+        super.start(event);
 
+        // get the two color selectors so we can set their colors
+        let strokeColor = document.querySelector('#stroke-color');
+        let fillColor = document.querySelector('#fill-color');
+
+        // get the color slsected at the mouse position. This is currently flawed because you cant select from background color. We need a way to ignore canvas if color picked is transparent
+        let { mouseX, mouseY } = getMouse(event, this.context.canvas);
+        let colorPicked = getPixelColor(mouseX, mouseY, this.context);
+
+        // set the stroke/fill based on the picker type
+        if (this.pickerType === 'stroke') {
+            strokeColor.value = colorPicked; 
+            this.context.strokeStyle = colorPicked;
+            this.previewContext.strokeStyle = colorPicked;
+        }
+        else if (this.pickerType === 'fill') {
+            fillColor.value = colorPicked; 
+            this.context.fillStyle = colorPicked;
+            this.previewContext.fillStyle = colorPicked;
+        }
     }
 
     // define empty draw so we don't call super for hover cursor
@@ -20,7 +41,7 @@ export default class Tool {
 
     // we are no longer painting when we finish
     finish(event) {
-        super.finish();
+        super.finish(event);
     }
 
 

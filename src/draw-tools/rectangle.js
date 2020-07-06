@@ -9,6 +9,7 @@ export default class RectangleTool extends Tool {
         // init a sizeless rect, get the preview context, and get the shift key
         this.rectangle = new Rectangle(0, 0, 0);
         this.shift = getKey('Shift');
+        this.setRadius();
     }
 
     start(event) {
@@ -70,5 +71,14 @@ export default class RectangleTool extends Tool {
 
         let rect = new Rectangle(xStart, yStart, length);
         rect.drawFill(this.context.strokeStyle, this.previewContext);
+    }
+
+    // for now we just have one radius input box so all radii will be the same
+    setRadius() {
+        let rectangleRadius = document.querySelector('#rectangle-radius');
+        this.rectangle.setRadius(parseInt(rectangleRadius.value));
+        rectangleRadius.addEventListener('input', () => {
+            this.rectangle.setRadius(parseInt(rectangleRadius.value));
+        });
     }
 }

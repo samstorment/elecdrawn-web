@@ -1,7 +1,6 @@
-import { getMousePosition } from './util.js';
-import { getPixelColor } from './color.js';
 import { DrawTool } from '../draw-tools/draw-tools.js';
 import CanvasState from '../canvas/canvas-state.js';
+// import { RoundRectangle } from './shape.js';
 
 
 // CANVAS - this is where drawings will show up
@@ -25,11 +24,6 @@ function setCanvasSize() {
 }
 
 // Sidebar change listeners
-let brushCheck = document.querySelector('#brush-check');
-let polygonSides = document.querySelector('#polygon-sides');
-polygonSides.addEventListener('input', () => {
-    drawTools.tools.polygon.numSides = polygonSides.value;
-});
 let strokeColor = document.querySelector('#stroke-color');
 strokeColor.addEventListener('input', () => {
     context.strokeStyle = strokeColor.value;
@@ -74,7 +68,6 @@ clearButton.addEventListener('click', clearCanvas);
 
 // manager for drawing tools
 let drawTools = new DrawTool(context);
-drawTools.tools.polygon.numSides = polygonSides.value;
 
 // get all of the selectable sidebar tools
 let sidebarTools = document.querySelectorAll('.sidebar-checkbox');
@@ -85,6 +78,11 @@ sidebarTools.forEach(tool => {
     });
 });
 
+
+// let rr = new RoundRectangle(300, 200, 100, -200);
+// rr.drawStroke(16, 'red', context);
+
+
 // Sloppy undo/redo shortcuts for now
 document.onkeydown = e => {
     if (e.ctrlKey) {
@@ -92,34 +90,6 @@ document.onkeydown = e => {
         if (e.key === 'y') { CanvasState.redo(context); }
     }
 }
-
-// changes the 
-function startPicker(event, pickerType) {
-
-    // get the color at this specific pixel and use it as the new stroke color
-    let { mouseX, mouseY } = getMousePosition(event);
-    let colorPicked = getPixelColor(mouseX, mouseY, context);
-
-
-    if (pickerType === 'stroke') { 
-        strokeColor.value = colorPicked; 
-        context.strokeStyle = colorPicked;
-        previewContext.strokeStyle = colorPicked;
-        showHoverCursor(event); // update the color of the hover cursor
-    }
-    else if (pickerType === 'fill') { 
-        fillColor.value = colorPicked; 
-        context.fillStyle = colorPicked;
-        previewContext.fillStyle = colorPicked;
-    }
-
-}
-
-function finishPicker(event) {
-    // return the paint mode to brush, this should actually go back to the last selected mode
-    brushCheck.checked = true;
-}
-
 
 // MAIN DRAWING EVENT LISTENERS
 canvas.addEventListener('mousedown', e => { drawTools.selectedTool.start(e); });    

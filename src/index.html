@@ -53,6 +53,7 @@
 
             <div class="sidebar-row">
                 <label for="rect-check">Rectangle</label>
+                <input type="number" class="sidebar-number default-hover" id="rectangle-radius" min="0" max="1000" value="0">
                 <input type="radio" class="sidebar-checkbox default-hover" id="rect-check" name="draw-type" value="rectangle">
             </div>
 
@@ -76,13 +77,13 @@
 
             <div class="sidebar-row">
                 <label for="stroke-color">Stroke</label>
-                <input type="radio" class="color-picker no-hover" id="stroke-picker" name="draw-type" value="stroke">
+                <input type="radio" class="sidebar-checkbox color-picker no-hover" id="stroke-picker" name="draw-type" value="strokePicker">
                 <input type="color" class="sidebar-button" id="stroke-color" value="#00aadd">
             </div>
 
             <div class="sidebar-row">
                 <label for="fill-color">Fill</label>
-                <input type="radio" class="color-picker no-hover" id="fill-picker" name="draw-type" value="fill">
+                <input type="radio" class="sidebar-checkbox color-picker no-hover" id="fill-picker" name="draw-type" value="fillPicker">
                 <input type="color" class="sidebar-button" id="fill-color" value="#ff0034">
             </div>
 

@@ -28,21 +28,67 @@ class Shape {
 export class Rectangle extends Shape {
 
     // setting height equal to width by default lets us draw squares by just passing a width argument
-    constructor(startX, startY, width, height=width) {
+    constructor(startX, startY, width, height=width, radius=0) {
         super(startX, startY);
         this.width = width;
         this.height = height;
+        this.setRadius(radius);
     }
 
     drawFill(color, context) {
         super.drawFill(color, context);
-        context.fillRect(this.startX, this.startY, this.width, this.height);
+        this._draw(context);
+        context.fill();
     }
 
     drawStroke(lineWeight, color, context) {
         super.drawStroke(lineWeight, color, context);
-        context.strokeRect(this.startX, this.startY, this.width, this.height);
+        this._draw(context);
+        context.stroke();
     }
+
+    _draw(context) {
+        context.beginPath();
+        context.moveTo(this.startX + this.radius.tl, this.startY);
+        context.lineTo(this.startX + this.width - this.radius.tr, this.startY);
+        context.quadraticCurveTo(this.startX + this.width, this.startY, this.startX + this.width, this.startY + this.radius.tr);
+        context.lineTo(this.startX + this.width, this.startY + this.height - this.radius.br);
+        context.quadraticCurveTo(this.startX + this.width, this.startY + this.height, this.startX + this.width - this.radius.br, this.startY + this.height);
+        context.lineTo(this.startX + this.radius.bl, this.startY + this.height);
+        context.quadraticCurveTo(this.startX, this.startY + this.height, this.startX, this.startY + this.height - this.radius.bl);
+        context.lineTo(this.startX, this.startY + this.radius.tl);
+        context.quadraticCurveTo(this.startX, this.startY, this.startX + this.radius.tl, this.startY);
+        context.closePath();
+    }
+
+    setRadius(radius) {
+
+        // if the radius is a single number, make all 4 corner radii the same
+        if (typeof(radius) === 'number') {
+            this.radius = { tl: radius, tr: radius, bl: radius, br: radius };
+        }
+        // if the radius is an object set any corresponding object properties 
+        else if (typeof(radius) === 'object') {
+            // default radius values all 0's
+            this.radius = { tl: 0, tr: 0, bl: 0, br: 0 };
+            // for each corner (tl, tr, bl, br) set this.radius to the argument if they share the property. otherwise just keep the default value
+            for (let corner in this.radius) {
+                this.radius[corner] = radius[corner] || this.radius[corner];
+            }
+        }
+    }
+
+    // THESE two are for a regular canvas rectangle with no consideration of border radii
+
+    // drawFill(color, context) {
+    //     super.drawFill(color, context);
+    //     context.fillRect(this.startX, this.startY, this.width, this.height);
+    // }
+
+    // drawStroke(lineWeight, color, context) {
+    //     super.drawStroke(lineWeight, color, context);
+    //     context.strokeRect(this.startX, this.startY, this.width, this.height);
+    // }
 
     // returns the coordinates from top left corner of the rectangle. this is different than normal startX, startY because those could be in any corner
     getCoords() {
@@ -204,5 +250,69 @@ export class Polygon extends Shape {
 
         return {x: xnew, y: ynew };
     }
-
 }
+
+// export class RoundRectangle extends Shape {
+
+//     constructor(startX, startY, width, height=width, radius=0) {
+//         super(startX, startY);
+//         this.width = width;
+//         this.height = height;
+//         this.setRadius(radius);
+//     }
+
+   
+//     drawFill(color, context) {
+//         super.drawFill(color, context);
+//         this._draw(context);
+//         context.fill();
+//     }
+
+//     drawStroke(lineWeight, color, context) {
+//         super.drawStroke(lineWeight, color, context);
+//         this._draw(context);
+//         context.stroke();
+//     }
+
+//     _draw(context) {
+//         context.beginPath();
+//         context.moveTo(this.startX + this.radius.tl, this.startY);
+//         context.lineTo(this.startX + this.width - this.radius.tr, this.startY);
+//         context.quadraticCurveTo(this.startX + this.width, this.startY, this.startX + this.width, this.startY + this.radius.tr);
+//         context.lineTo(this.startX + this.width, this.startY + this.height - this.radius.br);
+//         context.quadraticCurveTo(this.startX + this.width, this.startY + this.height, this.startX + this.width - this.radius.br, this.startY + this.height);
+//         context.lineTo(this.startX + this.radius.bl, this.startY + this.height);
+//         context.quadraticCurveTo(this.startX, this.startY + this.height, this.startX, this.startY + this.height - this.radius.bl);
+//         context.lineTo(this.startX, this.startY + this.radius.tl);
+//         context.quadraticCurveTo(this.startX, this.startY, this.startX + this.radius.tl, this.startY);
+//         context.closePath();
+//     }
+
+//     setStart(startX, startY) {
+//         this.startX = startX;
+//         this.startY = startY;
+//     }
+
+//     setSize(width, height) {
+//         this.width = width;
+//         this.height = height;
+//     }
+
+//     setRadius(radius) {
+
+//         // if the radius is a single number, make all 4 corner radii the same
+//         if (typeof(radius) === 'number') {
+//             this.radius = { tl: radius, tr: radius, bl: radius, br: radius };
+//         }
+//         // if the radius is an object set any corresponding object properties 
+//         else if (typeof(radius) === 'object') {
+//             // default radius values all 0's
+//             this.radius = { tl: 0, tr: 0, bl: 0, br: 0 };
+//             // for each corner (tl, tr, bl, br) set this.radius to the argument if they share the property. otherwise just keep the default value
+//             for (let corner in this.radius) {
+//                 this.radius[corner] = radius[corner] || this.radius[corner];
+//             }
+//         }
+//     }
+
+// }
