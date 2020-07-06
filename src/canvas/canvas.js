@@ -1,14 +1,8 @@
-import { Rectangle, Ellipse, Polygon } from './shape.js';
-import { getMousePosition, undoStack, redoStack, clearRedoStack } from './util.js';
-import { floodFill } from './fill.js';
+import { getMousePosition } from './util.js';
 import { getPixelColor } from './color.js';
+import { DrawTool } from '../draw-tools/draw-tools.js';
 import CanvasState from '../canvas/canvas-state.js';
 
-import { DrawTool } from '../draw-tools/draw-tools.js';
-
-let showHover = true;
-let painting = false;
-let mouseDown = false;
 
 // CANVAS - this is where drawings will show up
 let canvas = document.querySelector('#canvas');
@@ -30,16 +24,12 @@ function setCanvasSize() {
     backgroundCanvas.width = window.innerWidth - 200 - 40; 
 }
 
-// Sidebar buttons
+// Sidebar change listeners
 let brushCheck = document.querySelector('#brush-check');
 let polygonSides = document.querySelector('#polygon-sides');
 polygonSides.addEventListener('input', () => {
     drawTools.tools.polygon.numSides = polygonSides.value;
 });
-let fillCheck = document.querySelector('#fill-check');
-fillCheck.addEventListener('click', () => { showHover = false; });
-let clearButton = document.querySelector('#canvas-clear');
-clearButton.addEventListener('click', clearCanvas);
 let strokeColor = document.querySelector('#stroke-color');
 strokeColor.addEventListener('input', () => {
     context.strokeStyle = strokeColor.value;
@@ -69,10 +59,10 @@ downloadCanvas.addEventListener('click', function (e) {
     backgroundContext.fillStyle = backgroundColor.value;
     backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
 });
+let clearButton = document.querySelector('#canvas-clear');
+clearButton.addEventListener('click', clearCanvas);
 
-
-
-function initCanvas() {
+(function initCanvas() {
     setCanvasSize();
     backgroundContext.fillStyle = backgroundColor.value;
     backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
@@ -80,10 +70,7 @@ function initCanvas() {
     // set the inital canvas styles
     setupContext(context);
     setupContext(previewContext);
-}
-
-initCanvas();
-
+})();
 
 // manager for drawing tools
 let drawTools = new DrawTool(context);
@@ -131,22 +118,23 @@ function startPicker(event, pickerType) {
 function finishPicker(event) {
     // return the paint mode to brush, this should actually go back to the last selected mode
     brushCheck.checked = true;
-    showHover = true;
 }
 
 
-// EVENT LISTENERS
+// MAIN DRAWING EVENT LISTENERS
 canvas.addEventListener('mousedown', e => { drawTools.selectedTool.start(e); });    
 canvas.addEventListener('mousemove', e => { drawTools.selectedTool.draw(e); });
 canvas.addEventListener('mouseup', e => { drawTools.selectedTool.finish(e); });
-canvas.addEventListener('mouseenter', paintOnEnter);
-canvas.addEventListener('mouseleave', clearOnLeave);
+
+// SCREEN ENTER AND LEAVE -- these don't work well in all aspects. especially leaving the canvas while drawing the lasso
+canvas.addEventListener('mouseenter', e => { context.beginPath(); });
+canvas.addEventListener('mouseleave', e => { clearContext(previewContext); });
+
+// UPDATES HOVER CURSOR
 canvas.addEventListener('wheel', checkScrollDirection);
 
-// this is a bandaid fix, i'd like to make it so that you can keep painting if you leave the window and come back. However, releasing mouse outside of the window lets you keep painting without mouse held.
-document.body.onmouseleave = () => { painting = false; mouseDown = false; clearContext(previewContext); }    
-document.body.onmousedown = () => { mouseDown = true; }
-document.body.onmouseup = () => { mouseDown = false; } //finish(event); } // we need to call finish again to draw shapes if mouse goes up off cnavas
+
+document.body.onmouseleave = () => { clearContext(previewContext); }    
 
 // when reducing screen size, any part of the canvas that gets cut off is lost with this approach
 window.addEventListener('resize', () => {
@@ -159,10 +147,6 @@ window.addEventListener('resize', () => {
     context.putImageData(imageData, 0, 0);
 });
 
-// when we leave the canvas, clear the preview hover unless we are still painting. select drawn becomes false so we can't select and move an invisible selection
-function clearOnLeave() {
-    if (!painting) { clearContext(previewContext); } 
-}
 
 // change the stroke weight based on scroll direction
 function checkScrollDirection(event) {
@@ -183,6 +167,7 @@ function scrollIsUp(event) {
     return event.deltaY < 0;
 }
 
+
 function clearCanvas() {
     let imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     CanvasState.pushUndoStack(imageData);
@@ -200,5 +185,3 @@ function setupContext(ctx = context, strokeStyle = strokeColor.value, lineWidth 
     ctx.lineCap = lineCap;
     ctx.fillStyle = fillStyle;
 }
-
-

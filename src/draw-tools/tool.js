@@ -41,4 +41,5 @@ export default class Tool {
         let ellipse = new Ellipse(mouseX, mouseY, radius);
         ellipse.drawFill(this.context.strokeStyle, this.previewContext);
     }
+
 }
