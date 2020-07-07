@@ -8,7 +8,7 @@ export default class BrushTool extends Tool {
     }
 
     // lets default to a 2 pixel black line with a round end cap
-    start(event, lineWidth=2, strokeStyle='#000000', lineCap='round') {
+    start(event) {
         super.start(event);
         this.context.beginPath();
         // call draw once to draw a single dot

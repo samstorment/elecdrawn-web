@@ -1,13 +1,14 @@
-import BrushTool from '../draw-tools/brush.js';
-import RectangleTool from '../draw-tools/rectangle.js';
-import EllipseTool from '../draw-tools/ellipse.js';
-import LineTool from '../draw-tools/line.js';
-import RadialTool from '../draw-tools/radial.js';
-import PolygonTool from '../draw-tools/polygon.js';
-import SelectTool from '../draw-tools/select.js';
-import LassoTool from '../draw-tools/lasso.js';
-import BucketTool from '../draw-tools/bucket.js';
-import PickerTool from '../draw-tools/picker.js';
+import BrushTool from './brush.js';
+import RectangleTool from './rectangle.js';
+import EllipseTool from './ellipse.js';
+import LineTool from './line.js';
+import RadialTool from './radial.js';
+import PolygonTool from './polygon.js';
+import SelectTool from './select.js';
+import LassoTool from './lasso.js';
+import BucketTool from './bucket.js';
+import PickerTool from './picker.js';
+import BrushFillTool from './brush-fill.js';
 
 // manager for all drawing tools
 export class DrawTool {
@@ -20,6 +21,7 @@ export class DrawTool {
     setTools(context) {
         this.tools = {
             brush: new BrushTool(context),
+            brushFill: new BrushFillTool(context),
             rectangle: new RectangleTool(context),
             ellipse: new EllipseTool(context),
             line: new LineTool(context),
@@ -30,7 +32,6 @@ export class DrawTool {
             bucket: new BucketTool(context),
             strokePicker: new PickerTool(context, 'stroke'),
             fillPicker: new PickerTool(context, 'fill'),
-
         }
 
         this.selectedTool = this.tools.brush;

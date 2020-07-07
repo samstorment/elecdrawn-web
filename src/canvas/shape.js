@@ -49,15 +49,21 @@ export class Rectangle extends Shape {
 
     _draw(context) {
         context.beginPath();
+
         context.moveTo(this.startX + this.radius.tl, this.startY);
+        
         context.lineTo(this.startX + this.width - this.radius.tr, this.startY);
         context.quadraticCurveTo(this.startX + this.width, this.startY, this.startX + this.width, this.startY + this.radius.tr);
+
         context.lineTo(this.startX + this.width, this.startY + this.height - this.radius.br);
         context.quadraticCurveTo(this.startX + this.width, this.startY + this.height, this.startX + this.width - this.radius.br, this.startY + this.height);
+
         context.lineTo(this.startX + this.radius.bl, this.startY + this.height);
         context.quadraticCurveTo(this.startX, this.startY + this.height, this.startX, this.startY + this.height - this.radius.bl);
+
         context.lineTo(this.startX, this.startY + this.radius.tl);
         context.quadraticCurveTo(this.startX, this.startY, this.startX + this.radius.tl, this.startY);
+
         context.closePath();
     }
 
