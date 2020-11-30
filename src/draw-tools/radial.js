@@ -1,34 +1,40 @@
 import Tool from './tool.js';
 import { getMouse } from '../canvas/util.js';
 
-export default class BrushTool extends Tool {
+export default class RadialTool extends Tool {
 
     constructor(context) {
         super(context);
+        // get the preview context, get the start point of the first mouse click
+        this.mouseStart = { x: 0, y: 0 };
     }
 
-    // lets default to a 2 pixel black line with a round end cap
     start(event) {
+
         super.start(event);
+
         this.context.beginPath();
-        // call draw once to draw a single dot
-        this.draw(event);
+       
+        // we'll use a rectangle to track our line's start coords
+        let { mouseX, mouseY } = getMouse(event, this.context.canvas);
+        this.mouseStart.x = mouseX;
+        this.mouseStart.y = mouseY;
     }
 
     draw(event) { 
-
         super.draw(event);
         // if painting is false, the mouse isn't clicked so we shouldn't draw
         if (!this.painting) { return; }
 
         // get the current mouse coordinates on the canvas
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
-
-        // draw a line to the current mouse cooridnates
+      
+        // draw the preview line to each time we move the mouse
+        this.context.moveTo(this.mouseStart.x, this.mouseStart.y);
         this.context.lineTo(mouseX, mouseY);
         this.context.stroke();
 
-        // these two lines help to smooth the line
+        // makes the drawn lines look smoother
         this.context.beginPath();
         this.context.moveTo(mouseX, mouseY);
     }
