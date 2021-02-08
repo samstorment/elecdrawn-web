@@ -14,13 +14,13 @@ body {
     display: grid;
     grid-template-rows: 30px auto;
     grid-template-columns: 200px auto;
-    background-color: rgb(155, 190, 253);
+    background-color: rgb(112, 112, 112);
 }
 
 .title-bar {
     /* this line lets electron treat this area like a draggable windows titlebar*/
     -webkit-app-region: drag;
-    background-color: rgb(76, 87, 107);
+    background-color: rgb(65, 65, 65);
     height: 30px;
     color: white;
     display: flex;
@@ -72,9 +72,10 @@ body {
 .sidebar {
     display: flex;
     flex-direction: column;
-    background-color: cornflowerblue;
+    background-color: rgb(75, 75, 75);
     grid-row: 2 / -1;
     grid-column: 1;
+    color: white;
 }
 
 .sidebar-row {
@@ -85,7 +86,7 @@ body {
 
 
 .sidebar-row:hover {
-    background-color: lightskyblue;
+    background-color: rgba(155, 155, 155, 0.336);
 }
 
 .sidebar-row label {
@@ -120,4 +121,8 @@ body {
     height: 30px;
     border-radius: 5px;
     border: 1px solid gray;
+}
+
+a {
+    color: white;
 }
