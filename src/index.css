@@ -42,6 +42,7 @@ body {
     /* makes sure buttons on the title bar don't drag the whole window */
     -webkit-app-region: no-drag;
     /* makes the text on the buttons unselectable */
+    user-select: none;
     -webkit-user-select: none;
     height: 100%;
     width: 50px;

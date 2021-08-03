@@ -102,6 +102,7 @@ export default class LassoTool extends Tool {
     }
 
     finish(event) {
+
         if (!this.painting) { return; }
         this.painting = false;
 
@@ -155,7 +156,6 @@ export default class LassoTool extends Tool {
             CanvasState.resetRedoStack();
             this.lassoDrawn = true;
         }
-        
     }
 
     // this does draw the clipped area at the 
@@ -180,7 +180,5 @@ export default class LassoTool extends Tool {
         
         ctx.restore();  
         ctx.closePath();
-
     }
-
 }

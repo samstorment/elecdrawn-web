@@ -159,8 +159,12 @@ export default class SelectTool extends Tool {
             this.anchors = new Anchors(this.select, 10);
             this.anchors.drawAnchors(this.previewContext, 'red');
 
-            // get the image data inside the selection rectangle that was drawn
-            this.selectedImage = this.context.getImageData(this.mouseStart.x, this.mouseStart.y, this.select.width, this.select.height);
+            
+            // only do this if the select box doesn't have a size of 0
+            if (this.select.width > 0 && this.select.height > 0) {
+                // get the image data inside the selection rectangle that was drawn
+                this.selectedImage = this.context.getImageData(this.mouseStart.x, this.mouseStart.y, this.select.width, this.select.height);
+            }
 
             // push the current canvas state to the stack
             let imageData = this.context.getImageData(0, 0, this.context.canvas.width, this.context.canvas.height);

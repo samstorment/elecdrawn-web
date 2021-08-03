@@ -8,7 +8,6 @@ export default class PolygonTool extends Tool {
         super(context);
         // init a sizeless rect for tracking the bounds of the polygon
         this.rectangle = new Rectangle(0, 0, 0);
-        this.setSides();
     }
 
     start(event) {
@@ -25,6 +24,9 @@ export default class PolygonTool extends Tool {
         super.draw(event);
 
         if (!this.painting) { return; }
+
+        // get the sidebar val
+        this.setSides();
         
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
         let width = mouseX - this.rectangle.startX;
@@ -43,8 +45,7 @@ export default class PolygonTool extends Tool {
     
         // draw a new polygon originating from the center of the rectangle
         let poly = new Polygon(this.rectangle.startX + width/2, this.rectangle.startY + height/2);
-        let points = poly.getRegularPolygon(this.numSides, radius);
-        poly.points = points;
+        poly.getRegularPolygon(this.numSides, radius);
         poly.drawFill(this.context.fillStyle, this.previewContext);
         poly.drawStroke(this.context.lineWidth, this.context.strokeStyle, this.previewContext);
     
@@ -81,8 +82,5 @@ export default class PolygonTool extends Tool {
     setSides() {
         let polygonSides = document.querySelector('#polygon-sides');
         this.numSides = polygonSides.value;
-        polygonSides.addEventListener('input', () => {
-            this.numSides = polygonSides.value;
-        });
     }
 }

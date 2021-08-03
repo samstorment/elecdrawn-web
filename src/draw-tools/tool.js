@@ -28,6 +28,7 @@ export default class Tool {
     // we are no longer painting when we finish
     finish(event) {
         this.painting = false;
+        this.resetStroke();
     }
 
     drawHoverCursor(event) {
@@ -42,4 +43,9 @@ export default class Tool {
         ellipse.drawFill(this.context.strokeStyle, this.previewContext);
     }
 
+    resetStroke() {
+        // reset preview stroke color and weight
+        this.previewContext.lineWidth = document.querySelector('#stroke-slider').value;
+        this.previewContext.strokeStyle = document.querySelector('#stroke-color').value;
+    }
 }

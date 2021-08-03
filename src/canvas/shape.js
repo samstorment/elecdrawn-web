@@ -50,19 +50,21 @@ export class Rectangle extends Shape {
     _draw(context) {
         context.beginPath();
 
+        // start in the top left corner of the rectangle
         context.moveTo(this.startX + this.radius.tl, this.startY);
-        
+
+        // draw a line to each corner and a quadratic for the radius if the radius isn't 0 don't draw the quadratic
         context.lineTo(this.startX + this.width - this.radius.tr, this.startY);
-        context.quadraticCurveTo(this.startX + this.width, this.startY, this.startX + this.width, this.startY + this.radius.tr);
+        this.radius.tr !== 0 && context.quadraticCurveTo(this.startX + this.width, this.startY, this.startX + this.width, this.startY + this.radius.tr);
 
         context.lineTo(this.startX + this.width, this.startY + this.height - this.radius.br);
-        context.quadraticCurveTo(this.startX + this.width, this.startY + this.height, this.startX + this.width - this.radius.br, this.startY + this.height);
+        this.radius.br !== 0 && context.quadraticCurveTo(this.startX + this.width, this.startY + this.height, this.startX + this.width - this.radius.br, this.startY + this.height);
 
         context.lineTo(this.startX + this.radius.bl, this.startY + this.height);
-        context.quadraticCurveTo(this.startX, this.startY + this.height, this.startX, this.startY + this.height - this.radius.bl);
+        this.radius.bl !== 0 && context.quadraticCurveTo(this.startX, this.startY + this.height, this.startX, this.startY + this.height - this.radius.bl);
 
         context.lineTo(this.startX, this.startY + this.radius.tl);
-        context.quadraticCurveTo(this.startX, this.startY, this.startX + this.radius.tl, this.startY);
+        this.radius.tl !== 0 && context.quadraticCurveTo(this.startX, this.startY, this.startX + this.radius.tl, this.startY);
 
         context.closePath();
     }
@@ -198,13 +200,8 @@ export class Polygon extends Shape {
     drawFill(color, context) {
         super.drawFill(color, context);
 
-        // draw a line to each point in the array. add the startX and Y to the point for an offset 
-        this.points.forEach(point => {
-            context.lineTo(this.startX + point.x, this.startY + point.y);
-        });
-        
-        // finish the path by drawing a line from end-point of last line to start-point of first line (where we began path)
-        context.closePath()
+        this._draw(context);
+
         // actually put the lines on screen
         context.fill();
     }
@@ -212,15 +209,24 @@ export class Polygon extends Shape {
     drawStroke(lineWeight, color, context) {
         super.drawStroke(lineWeight, color, context);
 
+        this._draw(context);
+        
+        // actually put the lines on screen
+        context.stroke();
+    }
+
+    _draw(context) {
+        // get the first point and the remaining point. Move to the first point and loop through the rest below
+        const [ firstPoint, ...points ] = this.points;
+        context.moveTo(this.startX + firstPoint.x, this.startY + firstPoint.y);
+
         // draw a line to each point in the array. add the startX and Y to the point for an offset 
-        this.points.forEach(point => {
+        points.forEach(point => {
             context.lineTo(this.startX + point.x, this.startY + point.y);
         });
         
         // finish the path by drawing a line from end-point of last line to start-point of first line (where we began path)
-        context.closePath()
-        // actually put the lines on screen
-        context.stroke();
+        context.closePath();
     }
 
     // return the points for a REGULAR polygon. One with equilateral side lengths and equiangular interior/exterior angles
@@ -241,6 +247,7 @@ export class Polygon extends Shape {
             points.push(rotatedPoint);
         }
 
+        this.points = points;
         return points;
     }
 

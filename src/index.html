@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <!-- this makes annoying electron warning go away -->
         <meta http-equiv="Content-Security-Policy" content="script-src 'self';">
-        <title>Wadup</title>
+        <title>Elecdrawn</title>
         <link rel="stylesheet" href="index.css">
         <!-- type module makes the script tag defer by default -->
         <script defer src="./canvas/canvas.js" type="module"></script>
@@ -15,12 +15,7 @@
     <body>
         <div class="title-bar">
             <div class="title-button-container">
-                <div class="title-button" id="file-button">File</div>
-            </div>
-            <div class="title-button-container min-max-close">
-                <div class="title-button" id="min-button"><img src="./titlebar/dash.svg" alt="minimize"></div>
-                <div class="title-button" id="max-button"><img src="./titlebar/rect.svg" alt="maximize"></div>
-                <div class="title-button" id="close-button"><img src="./titlebar/x.svg" alt="close"></div>
+                <div class="title-button" id="help-button">Help</div>
             </div>
         </div>
         <div class="sidebar">
@@ -58,7 +53,7 @@
 
             <div class="sidebar-row">
                 <label for="rect-check">Rectangle</label>
-                <input type="number" class="sidebar-number " id="rectangle-radius" min="0" max="1000" value="0">
+                <input type="number" class="sidebar-number " id="rectangle-radius" min="-1000" max="1000" value="0">
                 <input type="radio" class="sidebar-checkbox " id="rect-check" name="draw-type" value="rectangle">
             </div>
 

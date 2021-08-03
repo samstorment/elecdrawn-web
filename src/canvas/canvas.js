@@ -29,21 +29,25 @@ strokeColor.addEventListener('input', () => {
     context.strokeStyle = strokeColor.value;
     previewContext.strokeStyle = strokeColor.value;
 });
+
 let fillColor = document.querySelector('#fill-color');
 fillColor.addEventListener('input', () => {
     context.fillStyle = fillColor.value;
     previewContext.fillStyle = fillColor.value;
 });
+
 let backgroundColor = document.querySelector('#background-color');
 backgroundColor.addEventListener('input', () => {
     backgroundContext.fillStyle = backgroundColor.value;
     backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
 });
+
 let strokeSlider = document.querySelector('#stroke-slider');
 strokeSlider.addEventListener('change', () => {
     context.lineWidth = strokeSlider.value;
     previewContext.lineWidth = strokeSlider.value;
 });
+
 let downloadCanvas = document.querySelector('#download-canvas');
 downloadCanvas.addEventListener('click', function (e) {
     // draw the canvas to the background just when we save so eveything from the canvas shows up
@@ -78,6 +82,20 @@ sidebarTools.forEach(tool => {
     });
 });
 
+let numberInputs = document.querySelectorAll('input[type="number"]');
+numberInputs.forEach(input => {
+    input.addEventListener('focusout', e => {
+        let val = parseInt(e.target.value);
+        let min = parseInt(e.target.min);
+        let max = parseInt(e.target.max);
+    
+        if (val > max) {
+            e.target.value = max;
+        } else if (val < min) {
+            e.target.value = min;
+        }
+    });
+});
 
 // let rr = new RoundRectangle(300, 200, 100, -200);
 // rr.drawStroke(16, 'red', context);
