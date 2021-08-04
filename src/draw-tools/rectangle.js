@@ -13,6 +13,7 @@ export default class RectangleTool extends Tool {
 
     start(event) {
         super.start(event);
+        this.setRadius();
         this.context.beginPath();
         // clear the preview context like any draw
         this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
@@ -27,8 +28,6 @@ export default class RectangleTool extends Tool {
         super.draw(event);
         // if painting is false, the mouse isn't clicked so we shouldn't draw
         if (!this.painting) { return; }
-
-        this.setRadius();
 
         // get the current mouse coordinates on the canvas
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
@@ -80,6 +79,5 @@ export default class RectangleTool extends Tool {
     setRadius() {
         let rectangleRadius = document.querySelector('#rectangle-radius');
         this.rectangle.setRadius(parseInt(rectangleRadius.value));
-
     }
 }

@@ -14,6 +14,9 @@ export default class Tool {
     // painting is true once we start using a tool. Push the current canvas state to the undo stack since we will be modifying it right after
     start(event) {
         this.painting = true;
+        // clear the hover cursor left on the preview canvas
+        this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+        // push the state to the undo stack
         const imageData = this.context.getImageData(0, 0, this.context.canvas.width, this.context.canvas.height);
         CanvasState.pushUndoStack(imageData);
         CanvasState.resetRedoStack();

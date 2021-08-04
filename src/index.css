@@ -2,6 +2,7 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     margin: 0px;
     padding: 0px;
+    box-sizing: border-box;
 }
 
 html, body {
@@ -74,7 +75,7 @@ body {
     pointer-events:none; 
 }
 
-#shortcuts-container {
+#hotkeys-container {
     display: none;
     flex-direction: column;
     background-color: white;
@@ -84,15 +85,15 @@ body {
     text-align: center;
 }
 
-#shortcuts-container h1 {
+#hotkeys-container h1 {
     border-bottom: 2px solid black;
 }
 
-#shortcuts-container h2 {
+#hotkeys-container h2 {
     margin-top: 10px;
 }
 
-#shortcut-close {
+#hotkeys-close {
     align-self: center;
     padding: 5px;
     font-size: large;
@@ -109,52 +110,97 @@ body {
     color: white;
 }
 
-.sidebar-row {
-    display: flex;
-    align-items: center;
-    padding: 0px 10px;
-}
-
-
 .sidebar-row:hover {
     background-color: rgba(155, 155, 155, 0.336);
 }
 
-.sidebar-row label {
+.sidebar-main-row {
+    display: flex;
+}
+
+.sidebar-main-row label {
+    margin-right: auto;
     flex: 1;
-    padding: 5px 0px;
+    display: flex;
+    align-items: center;
+    padding: 8px 5px;
+}
+
+.sidebar-subrow {
+    background-color: white;
+    color: black;
+    display: none;
+    font-size: small;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+}
+
+.sidebar-subrow label {
+    flex: 1;
+}
+
+.sidebar-subrow input {
+    max-width: 100px;
 }
 
 .sidebar-button {
-    width: 50px;
-    height: 30px;
     border-radius: 5px;
     border: 1px solid gray;
+    background-color: lightgray;
+    color: black;
+    text-align: center;
+    font-size: medium;
+    text-decoration: none;
+    margin: 5px;
+    padding: 5px;
+}
+
+.sidebar-radio {
+    width: 25px;
+    margin-right: 5px;
+    cursor: pointer;
 }
 
 .sidebar-checkbox {
-    height: 100%;
-    width: 20px;
-    margin: 0px 2px;
+    cursor: pointer;
 }
 
 .sidebar-number {
-    width: 40px;
+    flex: 1;
 }
 
 .sidebar-slider {
     width: 100px;
 }
 
-.color-picker {
-    border: 1px solid gray;
+.sidebar-color {
+    width: 60px;
+    margin-right: 5px;
 }
 
 .eye-dropper {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
 }
 
-a {
-    color: white;
+.arrow-button {
+    font-size: larger;
+    background-color: transparent;
+    padding: 0px 10px;
+    border: none;
+    color: lightgray;
+}
+
+.arrow-button:hover {
+    background-color: gray;
+}
+
+button {
+    cursor: pointer;
+}
+
+i {
+    pointer-events: none;
 }

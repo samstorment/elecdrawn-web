@@ -46,6 +46,12 @@ strokeSlider.addEventListener('change', () => {
     previewContext.lineWidth = strokeSlider.value;
 });
 
+let linecapSelect = document.querySelector('#line-caps');
+linecapSelect.addEventListener('change', e => {
+    context.lineCap = e.target.value;
+    previewContext.lineCap = e.target.value;
+});
+
 let downloadCanvas = document.querySelector('#download-canvas');
 downloadCanvas.addEventListener('click', function (e) {
     // draw the canvas to the background just when we save so eveything from the canvas shows up
@@ -58,6 +64,32 @@ downloadCanvas.addEventListener('click', function (e) {
 
 let clearButton = document.querySelector('#canvas-clear');
 clearButton.addEventListener('click', clearCanvas);
+
+// setup the arrow dropdowns for each row
+let rows = document.querySelectorAll('.sidebar-row');
+rows.forEach(row => {
+    const arrowButton = row.querySelector('.arrow-button');
+    const subrows = row.querySelectorAll('.sidebar-subrow');
+
+    arrowButton && arrowButton.addEventListener('click', e => {
+        // toggle the arrow and display the subrow or hide it
+        if (e.target.classList.contains("arrow-closed")) {
+            e.target.classList.remove("arrow-closed");
+            e.target.classList.add("arrow-open");
+            e.target.innerHTML = `<i class="fa fa-angle-down"></i>`;
+            subrows.forEach(subrow => {
+                subrow.style.display = 'flex';
+            });
+        } else {
+            e.target.classList.add("arrow-closed");
+            e.target.classList.remove("arrow-open");
+            e.target.innerHTML = `<i class="fa fa-angle-right"></i>`;
+            subrows.forEach(subrow => {
+                subrow.style.display = 'none';
+            });
+        }
+    });
+});
 
 (function initCanvas() {
     setCanvasSize();
@@ -73,7 +105,7 @@ clearButton.addEventListener('click', clearCanvas);
 let drawTools = new DrawTool(context);
 
 // get all of the selectable sidebar tools
-let sidebarTools = document.querySelectorAll('.sidebar-checkbox');
+let sidebarTools = document.querySelectorAll('.sidebar-radio');
 sidebarTools.forEach(tool => {
     // when we click a sidebar tool, make that the selected tool
     tool.addEventListener('click', () => {
@@ -140,6 +172,7 @@ function checkScrollDirection(event) {
     }
     context.lineWidth = strokeSlider.value;
     previewContext.lineWidth = strokeSlider.value;
+    // redraw the cursor as size scales up
     drawTools.selectedTool.drawHoverCursor(event);
 }
 
@@ -160,7 +193,7 @@ function clearContext(ctx) {
     ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
 }
 
-function setupContext(ctx = context, strokeStyle = strokeColor.value, lineWidth = strokeSlider.value, lineCap = 'round', fillStyle = fillColor.value) {
+function setupContext(ctx = context, strokeStyle = strokeColor.value, lineWidth = strokeSlider.value, lineCap = linecapSelect.value, fillStyle = fillColor.value) {
     ctx.beginPath();
     ctx.strokeStyle = strokeStyle;
     ctx.lineWidth = lineWidth;

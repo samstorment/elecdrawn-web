@@ -1,19 +1,19 @@
-let shortcuts = document.querySelector("#shortcuts-container");
+let hotkeys = document.querySelector("#hotkeys-container");
 let canvases = document.querySelectorAll(".canvas");
 
 
-let shortcutsButton = document.querySelector('#shortcuts-button');
-shortcutsButton.addEventListener('click', () => {
+let hotkeysButton = document.querySelector('#hotkeys-button');
+hotkeysButton.addEventListener('click', () => {
     canvases.forEach(element => {
         element.style.visibility = "hidden";
-        shortcuts.style.display = "flex";
+        hotkeys.style.display = "flex";
     });
 });
 
-let shortcutClose = document.querySelector("#shortcut-close");
-shortcutClose.addEventListener('click', () => {
+let hotkeysClose = document.querySelector("#hotkeys-close");
+hotkeysClose.addEventListener('click', () => {
     canvases.forEach(element => {
         element.style.visibility = "visible";
-        shortcuts.style.display = "none";
+        hotkeys.style.display = "none";
     });
 });

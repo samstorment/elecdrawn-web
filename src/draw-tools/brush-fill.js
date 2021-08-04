@@ -8,11 +8,13 @@ export default class BrushFillTool extends Tool {
         super(context);
         this.points = [];
         this.mouseStart = { x: 0, y: 0 };
+        this.drawClosingLine = false;
     }
 
     // lets default to a 2 pixel black line with a round end cap
     start(event) {
         super.start(event);
+        this.setDrawClosingLine();
         this.previewContext.beginPath();
         this.context.beginPath();
 
@@ -52,13 +54,20 @@ export default class BrushFillTool extends Tool {
         super.finish(event);
 
         // draw the final line from start to finish on the preview context. cant use close path because we are consistently re-beginning path
-        // this.previewContext.lineTo(this.mouseStart.x, this.mouseStart.y)
-        // this.previewContext.stroke();
+        if (this.drawClosingLine) {
+            this.previewContext.lineTo(this.mouseStart.x, this.mouseStart.y)
+            this.previewContext.stroke();
+        }
 
         // draw the preview to the main canvas since the main line was drawn to the preview so it shows over the polygon fill
         this.context.drawImage(this.previewContext.canvas, 0, 0);
 
         // reset the points
         this.points = [];
+    }
+
+    setDrawClosingLine() {
+        let checkbox = document.querySelector('#closing-line-checkbox');
+        this.drawClosingLine = checkbox.checked;
     }
 }
