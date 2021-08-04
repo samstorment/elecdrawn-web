@@ -7,6 +7,7 @@
         <meta http-equiv="Content-Security-Policy" content="script-src 'self';">
         <title>Elecdrawn</title>
         <link rel="stylesheet" href="index.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <!-- type module makes the script tag defer by default -->
         <script defer src="./canvas/canvas.js" type="module"></script>
         <script defer src="./titlebar/titlebar.js" type="module"></script>
@@ -15,7 +16,7 @@
     <body>
         <div class="title-bar">
             <div class="title-button-container">
-                <div class="title-button" id="help-button">Help</div>
+                <div class="title-button" id="shortcuts-button">Shortcuts</div>
             </div>
         </div>
         <div class="sidebar">
@@ -69,7 +70,7 @@
             </div>
 
             <div class="sidebar-row">
-                <label for="fill-check">Fill</label>
+                <label for="fill-check">Fill </label>
                 <input type="radio" class="sidebar-checkbox" id="fill-check" name="draw-type" value="bucket">
             </div>
 
@@ -77,12 +78,14 @@
 
             <div class="sidebar-row">
                 <label for="stroke-color">Stroke</label>
+                <label for="stroke-picker" class="eye-dropper"><i class="fa fa-eyedropper"></i></label>
                 <input type="radio" class="sidebar-checkbox color-picker" id="stroke-picker" name="draw-type" value="strokePicker">
                 <input type="color" class="sidebar-button" id="stroke-color" value="#00aadd">
             </div>
 
             <div class="sidebar-row">
                 <label for="fill-color">Fill</label>
+                <label for="fill-picker" class="eye-dropper"><i class="fa fa-eyedropper"></i></label>
                 <input type="radio" class="sidebar-checkbox color-picker" id="fill-picker" name="draw-type" value="fillPicker">
                 <input type="color" class="sidebar-button" id="fill-color" value="#ff0034">
             </div>
@@ -106,7 +109,26 @@
             </div>
 
         </div>
-        <div>
+        <div id="canvas-container">
+            <div id="shortcuts-container">
+                <h1>Shortcut Keys</h1>
+                
+                <h2>Select</h2>
+                <p>Delete Key to delete selected area</p>
+
+                <h2>Rectangle, Circle</h2>
+                <p>Shift + Click and Drag for perfect square/circle</p>
+
+                <h2>Line</h2>
+                <p>Shift + Click and Drag for straight line</p>
+
+                <h2>General</h2>
+                <p>Ctrl + Z to undo</p>
+                <p>Ctrl + Y to redo</p>
+                <p>Scroll Wheel to change stroke weight</p>
+
+                <button id="shortcut-close">Close</button>
+            </div>
             <canvas class="canvas" id="background-canvas"></canvas>
             <canvas class="canvas" id="canvas"></canvas>
             <canvas class="canvas" id="preview-canvas"></canvas>

@@ -45,14 +45,14 @@ body {
     user-select: none;
     -webkit-user-select: none;
     height: 100%;
-    width: 50px;
+    padding: 0px 10px;
     color: white;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
 }
 
 .title-button:hover {
-    cursor: default;
     background-color: rgba(155, 155, 155, 0.336);
 }
 
@@ -60,14 +60,42 @@ body {
     background-color: red;
 }
 
+#canvas-container {
+    display: flex;
+    padding: 20px;
+}
+
 .canvas {
     position: absolute;
-    margin: 20px 20px 0 20px;
-    /* padding: 0px 20px; */
+
 }
 
 #preview-canvas { 
     pointer-events:none; 
+}
+
+#shortcuts-container {
+    display: none;
+    flex-direction: column;
+    background-color: white;
+    flex: 1;
+    padding: 10px;
+}
+
+#shortcuts-container h1 {
+    text-align: center;
+}
+
+#shortcuts-container h2 {
+    margin-top: 10px;
+}
+
+#shortcut-close {
+    align-self: center;
+    padding: 5px;
+    font-size: large;
+    font-weight: bold;
+
 }
 
 .sidebar {
@@ -117,11 +145,12 @@ body {
 }
 
 .color-picker {
-    margin-right: 10px;
-    width: 30px;
-    height: 30px;
-    border-radius: 5px;
     border: 1px solid gray;
+}
+
+.eye-dropper {
+    display: flex;
+    justify-content: flex-end;
 }
 
 a {

@@ -1,7 +1,5 @@
 import { DrawTool } from '../draw-tools/draw-tools.js';
 import CanvasState from '../canvas/canvas-state.js';
-// import { RoundRectangle } from './shape.js';
-
 
 // CANVAS - this is where drawings will show up
 let canvas = document.querySelector('#canvas');
@@ -20,7 +18,7 @@ function setCanvasSize() {
     previewCanvas.height = window.innerHeight - 70; 
     previewCanvas.width = window.innerWidth - 200 - 40; 
     backgroundCanvas.height = window.innerHeight - 70; 
-    backgroundCanvas.width = window.innerWidth - 200 - 40; 
+    backgroundCanvas.width = window.innerWidth - 200 - 40;
 }
 
 // Sidebar change listeners
@@ -57,6 +55,7 @@ downloadCanvas.addEventListener('click', function (e) {
     backgroundContext.fillStyle = backgroundColor.value;
     backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
 });
+
 let clearButton = document.querySelector('#canvas-clear');
 clearButton.addEventListener('click', clearCanvas);
 
@@ -97,10 +96,6 @@ numberInputs.forEach(input => {
     });
 });
 
-// let rr = new RoundRectangle(300, 200, 100, -200);
-// rr.drawStroke(16, 'red', context);
-
-
 // Sloppy undo/redo shortcuts for now
 document.onkeydown = e => {
     if (e.ctrlKey) {
@@ -120,7 +115,6 @@ canvas.addEventListener('mouseleave', e => { clearContext(previewContext); });
 
 // UPDATES HOVER CURSOR
 canvas.addEventListener('wheel', checkScrollDirection);
-
 
 document.body.onmouseleave = () => { clearContext(previewContext); }    
 

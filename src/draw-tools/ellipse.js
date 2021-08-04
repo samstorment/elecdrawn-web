@@ -55,6 +55,9 @@ export default class EllipseTool extends Tool {
     finish(event) {
         super.finish(event);
 
+        // get rid of the black guideline box around the circle
+        this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+
         // draw an ellipse with a stroke border on top of a filled ellipse
         this.ellipse.drawFill(this.context.fillStyle, this.context);
         this.ellipse.drawStroke(this.context.lineWidth, this.context.strokeStyle, this.context);
