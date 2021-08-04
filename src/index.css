@@ -78,12 +78,14 @@ body {
     display: none;
     flex-direction: column;
     background-color: white;
+    align-items: center;
     flex: 1;
     padding: 10px;
+    text-align: center;
 }
 
 #shortcuts-container h1 {
-    text-align: center;
+    border-bottom: 2px solid black;
 }
 
 #shortcuts-container h2 {
@@ -95,7 +97,7 @@ body {
     padding: 5px;
     font-size: large;
     font-weight: bold;
-
+    margin-top: 10px;
 }
 
 .sidebar {
