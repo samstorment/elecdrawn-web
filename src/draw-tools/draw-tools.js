@@ -16,6 +16,7 @@ export class DrawTool {
     constructor(context) {
         this.context = context;
         this.setTools(context);
+        this.setToolChange();
     }
 
     setTools(context) {
@@ -34,6 +35,18 @@ export class DrawTool {
             fillPicker: new PickerTool(context, 'fill'),
         }
 
-        this.selectedTool = this.tools.brush;
+        let checkedTool = document.querySelector('.sidebar-radio:checked');
+        this.selectedTool = this.tools[checkedTool.value];
+    }
+
+    setToolChange() {
+        let sidebarTools = document.querySelectorAll('.sidebar-radio');
+        // add click event to all sidebar tools
+        sidebarTools.forEach(tool => {
+            // when we click a sidebar tool, make that the selected tool
+            tool.addEventListener('click', () => {
+                this.selectedTool = this.tools[tool.value];
+            });
+        });
     }
 }

@@ -8,32 +8,33 @@ export default class BrushTool extends Tool {
     }
 
     // lets default to a 2 pixel black line with a round end cap
-    start(event) {
-        super.start(event);
+    startLeft(event) {
+        super.startLeft(event);
         this.context.beginPath();
-        // call draw once to draw a single dot
-        this.draw(event);
+        // call draw once to draw a single dot if its a left click
+        this.left && this.drawLeft(event);
     }
 
-    draw(event) { 
+    drawLeft(event) { 
 
-        super.draw(event);
+        super.drawLeft(event);
         // if painting is false, the mouse isn't clicked so we shouldn't draw
         if (!this.painting) { return; }
 
         // get the current mouse coordinates on the canvas
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
-
+        
         // draw a line to the current mouse cooridnates
         this.context.lineTo(mouseX, mouseY);
         this.context.stroke();
-
+        
         // these two lines help to smooth the line
         this.context.beginPath();
         this.context.moveTo(mouseX, mouseY);
+    
     }
 
-    finish(event) {
-        super.finish(event);
+    finishLeft(event) {
+        super.finishLeft(event);
     }
 }

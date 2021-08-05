@@ -1,5 +1,6 @@
 import { DrawTool } from '../draw-tools/draw-tools.js';
 import CanvasState from '../canvas/canvas-state.js';
+import { backgroundColor, fillColor, linecapSelect, strokeColor, strokeSlider } from '../sidebar/sidebar.js';
 
 // CANVAS - this is where drawings will show up
 let canvas = document.querySelector('#canvas');
@@ -21,75 +22,7 @@ function setCanvasSize() {
     backgroundCanvas.width = window.innerWidth - 200 - 40;
 }
 
-// Sidebar change listeners
-let strokeColor = document.querySelector('#stroke-color');
-strokeColor.addEventListener('input', () => {
-    context.strokeStyle = strokeColor.value;
-    previewContext.strokeStyle = strokeColor.value;
-});
 
-let fillColor = document.querySelector('#fill-color');
-fillColor.addEventListener('input', () => {
-    context.fillStyle = fillColor.value;
-    previewContext.fillStyle = fillColor.value;
-});
-
-let backgroundColor = document.querySelector('#background-color');
-backgroundColor.addEventListener('input', () => {
-    backgroundContext.fillStyle = backgroundColor.value;
-    backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
-});
-
-let strokeSlider = document.querySelector('#stroke-slider');
-strokeSlider.addEventListener('change', () => {
-    context.lineWidth = strokeSlider.value;
-    previewContext.lineWidth = strokeSlider.value;
-});
-
-let linecapSelect = document.querySelector('#line-caps');
-linecapSelect.addEventListener('change', e => {
-    context.lineCap = e.target.value;
-    previewContext.lineCap = e.target.value;
-});
-
-let downloadCanvas = document.querySelector('#download-canvas');
-downloadCanvas.addEventListener('click', function (e) {
-    // draw the canvas to the background just when we save so eveything from the canvas shows up
-    backgroundContext.drawImage(canvas, 0, 0);
-    let dataURL = backgroundCanvas.toDataURL('image/png');
-    downloadCanvas.href = dataURL;
-    backgroundContext.fillStyle = backgroundColor.value;
-    backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
-});
-
-let clearButton = document.querySelector('#canvas-clear');
-clearButton.addEventListener('click', clearCanvas);
-
-// setup the arrow dropdowns for each row
-let rows = document.querySelectorAll('.sidebar-row');
-rows.forEach(row => {
-    const arrowButton = row.querySelector('.arrow-button');
-    const subrows = row.querySelectorAll('.sidebar-subrow');
-
-    arrowButton && arrowButton.addEventListener('click', e => {
-        // toggle the arrow and display the subrow or hide it
-        if (e.target.classList.contains("arrow-closed")) {
-            e.target.classList.remove("arrow-closed");
-            e.target.classList.add("arrow-open");
-            e.target.innerHTML = `<i class="fa fa-angle-down"></i>`;
-            subrows.forEach(subrow => {
-                subrow.style.display = 'flex';
-            });
-        } else {
-            e.target.classList.add("arrow-closed");
-            e.target.classList.remove("arrow-open");
-            e.target.innerHTML = `<i class="fa fa-angle-right"></i>`;
-            subrows.forEach(subrow => {
-                subrow.style.display = 'none';
-            });
-        }
-    });
-});
 
 (function initCanvas() {
     setCanvasSize();
@@ -100,18 +33,6 @@ rows.forEach(row => {
     setupContext(context);
     setupContext(previewContext);
 })();
-
-// manager for drawing tools
-let drawTools = new DrawTool(context);
-
-// get all of the selectable sidebar tools
-let sidebarTools = document.querySelectorAll('.sidebar-radio');
-sidebarTools.forEach(tool => {
-    // when we click a sidebar tool, make that the selected tool
-    tool.addEventListener('click', () => {
-        drawTools.selectedTool = drawTools.tools[tool.value];
-    });
-});
 
 let numberInputs = document.querySelectorAll('input[type="number"]');
 numberInputs.forEach(input => {
@@ -136,10 +57,39 @@ document.onkeydown = e => {
     }
 }
 
+// manager for drawing tools
+let drawTools = new DrawTool(context);
+
 // MAIN DRAWING EVENT LISTENERS
-canvas.addEventListener('mousedown', e => { drawTools.selectedTool.start(e); });    
-canvas.addEventListener('mousemove', e => { drawTools.selectedTool.draw(e); });
-canvas.addEventListener('mouseup', e => { drawTools.selectedTool.finish(e); });
+canvas.addEventListener('mousedown', e => {
+    if (e.which === 1) {
+        drawTools.selectedTool.startLeft(e);
+    } else if (e.which === 2) {
+        drawTools.selectedTool.startMiddle(e);
+    } else if (e.which === 3) {
+        drawTools.selectedTool.startRight(e);
+    }
+});
+
+canvas.addEventListener('mousemove', e => {
+    if (drawTools.selectedTool.left) {
+        drawTools.selectedTool.drawLeft(e);
+    } else if (drawTools.selectedTool.middle) {
+        drawTools.selectedTool.drawMiddle(e);
+    } else if (drawTools.selectedTool.right) {
+        drawTools.selectedTool.drawRight(e);
+    }
+});
+
+canvas.addEventListener('mouseup', e => { 
+    if (drawTools.selectedTool.left) {
+        drawTools.selectedTool.finishLeft(e);
+    } else if (drawTools.selectedTool.middle) {
+        drawTools.selectedTool.finishMiddle(e);
+    } else if (drawTools.selectedTool.right) {
+        drawTools.selectedTool.finishRight(e);
+    }
+});
 
 // SCREEN ENTER AND LEAVE -- these don't work well in all aspects. especially leaving the canvas while drawing the lasso
 canvas.addEventListener('mouseenter', e => { context.beginPath(); });
@@ -180,13 +130,6 @@ function checkScrollDirection(event) {
 function scrollIsUp(event) {
     if (event.wheelDelta) { return event.wheelDelta > 0; }
     return event.deltaY < 0;
-}
-
-
-function clearCanvas() {
-    let imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-    CanvasState.pushUndoStack(imageData);
-    context.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 function clearContext(ctx) {

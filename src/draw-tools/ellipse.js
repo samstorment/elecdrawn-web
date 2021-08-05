@@ -12,8 +12,8 @@ export default class EllipseTool extends Tool {
         this.shift = getKey('Shift');
     }
 
-    start(event) {
-        super.start(event);
+    startLeft(event) {
+        super.startLeft(event);
         this.context.beginPath();
       
         // set the start point of the rectangle to the position of the first mouse click
@@ -21,8 +21,8 @@ export default class EllipseTool extends Tool {
         this.rectangle.setStart(mouseX, mouseY);
     }
 
-    draw(event) { 
-        super.draw(event);
+    drawLeft(event) { 
+        super.drawLeft(event);
         // if painting is false, the mouse isn't clicked so we shouldn't draw
         if (!this.painting) { return; }
 
@@ -52,8 +52,8 @@ export default class EllipseTool extends Tool {
         this.rectangle.drawStroke(2, 'black', this.previewContext);
     }
 
-    finish(event) {
-        super.finish(event);
+    finishLeft(event) {
+        super.finishLeft(event);
 
         // get rid of the black guideline box around the circle
         this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);

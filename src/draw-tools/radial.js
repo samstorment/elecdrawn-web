@@ -9,9 +9,9 @@ export default class RadialTool extends Tool {
         this.mouseStart = { x: 0, y: 0 };
     }
 
-    start(event) {
+    startLeft(event) {
 
-        super.start(event);
+        super.startLeft(event);
 
         this.context.beginPath();
        
@@ -21,8 +21,8 @@ export default class RadialTool extends Tool {
         this.mouseStart.y = mouseY;
     }
 
-    draw(event) { 
-        super.draw(event);
+    drawLeft(event) { 
+        super.drawLeft(event);
         // if painting is false, the mouse isn't clicked so we shouldn't draw
         if (!this.painting) { return; }
 
@@ -39,7 +39,7 @@ export default class RadialTool extends Tool {
         this.context.moveTo(mouseX, mouseY);
     }
 
-    finish(event) {
-        super.finish(event);
+    finishLeft(event) {
+        super.finishLeft(event);
     }
 }

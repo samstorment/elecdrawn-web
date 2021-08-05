@@ -8,20 +8,20 @@ export default class BucketTool extends Tool {
         super(context);
     }
 
-    start(event) {
-        super.start(event);
+    startLeft(event) {
+        super.startLeft(event);
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
         this.floodFill(mouseX, mouseY, this.context.fillStyle, this.context, 128);
         this.context.beginPath();    // start a new path so we don't mess our other tools don't start at weird spot
     }
 
-    // define an empty draw function to override super class because we don't want to draw a gover cursor
-    draw(event) {
+    // define an empty draw functions to override super class because we don't want to draw a gover cursor
+    drawLeft(event) {}
+    drawRight(event) {}
+    drawMiddle(event) {}
 
-    }
-
-    finish(event) {
-        super.finish();
+    finishLeft(event) {
+        super.finishLeft(event);
     }
 
     floodFill(startX, startY, hexFillColor, context, range = 1) {

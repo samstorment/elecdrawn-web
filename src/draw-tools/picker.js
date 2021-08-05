@@ -10,8 +10,8 @@ export default class PickerTool extends Tool {
         this.pickerType = pickerType;
     }
 
-    start(event) {
-        super.start(event);
+    startLeft(event) {
+        super.startLeft(event);
 
         // get the two color selectors so we can set their colors
         let strokeColor = document.querySelector('#stroke-color');
@@ -35,13 +35,13 @@ export default class PickerTool extends Tool {
     }
 
     // define empty draw so we don't call super for hover cursor
-    draw(event) { 
+    drawLeft(event) { 
       
     }
 
     // we are no longer painting when we finish
-    finish(event) {
-        super.finish(event);
+    finishLeft(event) {
+        super.finishLeft(event);
     }
 
 

@@ -22,7 +22,7 @@ export default class SelectTool extends Tool {
         this.mouseStart = { x: 0, y: 0 };
     }
 
-    start(event) {
+    startLeft(event) {
         
         // we don't call super.start because we don't want to save the canvas state to the undo stack immeditaely
         this.painting = true;
@@ -59,7 +59,15 @@ export default class SelectTool extends Tool {
         }
     }
 
-    draw(event) { 
+    startMiddle(event) {
+        this.startLeft(event);
+    }
+
+    startRight(event) {
+        this.startLeft(event);
+    }
+
+    drawLeft(event) { 
 
         // get the mouse position on the canvas
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
@@ -102,9 +110,9 @@ export default class SelectTool extends Tool {
         }
     }
 
-    finish(event) {
+    finishLeft(event) {
         if (!this.painting) { return; }
-        super.finish(event);
+        super.finishLeft(event);
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
         let width = mouseX - this.mouseStart.x;
         let height = mouseY - this.mouseStart.y;

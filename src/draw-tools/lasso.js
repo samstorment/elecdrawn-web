@@ -17,8 +17,8 @@ export default class LassoTool extends Tool {
     
     }
 
-    start(event) {
-        super.start(event);
+    startLeft(event) {
+        super.startLeft(event);
 
         // reset the path from the last lasso selection for the context and preview context
         this.context.beginPath();
@@ -54,7 +54,7 @@ export default class LassoTool extends Tool {
         // if (lassoDrawn && !previewContext.isPointInPath(mouseX, mouseY))  { lassoDrawn = false; }
     }
 
-    draw(event) { 
+    drawLeft(event) { 
         // if painting is false, the mouse isn't clicked so we shouldn't draw
         if (!this.painting) { return; }
 
@@ -79,6 +79,8 @@ export default class LassoTool extends Tool {
             // draw the lasso'd region of the canvas to the given the current mouse positions - offsets. We use the ghost canvas since it contains the FULL canvas before we clear it in the line above
             this.drawClippedImage(this.ghostContext.canvas, this.previewContext, this.points, mouseX - imageXOffset, mouseY - imageYOffset);
         
+            // reset back to normal stroke weight and color
+            this.resetStroke();
         } else {
             // add the current mouse drawing coords to the points array
             this.points.push( {x: mouseX, y: mouseY} );
@@ -98,10 +100,12 @@ export default class LassoTool extends Tool {
 
             // draw the lines to the ghost as well so we can pt the black lasso line there. This way when we move the lasso'd region, there is a black outline
             this.ghostContext.lineTo(mouseX, mouseY);
+
         }
+
     }
 
-    finish(event) {
+    finishLeft(event) {
 
         if (!this.painting) { return; }
         this.painting = false;

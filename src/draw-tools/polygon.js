@@ -10,8 +10,8 @@ export default class PolygonTool extends Tool {
         this.rectangle = new Rectangle(0, 0, 0);
     }
 
-    start(event) {
-        super.start(event);
+    startLeft(event) {
+        super.startLeft(event);
         this.context.beginPath();
       
         // set the start point of the rectangle to the position of the first mouse click
@@ -19,9 +19,9 @@ export default class PolygonTool extends Tool {
         this.rectangle.setStart(mouseX, mouseY);
     }
 
-    draw(event) { 
+    drawLeft(event) { 
 
-        super.draw(event);
+        super.drawLeft(event);
 
         if (!this.painting) { return; }
 
@@ -53,8 +53,8 @@ export default class PolygonTool extends Tool {
         this.rectangle.drawStroke(2, "#000000", this.previewContext);
     }
 
-    finish(event) {
-        super.finish(event);
+    finishLeft(event) {
+        super.finishLeft(event);
 
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
         let width = mouseX - this.rectangle.startX;
@@ -73,10 +73,25 @@ export default class PolygonTool extends Tool {
     
         // draw a new polygon originating from the center of the rectangle
         let poly = new Polygon(this.rectangle.startX + width/2, this.rectangle.startY + height/2);
-        let points = poly.getRegularPolygon(this.numSides, radius);
-        poly.points = points;
+        poly.getRegularPolygon(this.numSides, radius);
         poly.drawFill(this.context.fillStyle, this.context);
         poly.drawStroke(this.context.lineWidth, this.context.strokeStyle, this.context);
+    }
+
+    drawHoverCursor(event) {
+        let { mouseX, mouseY } = getMouse(event, this.context.canvas);
+        this.setSides();
+
+        // clear the preview canvas anytime we move, but draw right after
+        this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+        this.previewContext.beginPath();
+
+        let radius = this.context.lineWidth / 2;
+
+        let poly = new Polygon(mouseX, mouseY);
+        poly.getRegularPolygon(this.numSides, radius);
+        poly.drawFill(this.context.strokeStyle, this.previewContext);
+     
     }
 
     setSides() {

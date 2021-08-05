@@ -11,21 +11,19 @@ export default class RectangleTool extends Tool {
         this.shift = getKey('Shift');
     }
 
-    start(event) {
-        super.start(event);
+    startLeft(event) {
+        super.startLeft(event);
         this.setRadius();
         this.context.beginPath();
-        // clear the preview context like any draw
-        this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
-     
+
         // set the start point of the rectangle to the position of the first mouse click
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
         this.rectangle.setStart(mouseX, mouseY);
     }
 
-    draw(event) { 
+    drawLeft(event) { 
 
-        super.draw(event);
+        super.drawLeft(event);
         // if painting is false, the mouse isn't clicked so we shouldn't draw
         if (!this.painting) { return; }
 
@@ -50,8 +48,8 @@ export default class RectangleTool extends Tool {
         this.rectangle.drawStroke(this.context.lineWidth, this.context.strokeStyle, this.previewContext);
     }
 
-    finish(event) {
-        super.finish(event);
+    finishLeft(event) {
+        super.finishLeft(event);
 
         // draw a rectangle with a stroke border on top of a filled rectangle
         this.rectangle.drawFill(this.context.fillStyle, this.context);

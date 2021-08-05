@@ -12,8 +12,8 @@ export default class BrushFillTool extends Tool {
     }
 
     // lets default to a 2 pixel black line with a round end cap
-    start(event) {
-        super.start(event);
+    startLeft(event) {
+        super.startLeft(event);
         this.setDrawClosingLine();
         this.previewContext.beginPath();
         this.context.beginPath();
@@ -21,14 +21,11 @@ export default class BrushFillTool extends Tool {
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
         this.mouseStart.x = mouseX;
         this.mouseStart.y = mouseY;
-
-        // call draw once to draw a single dot
-        this.draw(event);
     }
 
-    draw(event) { 
+    drawLeft(event) { 
 
-        super.draw(event);
+        super.drawLeft(event);
         // if painting is false, the mouse isn't clicked so we shouldn't draw
         if (!this.painting) { return; }
 
@@ -50,8 +47,8 @@ export default class BrushFillTool extends Tool {
         this.previewContext.moveTo(mouseX, mouseY);
     }
 
-    finish(event) {
-        super.finish(event);
+    finishLeft(event) {
+        super.finishLeft(event);
 
         // draw the final line from start to finish on the preview context. cant use close path because we are consistently re-beginning path
         if (this.drawClosingLine) {
