@@ -18,12 +18,14 @@ strokeColor.addEventListener('input', () => {
 
 export let fillColor = document.querySelector('#fill-color');
 fillColor.addEventListener('input', () => {
+    console.log('fill change');
     context.fillStyle = fillColor.value;
     previewContext.fillStyle = fillColor.value;
 });
 
 export let backgroundColor = document.querySelector('#background-color');
-backgroundColor.addEventListener('input', () => {
+backgroundColor.addEventListener('input', e => {
+    console.log('wow');
     backgroundContext.fillStyle = backgroundColor.value;
     backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
 });
@@ -79,6 +81,21 @@ rows.forEach(row => {
             subrows.forEach(subrow => {
                 subrow.style.display = 'none';
             });
+        }
+    });
+});
+
+let numberInputs = document.querySelectorAll('input[type="number"]');
+numberInputs.forEach(input => {
+    input.addEventListener('focusout', e => {
+        let val = parseInt(e.target.value);
+        let min = parseInt(e.target.min);
+        let max = parseInt(e.target.max);
+    
+        if (val > max) {
+            e.target.value = max;
+        } else if (val < min) {
+            e.target.value = min;
         }
     });
 });

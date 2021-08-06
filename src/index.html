@@ -3,15 +3,13 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <!-- this makes annoying electron warning go away -->
-        <meta http-equiv="Content-Security-Policy" content="script-src 'self';">
         <title>Elecdrawn</title>
         <link rel="stylesheet" href="index.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <!-- type module makes the script tag defer by default -->
+        <script defer src="https://unpkg.com/@panzoom/panzoom@4.4.1/dist/panzoom.min.js"></script>
         <script defer src="./canvas/canvas.js" type="module"></script>
         <script defer src="./titlebar/titlebar.js" type="module"></script>
-        
     </head>
     <body>
         <div class="title-bar">
@@ -165,26 +163,28 @@
          
 
         </div>
+        <div id="hotkeys-container">
+            <h1>Hot Keys</h1>
+            
+            <h2>Select</h2>
+            <p>Delete Key to delete selected area</p>
+
+            <h2>Rectangle, Circle</h2>
+            <p>Shift + Click and Drag for perfect square/circle</p>
+
+            <h2>Line</h2>
+            <p>Shift + Click and Drag for straight line</p>
+
+            <h2>General</h2>
+            <p>Ctrl + Z to undo</p>
+            <p>Ctrl + Y to redo</p>
+            <p>Scroll Wheel to change stroke weight</p>
+            <p>Middle Mouse Button to Pan</p>
+            <!-- <p>Right Click to erase</p> -->
+
+            <button id="hotkeys-close">Close</button>
+        </div>
         <div id="canvas-container">
-            <div id="hotkeys-container">
-                <h1>Hot Keys</h1>
-                
-                <h2>Select</h2>
-                <p>Delete Key to delete selected area</p>
-
-                <h2>Rectangle, Circle</h2>
-                <p>Shift + Click and Drag for perfect square/circle</p>
-
-                <h2>Line</h2>
-                <p>Shift + Click and Drag for straight line</p>
-
-                <h2>General</h2>
-                <p>Ctrl + Z to undo</p>
-                <p>Ctrl + Y to redo</p>
-                <p>Scroll Wheel to change stroke weight</p>
-
-                <button id="hotkeys-close">Close</button>
-            </div>
             <canvas class="canvas" id="background-canvas"></canvas>
             <canvas class="canvas" id="canvas"></canvas>
             <canvas class="canvas" id="preview-canvas"></canvas>

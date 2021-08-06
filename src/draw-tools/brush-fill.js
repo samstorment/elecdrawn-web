@@ -21,6 +21,8 @@ export default class BrushFillTool extends Tool {
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
         this.mouseStart.x = mouseX;
         this.mouseStart.y = mouseY;
+
+        this.drawLeft(event);
     }
 
     drawLeft(event) { 

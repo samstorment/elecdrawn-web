@@ -45,22 +45,6 @@ export default class Tool {
     
     drawMiddle(event) {
         this.drawHoverCursor(event);
-        
-        if (!this.painting) return;
-        let { mouseX, mouseY } = getMouse(event, this.context.canvas);
-
-        let changeX = mouseX - this.startX;
-        let changeY = mouseY - this.startY;
-        
-        this.setStart(mouseX, mouseY);
-
-        let canvasWidth = this.context.canvas.clientWidth;
-        let canvasHeight = this.context.canvas.clientHeight;
-
-        const imageData = this.context.getImageData(0, 0, canvasWidth, canvasHeight);
-        this.context.clearRect(0,0,canvasWidth,canvasHeight);
-        
-        this.context.putImageData(imageData, changeX, changeY);
     }
 
     drawRight(event) {

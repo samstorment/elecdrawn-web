@@ -2,6 +2,9 @@ import { DrawTool } from '../draw-tools/draw-tools.js';
 import CanvasState from '../canvas/canvas-state.js';
 import { backgroundColor, fillColor, linecapSelect, strokeColor, strokeSlider } from '../sidebar/sidebar.js';
 
+const width = 1920;
+const height = 1080;
+
 // CANVAS - this is where drawings will show up
 let canvas = document.querySelector('#canvas');
 let context = canvas.getContext('2d');
@@ -13,16 +16,28 @@ let previewContext = previewCanvas.getContext('2d');
 let backgroundCanvas = document.querySelector('#background-canvas');
 let backgroundContext = backgroundCanvas.getContext('2d');
 
+let canvasContainer = document.querySelector("#canvas-container");
+
 function setCanvasSize() {
-    canvas.height = window.innerHeight - 70;   // subtract 80 to make room for the margin and the buttons
-    canvas.width = window.innerWidth - 200 - 40;     // subtract 200 to make room for the sidebar. subtract 40 for padding-left and right
-    previewCanvas.height = window.innerHeight - 70; 
-    previewCanvas.width = window.innerWidth - 200 - 40; 
-    backgroundCanvas.height = window.innerHeight - 70; 
-    backgroundCanvas.width = window.innerWidth - 200 - 40;
+    canvas.width             = width;
+    canvas.height            = height;
+    previewCanvas.width      = width;
+    previewCanvas.height     = height;
+    backgroundCanvas.width   = width;
+    backgroundCanvas.height  = height;
 }
 
 
+const panzoom = Panzoom(canvasContainer, {
+    handleStartEvent: e => {
+        if (e.button !== 1) {
+            throw 'error';
+        } else {
+            e.preventDefault();
+        }
+    },
+    cursor: 'default'
+});
 
 (function initCanvas() {
     setCanvasSize();
@@ -34,26 +49,12 @@ function setCanvasSize() {
     setupContext(previewContext);
 })();
 
-let numberInputs = document.querySelectorAll('input[type="number"]');
-numberInputs.forEach(input => {
-    input.addEventListener('focusout', e => {
-        let val = parseInt(e.target.value);
-        let min = parseInt(e.target.min);
-        let max = parseInt(e.target.max);
-    
-        if (val > max) {
-            e.target.value = max;
-        } else if (val < min) {
-            e.target.value = min;
-        }
-    });
-});
 
 // Sloppy undo/redo shortcuts for now
 document.onkeydown = e => {
     if (e.ctrlKey) {
-        if (e.key === 'z') { CanvasState.undo(context); }
-        if (e.key === 'y') { CanvasState.redo(context); }
+        if (e.key === 'z' || e.key === 'Z') { CanvasState.undo(context); }
+        if (e.key === 'y' || e.key === 'Y') { CanvasState.redo(context); }
     }
 }
 
