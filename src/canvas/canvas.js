@@ -27,7 +27,7 @@ function setCanvasSize() {
     backgroundCanvas.height  = height;
 }
 
-
+// Pan the canvas container with middle mouse button
 const panzoom = Panzoom(canvasContainer, {
     handleStartEvent: e => {
         if (e.button !== 1) {
@@ -37,6 +37,10 @@ const panzoom = Panzoom(canvasContainer, {
         }
     },
     cursor: 'default'
+});
+
+document.querySelector('#restore-button').addEventListener('click', e => {
+    panzoom.reset();
 });
 
 (function initCanvas() {

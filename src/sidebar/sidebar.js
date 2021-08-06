@@ -18,7 +18,6 @@ strokeColor.addEventListener('input', () => {
 
 export let fillColor = document.querySelector('#fill-color');
 fillColor.addEventListener('input', () => {
-    console.log('fill change');
     context.fillStyle = fillColor.value;
     previewContext.fillStyle = fillColor.value;
 });

@@ -5,32 +5,27 @@
     box-sizing: border-box;
 }
 
-html {
+html, body {
     height: 100%;
 }
 
-body {
-    display: grid;
-    grid-template-rows: 40px auto;
-    grid-template-columns: 200px auto;
-    background-color: rgb(112, 112, 112);
-    height: 100%;
+#app {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    display: flex;
+    flex: 1;
+    background-color: gray;
 }
 
 .title-bar {
-    /* this line lets electron treat this area like a draggable windows titlebar*/
-    -webkit-app-region: drag;
     background-color: rgb(65, 65, 65);
     color: white;
     display: flex;
-    grid-row: 1;
-    grid-column: 1 / -1;
-    z-index: 10000;
-}
-
-.title-button-container {
-    color: white;
-    display: flex;
+    height: 40px;
 }
 
 .min-max-close {
@@ -39,8 +34,6 @@ body {
 
 .title-button {
     display: flex;
-    /* makes sure buttons on the title bar don't drag the whole window */
-    -webkit-app-region: no-drag;
     /* makes the text on the buttons unselectable */
     user-select: none;
     -webkit-user-select: none;
@@ -50,20 +43,22 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    background-color: inherit;
+    border: none;
+}
+
+#hotkeys-button {
+    margin-left: auto;
 }
 
 .title-button:hover {
     background-color: rgba(155, 155, 155, 0.336);
 }
 
-#close-button:hover {
-    background-color: red;
-}
 
 #canvas-container {
     display: flex;
     background-color: transparent;
-    position: relative;
 }
 
 .canvas {
@@ -101,12 +96,10 @@ body {
     margin-top: 10px;
 }
 
-.sidebar {
+#sidebar {
     display: flex;
     flex-direction: column;
     background-color: rgb(75, 75, 75);
-    grid-row: 2 / -1;
-    grid-column: 1;
     color: white;
     z-index: 10000;
 }
@@ -129,7 +122,7 @@ body {
 }
 
 .sidebar-subrow {
-    background-color: white;
+    background-color: lightgray;
     color: black;
     display: none;
     font-size: small;
@@ -177,6 +170,7 @@ body {
 
 .sidebar-color {
     width: 60px;
+    align-self: center;
 }
 
 .eye-dropper {
@@ -203,4 +197,15 @@ button {
 
 i {
     pointer-events: none;
+}
+
+footer {
+    background-color: rgb(65, 65, 65);
+    height: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    padding: 0px 10px;
+    font-size: small;
 }
