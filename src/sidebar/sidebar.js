@@ -24,7 +24,6 @@ fillColor.addEventListener('input', () => {
 
 export let backgroundColor = document.querySelector('#background-color');
 backgroundColor.addEventListener('input', e => {
-    console.log('wow');
     backgroundContext.fillStyle = backgroundColor.value;
     backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
 });

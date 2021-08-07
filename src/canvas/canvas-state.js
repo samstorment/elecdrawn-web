@@ -15,6 +15,8 @@ export default class CanvasState {
             const oldImage = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
             this.redoStack.push(oldImage);
             context.putImageData(newImage, 0, 0);
+            // save to local storage on undo/redo
+            localStorage.setItem("canvas", context.canvas.toDataURL());
         }
     }
 
@@ -24,6 +26,8 @@ export default class CanvasState {
             const oldImage = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
             this.undoStack.push(oldImage);
             context.putImageData(newImage, 0, 0);
+            // save to local storage on undo/redo
+            localStorage.setItem("canvas", context.canvas.toDataURL());
         }
     }
 

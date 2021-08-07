@@ -18,7 +18,7 @@ export default class BrushFillTool extends Tool {
         this.previewContext.beginPath();
         this.context.beginPath();
 
-        let { mouseX, mouseY } = getMouse(event, this.context.canvas);
+        let { mouseX, mouseY } = getMouse(event, this.context.canvas, 105);
         this.mouseStart.x = mouseX;
         this.mouseStart.y = mouseY;
 

@@ -5,9 +5,15 @@ function getElementPosition(element) {
     let offsetX = boundingBox.left;
     let offsetY = boundingBox.top;
 
+    const dynamicWidth = element.getBoundingClientRect().width;
+    const staticWidth = element.offsetWidth;
+
+    const scale = dynamicWidth / staticWidth;
+
     return {
         x: offsetX,
-        y: offsetY
+        y: offsetY,
+        scale: scale
     }
 }
 
@@ -15,11 +21,11 @@ function getElementPosition(element) {
 export function getMouse(event, element) {
 
     // Get the canvas X and Y coordinates so we knwow where to draw
-    let { x, y } = getElementPosition(element);
+    let { x, y, scale } = getElementPosition(element);
 
     return {
-        mouseX: event.clientX - x,   
-        mouseY: event.clientY - y
+        mouseX: (event.clientX - x)  / scale,   
+        mouseY: (event.clientY - y) / scale
     };
 }
 

@@ -16,6 +16,8 @@ export default class SelectTool extends Tool {
         // init a sizeless rect, get the preview context
         this.selectDrawn = false;
         this.scaleClicked = false;
+        this.scaling = false;
+        this.dragging = false;
         this.select = new Rectangle(0, 0, 0);
         this.setDeleteListener();
         this.selectedImage = {};
@@ -47,7 +49,9 @@ export default class SelectTool extends Tool {
                 this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
                 // remove the canvas state that we pushed needlessly since we didn't move the selection
                 CanvasState.popUndoStack();
-            } else if (anchor) {
+            } 
+            // if anchor exists
+            else if (anchor) {
                 let { x, y } = this.anchors.getOppositeAnchor(anchor);
                 this.mouseStart.x = x;
                 this.mouseStart.y = y;
@@ -73,13 +77,18 @@ export default class SelectTool extends Tool {
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
         let width = mouseX - this.mouseStart.x;
         let height = mouseY - this.mouseStart.y;
-        
+
         // update the scale cursor if we hover an anchor, do this regardless of if we are painting
-        this.updateScaleCursor(mouseX, mouseY);
+        this.updateCursor(mouseX, mouseY);
         
         // if painting is false, the mouse isn't clicked so we shouldn't draw
-        
+        if (!this.painting) { return; }
+
         if (this.scaleClicked) {
+
+            // we start scaling if we draw while scaleClicked is true
+            this.scaling = true;
+
             this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
             
             // clear the context at the inital point where the select rect was drawn
@@ -96,14 +105,10 @@ export default class SelectTool extends Tool {
             // draw the anchors as we move the scale rect
             let anchors = new Anchors(scaleRect, 10);
             anchors.drawAnchors(this.previewContext, 'red');
-            
-            return;
+ 
         }
-        
-        if (!this.painting) { return; }
-        
         // if the select rectangle is drawn we want to drag it, otherwise we need to draw the select rect
-        if (this.selectDrawn) {
+        else if (this.selectDrawn) {
             this.dragSelectedImage(mouseX, mouseY);
         } else {
             this.drawSelectRect(width, height);
@@ -118,7 +123,7 @@ export default class SelectTool extends Tool {
         let height = mouseY - this.mouseStart.y;
 
         // if we clicked and never moved our mouse, do nothing
-        if (this.mouseStart.x === mouseX && this.mouseStart.y === mouseY) { return; }
+        if (width === 0 && height === 0) { return; }
 
         // if we are scaling the selected rect
         if (this.scaleClicked) {
@@ -129,20 +134,15 @@ export default class SelectTool extends Tool {
             // draw the scaled up ghost context image to the main context
             this.context.drawImage(this.ghostContext.canvas, this.mouseStart.x, this.mouseStart.y, width, height);
             
-            // reset the cursor and the ghost canvas back to their default states
-            this.context.canvas.style.cursor = 'default';
-        
             // remove the ghost context because we are done with it
             this.ghostContext.canvas.remove();
             
-            // end the scale and the selection
+            // end scaleClicked, scaling and the selection
             this.scaleClicked = false;
+            this.scaling = false;
             this.selectDrawn = false;
 
-            return;
-        }
-
-        if (this.selectDrawn) {
+        } else if (this.selectDrawn) {
 
             // get the coords of the select rect
             let { topLeftX, topLeftY, botRightX, botRightY } = this.select.getCoords();
@@ -160,20 +160,24 @@ export default class SelectTool extends Tool {
             this.context.drawImage(this.previewContext.canvas, 0, 0);
             this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height); // clear the preview so the selection we made doesn't linger
             
+            // select box no longer drawn and we stop dragging
             this.selectDrawn = false;
+            this.dragging = false;
         } else {
 
             // create the draggable corner anchors for scaling the rectangle
             this.anchors = new Anchors(this.select, 10);
             this.anchors.drawAnchors(this.previewContext, 'red');
 
-            
-            // only do this if the select box doesn't have a size of 0
-            if (this.select.width > 0 && this.select.height > 0) {
-                // get the image data inside the selection rectangle that was drawn
-                this.selectedImage = this.context.getImageData(this.mouseStart.x, this.mouseStart.y, this.select.width, this.select.height);
+            // if the width or height is 0 we want to clear the drawn select rect and return
+            if (this.select.width === 0 || this.select.height === 0) {
+                this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+                return;
             }
-
+        
+            // get the image data inside the selection rectangle that was drawn
+            this.selectedImage = this.context.getImageData(this.mouseStart.x, this.mouseStart.y, this.select.width, this.select.height);
+           
             // push the current canvas state to the stack
             let imageData = this.context.getImageData(0, 0, this.context.canvas.width, this.context.canvas.height);
             CanvasState.pushUndoStack(imageData);
@@ -181,11 +185,16 @@ export default class SelectTool extends Tool {
 
             // we have just finished drawing the selection box
             this.selectDrawn = true;
+
         }
+        this.updateCursor(mouseX, mouseY);
     }
 
     // drag the selected image around the screen
     dragSelectedImage(mouseX, mouseY) {
+
+        // we start dragging
+        this.dragging = true;
 
         let { topLeftX, topLeftY, botRightX, botRightY } = this.select.getCoords();
 
@@ -205,8 +214,12 @@ export default class SelectTool extends Tool {
         this.context.clearRect(this.select.startX, this.select.startY, this.select.width, this.select.height);
         this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
 
+        // top left coords of the dragged select rectangle
+        let newTopLeftX = mouseX - rectXOffset;
+        let newTopLeftY = mouseY - rectYOffset;
+
         // draw a rect and the selected image at the current mouse position, but account for the initial click's offset
-        let rect = new Rectangle(mouseX - rectXOffset, mouseY - rectYOffset, this.select.width, this.select.height);
+        let rect = new Rectangle(newTopLeftX, newTopLeftY, this.select.width, this.select.height);
         rect.drawStroke(3, '#000000', this.previewContext);
 
         this.previewContext.putImageData(this.selectedImage, mouseX - imageXOffset, mouseY - imageYOffset);
@@ -219,14 +232,23 @@ export default class SelectTool extends Tool {
         this.select.drawStroke(1, '#000000', this.previewContext);
     }
 
-    // if the select rect is drawn, check if the cursor is hovering over a scale anchor and change the cursor to a scale cursor if it is
-    updateScaleCursor(mouseX, mouseY) {
-        // only check the anchors if the select rect is drawn. If scale is clicked we don't check because we'd then instantly set cursor back to default
-        if (this.selectDrawn && !this.scaleClicked) {
+    // if the select rect is drawn, we change to cursor to a drag arrow if hovering anchor. Move arrow if hovering select box
+    updateCursor(mouseX, mouseY) {
+        // only check the anchors if the select rect is drawn.
+        if (this.dragging) { this.context.canvas.style.cursor = 'move'; }
+        else if (this.scaling) { 
             let anchor = this.anchors.getAnchor(mouseX, mouseY);
             if (anchor === 1 || anchor === 4) { this.context.canvas.style.cursor = 'nw-resize'; }
             else if (anchor === 2 || anchor === 3) { this.context.canvas.style.cursor = 'ne-resize'; }
+        }
+        else if (this.selectDrawn) {
+            let anchor = this.anchors.getAnchor(mouseX, mouseY);
+            if (anchor === 1 || anchor === 4) { this.context.canvas.style.cursor = 'nw-resize'; }
+            else if (anchor === 2 || anchor === 3) { this.context.canvas.style.cursor = 'ne-resize'; }
+            else if (this.select.isInside(mouseX, mouseY)) { this.context.canvas.style.cursor = 'move'; }
             else { this.context.canvas.style.cursor = 'default'; }
+        } else {
+            this.context.canvas.style.cursor = 'default';
         }
     }
 

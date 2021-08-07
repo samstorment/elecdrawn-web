@@ -1,6 +1,7 @@
 import { DrawTool } from '../draw-tools/draw-tools.js';
 import CanvasState from '../canvas/canvas-state.js';
 import { backgroundColor, fillColor, linecapSelect, strokeColor, strokeSlider } from '../sidebar/sidebar.js';
+import { getKey } from './util.js';
 
 const width = 1920;
 const height = 1080;
@@ -47,10 +48,16 @@ document.querySelector('#restore-button').addEventListener('click', e => {
     setCanvasSize();
     backgroundContext.fillStyle = backgroundColor.value;
     backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
-    clearContext(previewContext);
     // set the inital canvas styles
     setupContext(context);
     setupContext(previewContext);
+
+    const imageURL = localStorage.getItem("canvas");
+    const image = new Image;
+    image.src = imageURL;
+    image.onload = () => {
+        context.drawImage(image, 0, 0);
+    }
 })();
 
 
@@ -94,6 +101,8 @@ canvas.addEventListener('mouseup', e => {
     } else if (drawTools.selectedTool.right) {
         drawTools.selectedTool.finishRight(e);
     }
+    // after drawing is finished, update the localstorage image
+    localStorage.setItem("canvas", canvas.toDataURL());
 });
 
 // SCREEN ENTER AND LEAVE -- these don't work well in all aspects. especially leaving the canvas while drawing the lasso
@@ -101,21 +110,16 @@ canvas.addEventListener('mouseenter', e => { context.beginPath(); });
 canvas.addEventListener('mouseleave', e => { clearContext(previewContext); });
 
 // UPDATES HOVER CURSOR
-canvas.addEventListener('wheel', checkScrollDirection);
-
-document.body.onmouseleave = () => { clearContext(previewContext); }    
-
-// when reducing screen size, any part of the canvas that gets cut off is lost with this approach
-window.addEventListener('resize', () => {
-    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-    setCanvasSize();
-    setupContext(context);
-    setupContext(previewContext);
-    backgroundContext.fillStyle = backgroundColor.value;
-    backgroundContext.fillRect(0, 0, canvas.width, canvas.height);  
-    context.putImageData(imageData, 0, 0);
+const shift = getKey('Shift');
+canvas.parentElement.addEventListener('wheel', e => {
+    if (shift.isDown) {
+        panzoom.zoomWithWheel(e);
+    } else {
+        checkScrollDirection(e);
+    }
 });
 
+document.body.onmouseleave = () => { clearContext(previewContext); }    
 
 // change the stroke weight based on scroll direction
 function checkScrollDirection(event) {
