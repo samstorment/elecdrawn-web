@@ -17,8 +17,8 @@ export default class LassoTool extends Tool {
     
     }
 
-    startLeft(event) {
-        super.startLeft(event);
+    start(event) {
+        super.start(event);
 
         // reset the path from the last lasso selection for the context and preview context
         this.context.beginPath();
@@ -54,7 +54,7 @@ export default class LassoTool extends Tool {
         // if (lassoDrawn && !previewContext.isPointInPath(mouseX, mouseY))  { lassoDrawn = false; }
     }
 
-    drawLeft(event) { 
+    draw(event) { 
         // if painting is false, the mouse isn't clicked so we shouldn't draw
         if (!this.painting) { return; }
 
@@ -105,7 +105,7 @@ export default class LassoTool extends Tool {
 
     }
 
-    finishLeft(event) {
+    finish(event) {
 
         if (!this.painting) { return; }
         this.painting = false;
@@ -185,4 +185,7 @@ export default class LassoTool extends Tool {
         ctx.restore();  
         ctx.closePath();
     }
+
+    // never want to draw a hover cursor for lasso
+    drawHoverCursor() {}
 }

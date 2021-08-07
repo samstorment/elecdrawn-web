@@ -1,6 +1,7 @@
 import Tool from './tool.js';
 import { getMouse } from '../canvas/util.js';
 import { Polygon } from '../canvas/shape.js';
+import CanvasState from '../canvas/canvas-state.js';
 
 export default class BrushFillTool extends Tool {
 
@@ -12,22 +13,21 @@ export default class BrushFillTool extends Tool {
     }
 
     // lets default to a 2 pixel black line with a round end cap
-    startLeft(event) {
-        super.startLeft(event);
+    start(event) {
+        super.start(event);
         this.setDrawClosingLine();
         this.previewContext.beginPath();
-        this.context.beginPath();
 
         let { mouseX, mouseY } = getMouse(event, this.context.canvas, 105);
         this.mouseStart.x = mouseX;
         this.mouseStart.y = mouseY;
 
-        this.drawLeft(event);
+        this.draw(event);
     }
 
-    drawLeft(event) { 
+    draw(event) { 
 
-        super.drawLeft(event);
+        super.draw(event);
         // if painting is false, the mouse isn't clicked so we shouldn't draw
         if (!this.painting) { return; }
 
@@ -49,8 +49,8 @@ export default class BrushFillTool extends Tool {
         this.previewContext.moveTo(mouseX, mouseY);
     }
 
-    finishLeft(event) {
-        super.finishLeft(event);
+    finish(event) {
+        super.finish(event);
 
         // draw the final line from start to finish on the preview context. cant use close path because we are consistently re-beginning path
         if (this.drawClosingLine) {
@@ -68,5 +68,23 @@ export default class BrushFillTool extends Tool {
     setDrawClosingLine() {
         let checkbox = document.querySelector('#closing-line-checkbox');
         this.drawClosingLine = checkbox.checked;
+    }
+
+    // need special mouse up because we draw polygon straight to the canvas
+    mouseUp() {
+        document.body.addEventListener('mouseup', e => {
+            // check if painting so we only fire this on mouse up outside of canvas. painting will be false inside canvas as canvas mouseup event fires first
+            if (this.painting) {                
+                this.painting = false;
+                // clear the preview
+                this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+                // effectively clearing the main context by undoing the most recent draw to it
+                CanvasState.undo(this.context);
+                // clear backgrond color
+                this.context.canvas.style.backgroundColor = "rgb(0,0,0,0)";
+                // reset the points in the polygon
+                this.points = [];
+            }
+        });
     }
 }

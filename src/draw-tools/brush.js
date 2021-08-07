@@ -8,16 +8,16 @@ export default class BrushTool extends Tool {
     }
 
     // lets default to a 2 pixel black line with a round end cap
-    startLeft(event) {
-        super.startLeft(event);
+    start(event) {
+        super.start(event);
         this.context.beginPath();
         // call draw once to draw a single dot if its a left click
-        this.left && this.drawLeft(event);
+        this.draw(event);
     }
 
-    drawLeft(event) { 
+    draw(event) { 
 
-        super.drawLeft(event);
+        super.draw(event);
         // if painting is false, the mouse isn't clicked so we shouldn't draw
         if (!this.painting) { return; }
 
@@ -32,9 +32,5 @@ export default class BrushTool extends Tool {
         this.context.beginPath();
         this.context.moveTo(mouseX, mouseY);
     
-    }
-
-    finishLeft(event) {
-        super.finishLeft(event);
     }
 }

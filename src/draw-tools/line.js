@@ -11,9 +11,9 @@ export default class LineTool extends Tool {
         this.rectangle = new Rectangle(0, 0, 0);
     }
 
-    startLeft(event) {
+    start(event) {
 
-        super.startLeft(event);
+        super.start(event);
 
         this.context.beginPath();
         this.previewContext.beginPath();
@@ -23,8 +23,8 @@ export default class LineTool extends Tool {
         this.rectangle.setStart(mouseX, mouseY);
     }
 
-    drawLeft(event) { 
-        super.drawLeft(event);
+    draw(event) { 
+        super.draw(event);
         // if painting is false, the mouse isn't clicked so we shouldn't draw
         if (!this.painting) { return; }
 
@@ -54,8 +54,8 @@ export default class LineTool extends Tool {
         this.previewContext.beginPath();
     }
 
-    finishLeft(event) {
-        super.finishLeft(event);
+    finish(event) {
+        super.finish(event);
 
         this.context.moveTo(this.rectangle.startX, this.rectangle.startY);
         this.context.lineTo(this.rectangle.startX + this.rectangle.width, this.rectangle.startY + this.rectangle.height);

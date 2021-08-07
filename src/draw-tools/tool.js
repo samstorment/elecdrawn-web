@@ -8,64 +8,47 @@ export default class Tool {
     constructor(context) {
         this.context = context;
         this.painting = false;
-        this.left = true;
-        this.setStart(0, 0);
+        this.mouseUp();
         this.previewContext = document.querySelector("#preview-canvas").getContext('2d');
     }
 
     // painting is true once we start using a tool. Push the current canvas state to the undo stack since we will be modifying it right after
-    startLeft(event) {
+    start(event) {
         this.painting = true;
-        this._setWhich(event);
 
         // push the state to the undo stack
         const imageData = this.context.getImageData(0, 0, this.context.canvas.width, this.context.canvas.height);
         CanvasState.pushUndoStack(imageData);
         CanvasState.resetRedoStack();
+        
     }
 
-    startMiddle(event) {
-        this.painting = true;
-        this._setWhich(event);
-
-        let { mouseX, mouseY } = getMouse(event, this.context.canvas);
-        this.setStart(mouseX, mouseY);
-    }
-
-    startRight(event) {
-        this.painting = true;
-        this._setWhich(event);
-    }
-
-    drawLeft(event) { 
+    draw(event) { 
         if (!this.painting) {
             this.drawHoverCursor(event);
         }
     }
-    
-    drawMiddle(event) {
-        this.drawHoverCursor(event);
-    }
-
-    drawRight(event) {
-        this.drawHoverCursor(event);
-    }
-
 
     // we are no longer painting when we finish
-    finishLeft(event) {
+    finish(event) {
         this.painting = false;
         this.resetStroke();
     }
 
-    finishMiddle(event) {
-        this.painting = false;
-        // this._resetWhich();
+    leave(event) {
+        // remove the hover cursor if we leave and we aren't painting
+        if (!this.painting) {
+            this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+        }
+
+        if (this.painting) {
+            this.context.canvas.style.backgroundColor = "rgb(255,0,0,0.25)";
+        }
     }
 
-    finishRight(event) {
-        this.painting = false;
-        // this._resetWhich();
+    enter(event) {
+        this.context.beginPath();
+        this.context.canvas.style.backgroundColor = "rgb(0,0,0,0)";
     }
 
     drawHoverCursor(event) {
@@ -80,20 +63,19 @@ export default class Tool {
         ellipse.drawFill(this.context.strokeStyle, this.previewContext);
     }
 
-    setStart(x, y) {
-        this.startX = x;
-        this.startY = y;
-    }
-
     resetStroke() {
         // reset preview stroke color and weight
         this.previewContext.lineWidth = document.querySelector('#stroke-slider').value;
         this.previewContext.strokeStyle = document.querySelector('#stroke-color').value;
     }
 
-    _setWhich(event) {
-        this.left = event.which === 1;
-        this.middle = event.which === 2;
-        this.right = event.which === 3;
+    mouseUp() {
+        document.body.addEventListener('mouseup', e => {
+            if (this.painting) {                
+                this.painting = false;
+                this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+                this.context.canvas.style.backgroundColor = "rgb(0,0,0,0)";
+            }
+        });
     }
 }

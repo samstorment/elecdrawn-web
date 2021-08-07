@@ -10,8 +10,8 @@ export default class PolygonTool extends Tool {
         this.rectangle = new Rectangle(0, 0, 0);
     }
 
-    startLeft(event) {
-        super.startLeft(event);
+    start(event) {
+        super.start(event);
         this.context.beginPath();
       
         // set the start point of the rectangle to the position of the first mouse click
@@ -19,9 +19,9 @@ export default class PolygonTool extends Tool {
         this.rectangle.setStart(mouseX, mouseY);
     }
 
-    drawLeft(event) { 
+    draw(event) { 
 
-        super.drawLeft(event);
+        super.draw(event);
 
         if (!this.painting) { return; }
 
@@ -53,8 +53,8 @@ export default class PolygonTool extends Tool {
         this.rectangle.drawStroke(2, "#000000", this.previewContext);
     }
 
-    finishLeft(event) {
-        super.finishLeft(event);
+    finish(event) {
+        super.finish(event);
 
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
         let width = mouseX - this.rectangle.startX;

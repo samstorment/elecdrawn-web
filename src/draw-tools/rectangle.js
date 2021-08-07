@@ -11,8 +11,8 @@ export default class RectangleTool extends Tool {
         this.shift = getKey('Shift');
     }
 
-    startLeft(event) {
-        super.startLeft(event);
+    start(event) {
+        super.start(event);
         this.setRadius();
         this.context.beginPath();
 
@@ -21,9 +21,9 @@ export default class RectangleTool extends Tool {
         this.rectangle.setStart(mouseX, mouseY);
     }
 
-    drawLeft(event) { 
+    draw(event) { 
 
-        super.drawLeft(event);
+        super.draw(event);
         // if painting is false, the mouse isn't clicked so we shouldn't draw
         if (!this.painting) { return; }
 
@@ -48,8 +48,8 @@ export default class RectangleTool extends Tool {
         this.rectangle.drawStroke(this.context.lineWidth, this.context.strokeStyle, this.previewContext);
     }
 
-    finishLeft(event) {
-        super.finishLeft(event);
+    finish(event) {
+        super.finish(event);
 
         // draw a rectangle with a stroke border on top of a filled rectangle
         this.rectangle.drawFill(this.context.fillStyle, this.context);

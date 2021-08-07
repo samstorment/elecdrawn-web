@@ -31,10 +31,11 @@ function setCanvasSize() {
 // Pan the canvas container with middle mouse button
 const panzoom = Panzoom(canvasContainer, {
     handleStartEvent: e => {
-        if (e.button !== 1) {
+        if (e.button === 0) {
             throw 'error';
         } else {
             e.preventDefault();
+            e.stopPropagation();
         }
     },
     cursor: 'default'
@@ -74,42 +75,27 @@ let drawTools = new DrawTool(context);
 
 // MAIN DRAWING EVENT LISTENERS
 canvas.addEventListener('mousedown', e => {
-    if (e.which === 1) {
-        drawTools.selectedTool.startLeft(e);
-    } else if (e.which === 2) {
-        drawTools.selectedTool.startMiddle(e);
-    } else if (e.which === 3) {
-        drawTools.selectedTool.startRight(e);
-    }
+    drawTools.selectedTool.start(e);
 });
 
 canvas.addEventListener('mousemove', e => {
-    if (drawTools.selectedTool.left) {
-        drawTools.selectedTool.drawLeft(e);
-    } else if (drawTools.selectedTool.middle) {
-        drawTools.selectedTool.drawMiddle(e);
-    } else if (drawTools.selectedTool.right) {
-        drawTools.selectedTool.drawRight(e);
-    }
+    drawTools.selectedTool.draw(e);
 });
 
 canvas.addEventListener('mouseup', e => { 
-    if (drawTools.selectedTool.left) {
-        drawTools.selectedTool.finishLeft(e);
-    } else if (drawTools.selectedTool.middle) {
-        drawTools.selectedTool.finishMiddle(e);
-    } else if (drawTools.selectedTool.right) {
-        drawTools.selectedTool.finishRight(e);
-    }
+    drawTools.selectedTool.finish(e);
     // after drawing is finished, update the localstorage image
     localStorage.setItem("canvas", canvas.toDataURL());
 });
 
 // SCREEN ENTER AND LEAVE -- these don't work well in all aspects. especially leaving the canvas while drawing the lasso
-canvas.addEventListener('mouseenter', e => { context.beginPath(); });
-canvas.addEventListener('mouseleave', e => { clearContext(previewContext); });
+canvas.addEventListener('mouseenter', e => { drawTools.selectedTool.enter(e); });
+canvas.addEventListener('mouseleave', e => { drawTools.selectedTool.leave(e); });
 
-// UPDATES HOVER CURSOR
+// disables the right click menu on the canvas
+canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+// UPDATES HOVER CURSOR and ZOOM
 const shift = getKey('Shift');
 canvas.parentElement.addEventListener('wheel', e => {
     if (shift.isDown) {

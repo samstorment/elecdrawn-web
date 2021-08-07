@@ -24,7 +24,7 @@ export default class SelectTool extends Tool {
         this.mouseStart = { x: 0, y: 0 };
     }
 
-    startLeft(event) {
+    start(event) {
         
         // we don't call super.start because we don't want to save the canvas state to the undo stack immeditaely
         this.painting = true;
@@ -63,15 +63,7 @@ export default class SelectTool extends Tool {
         }
     }
 
-    startMiddle(event) {
-        this.startLeft(event);
-    }
-
-    startRight(event) {
-        this.startLeft(event);
-    }
-
-    drawLeft(event) { 
+    draw(event) { 
 
         // get the mouse position on the canvas
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
@@ -115,9 +107,9 @@ export default class SelectTool extends Tool {
         }
     }
 
-    finishLeft(event) {
+    finish(event) {
         if (!this.painting) { return; }
-        super.finishLeft(event);
+        super.finish(event);
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
         let width = mouseX - this.mouseStart.x;
         let height = mouseY - this.mouseStart.y;
@@ -189,6 +181,8 @@ export default class SelectTool extends Tool {
         }
         this.updateCursor(mouseX, mouseY);
     }
+
+  
 
     // drag the selected image around the screen
     dragSelectedImage(mouseX, mouseY) {
@@ -264,6 +258,9 @@ export default class SelectTool extends Tool {
             }
         }
     }
+
+    // never want to draw hover cursor for select
+    drawHoverCursor() {}
 }
 
 class Anchors {

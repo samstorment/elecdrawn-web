@@ -183,7 +183,7 @@ main {
 .arrow-button {
     font-size: larger;
     background-color: transparent;
-    padding: 0px 10px;
+    padding: 5px 10px;
     border: none;
     color: lightgray;
 }
