@@ -182,7 +182,16 @@ export default class SelectTool extends Tool {
         this.updateCursor(mouseX, mouseY);
     }
 
-  
+    leave(event) {
+        // remove the hover cursor if we leave and we aren't painting
+        if (!this.painting && !this.selectDrawn) {
+            this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+        }
+
+        if (this.painting) {
+            this.context.canvas.style.backgroundColor = "rgb(255,0,0,0.25)";
+        }
+    }
 
     // drag the selected image around the screen
     dragSelectedImage(mouseX, mouseY) {

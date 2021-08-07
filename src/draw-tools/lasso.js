@@ -162,6 +162,17 @@ export default class LassoTool extends Tool {
         }
     }
 
+    leave(event) {
+        // remove the hover cursor if we leave and we aren't painting
+        if (!this.painting && !this.lassoDrawn) {
+            this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+        }
+
+        if (this.painting) {
+            this.context.canvas.style.backgroundColor = "rgb(255,0,0,0.25)";
+        }
+    }
+
     // this does draw the clipped area at the 
     drawClippedImage(img, ctx, clipPts, x ,y) {
 
