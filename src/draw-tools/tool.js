@@ -51,6 +51,10 @@ export default class Tool {
         this.context.canvas.style.backgroundColor = "rgb(0,0,0,0)";
     }
 
+    cleanup() {
+        console.log("Cleaned Up");
+    }
+
     drawHoverCursor(event) {
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
 
@@ -71,6 +75,7 @@ export default class Tool {
 
     mouseUp() {
         document.body.addEventListener('mouseup', e => {
+            // check if painting because painting will be false only if we mouseup outside of the canvas
             if (this.painting) {                
                 this.painting = false;
                 this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);

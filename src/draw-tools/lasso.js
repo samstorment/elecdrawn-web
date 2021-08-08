@@ -18,6 +18,7 @@ export default class LassoTool extends Tool {
     }
 
     start(event) {
+
         super.start(event);
 
         // reset the path from the last lasso selection for the context and preview context
@@ -55,12 +56,15 @@ export default class LassoTool extends Tool {
     }
 
     draw(event) { 
+
+        
         // if painting is false, the mouse isn't clicked so we shouldn't draw
         if (!this.painting) { return; }
-
+        
+        
         // get the current mouse coordinates on the canvas
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
-
+        
         if (this.lassoDrawn) {
 
             // clear the preview context like any draw
@@ -168,9 +172,21 @@ export default class LassoTool extends Tool {
             this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
         }
 
+        // warn the user they've exited canvas
         if (this.painting) {
             this.context.canvas.style.backgroundColor = "rgb(255,0,0,0.25)";
         }
+    }
+
+    cleanup() {
+        // clear the preview context to remove black lasso line
+        this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+        // lasso is no longer drawn
+        this.lassoDrawn = false;
+        // reset lasso points
+        this.points = [];
+        // restore the full context since we clipped it to the lasso region
+        this.context.restore();
     }
 
     // this does draw the clipped area at the 

@@ -45,6 +45,7 @@ export class DrawTool {
         sidebarTools.forEach(tool => {
             // when we click a sidebar tool, make that the selected tool
             tool.addEventListener('click', () => {
+                this.selectedTool.cleanup();
                 this.selectedTool = this.tools[tool.value];
             });
         });
