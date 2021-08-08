@@ -52,7 +52,8 @@ export default class Tool {
     }
 
     cleanup() {
-        console.log("Cleaned Up");
+        this.resetStroke();
+        this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
     }
 
     drawHoverCursor(event) {

@@ -91,6 +91,7 @@ canvas.addEventListener('mouseup', e => {
 // SCREEN ENTER AND LEAVE -- these don't work well in all aspects. especially leaving the canvas while drawing the lasso
 canvas.addEventListener('mouseenter', e => { drawTools.selectedTool.enter(e); });
 canvas.addEventListener('mouseleave', e => { drawTools.selectedTool.leave(e); });
+document.body.onmouseleave = e => { drawTools.selectedTool.leave(e); }    
 
 // disables the right click menu on the canvas
 canvas.addEventListener('contextmenu', e => e.preventDefault());
@@ -105,7 +106,6 @@ canvas.parentElement.addEventListener('wheel', e => {
     }
 });
 
-document.body.onmouseleave = () => { clearContext(previewContext); }    
 
 // change the stroke weight based on scroll direction
 function checkScrollDirection(event) {

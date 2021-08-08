@@ -53,17 +53,17 @@ export function getKey(value) {
         if (event.key === key.value && key.isUp) {
             key.isDown = true;
             key.isUp = false;
+            // If the key.press function is defined, call it
+            if (key.press) { key.press(); }
         }
-        // If the key.press function is defined, call it
-        if (key.press) { key.press(); }
     };
 
     let upHandler = event => {
         if (event.key === key.value && key.isDown) {
             key.isDown = false;
             key.isUp = true;
+            if (key.release) { key.release(); }
         }
-        if (key.release) { key.release(); }
     };
 
     // add the key event listeners

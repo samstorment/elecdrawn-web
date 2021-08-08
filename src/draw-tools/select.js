@@ -193,6 +193,17 @@ export default class SelectTool extends Tool {
         }
     }
 
+    // reset anything we may have changed
+    cleanup() {
+        super.cleanup();
+        this.selectDrawn = false;
+        this.selectDrawn = false;
+        this.dragging = false;
+        this.scaleClicked = false;
+        this.scaling = false;
+        this.context.canvas.style.cursor = 'default';
+    }
+
     // drag the selected image around the screen
     dragSelectedImage(mouseX, mouseY) {
 
@@ -266,6 +277,25 @@ export default class SelectTool extends Tool {
                 this.selectDrawn = false;
             }
         }
+    }
+
+    mouseUp() {
+        document.body.addEventListener('mouseup', e => {
+            // check if painting because painting will be false only if we mouseup outside of the canvas
+            if (this.painting) {           
+                this.painting = false;
+                // only undo if mouse comes up when scaling or dragging
+                if (this.scaling || this.dragging) {
+                    CanvasState.undo(this.context);
+                }
+                // reset select state
+                this.cleanup();
+                // clear black select box
+                this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+                // remove red warning color
+                this.context.canvas.style.backgroundColor = "rgb(0,0,0,0)";
+            }
+        });
     }
 
     // never want to draw hover cursor for select

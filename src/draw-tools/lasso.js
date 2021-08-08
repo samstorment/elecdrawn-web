@@ -179,14 +179,15 @@ export default class LassoTool extends Tool {
     }
 
     cleanup() {
-        // clear the preview context to remove black lasso line
-        this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+        super.cleanup();
         // lasso is no longer drawn
         this.lassoDrawn = false;
         // reset lasso points
         this.points = [];
         // restore the full context since we clipped it to the lasso region
         this.context.restore();
+        // fix the stroke weight and color
+        this.resetStroke();
     }
 
     // this does draw the clipped area at the 
@@ -211,6 +212,22 @@ export default class LassoTool extends Tool {
         
         ctx.restore();  
         ctx.closePath();
+    }
+
+    mouseUp() {
+        document.body.addEventListener('mouseup', e => {
+            if (this.painting) {           
+                this.painting = false;
+                // if the lasso was drawn we want to undo the removal of the lasso'd area
+                if (this.lassoDrawn) {
+                    CanvasState.undo(this.context);
+                }
+                // cleanup to a fresh lasso state
+                this.cleanup();
+                // reset the red warning color to nothing
+                this.context.canvas.style.backgroundColor = "rgb(0,0,0,0)";
+            }
+        });
     }
 
     // never want to draw a hover cursor for lasso
