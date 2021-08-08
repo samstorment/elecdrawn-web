@@ -19,9 +19,9 @@ export default class SelectTool extends Tool {
         this.scaling = false;
         this.dragging = false;
         this.select = new Rectangle(0, 0, 0);
-        this.setDeleteListener();
         this.selectedImage = {};
         this.mouseStart = { x: 0, y: 0 };
+        this.setDeleteListener();
     }
 
     start(event) {
@@ -266,7 +266,6 @@ export default class SelectTool extends Tool {
         }
     }
 
-    // this is causing problems with pressing ctrl+shift+i 
     setDeleteListener() {
         let del = getKey("Delete");
         del.press = () => {

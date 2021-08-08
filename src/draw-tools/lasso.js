@@ -1,9 +1,7 @@
 import Tool from './tool.js';
 import CanvasState from '../canvas/canvas-state.js';
-import { getMouse } from '../canvas/util.js';
+import { getKey, getMouse } from '../canvas/util.js';
 
-// TODO:
-//      end lasso when click outside of lasso area.
 export default class LassoTool extends Tool {
 
     constructor(context) {
@@ -14,7 +12,7 @@ export default class LassoTool extends Tool {
         this.mouseStart = { x: 0, y: 0 };
         this.lassoCoords = { topLeftX: 100000, topLeftY: 100000, botRightX: -100000, botRightY: -100000 };
         this.selectedImage = {};
-    
+        this.setDeleteListener();
     }
 
     start(event) {
@@ -35,11 +33,6 @@ export default class LassoTool extends Tool {
         this.mouseStart.y = mouseY;
 
         if (!this.lassoDrawn) {
-            // These 4 lines are for handling a a situation where we never dragged after drawing the lasso (like leaving the canvas after drawing)
-            this.points = [];   // reset any (x, y) coordinates that were drawn to the clips 
-            this.context.restore;   // restore the canvas to its pre clipped state. otherwise we can only draw to the lasso'd area we made before cancelling the lasso
-            this.lassoCoords = { topLeftX: 100000, topLeftY: 100000, botRightX: -100000, botRightY: -100000 }; // reset the rectangle coords of the lasso
-
             // create the ghost canvas at the canvas size each time we draw
             this.ghostContext = document.createElement("canvas").getContext('2d');
             this.ghostContext.canvas.width = this.context.canvas.width;
@@ -57,10 +50,8 @@ export default class LassoTool extends Tool {
 
     draw(event) { 
 
-        
         // if painting is false, the mouse isn't clicked so we shouldn't draw
         if (!this.painting) { return; }
-        
         
         // get the current mouse coordinates on the canvas
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
@@ -166,6 +157,11 @@ export default class LassoTool extends Tool {
         }
     }
 
+    // override the normal enter function because it calls context.beginPath();
+    enter() {
+        this.context.canvas.style.backgroundColor = "rgb(0,0,0,0)";
+    }
+
     leave(event) {
         // remove the hover cursor if we leave and we aren't painting
         if (!this.painting && !this.lassoDrawn) {
@@ -228,6 +224,17 @@ export default class LassoTool extends Tool {
                 this.context.canvas.style.backgroundColor = "rgb(0,0,0,0)";
             }
         });
+    }
+
+    setDeleteListener() {
+        let del = getKey("Delete");
+        del.press = () => {
+            if (this.lassoDrawn) {
+                this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
+                this.lassoDrawn = false;
+                this.cleanup();
+            }
+        }
     }
 
     // never want to draw a hover cursor for lasso
