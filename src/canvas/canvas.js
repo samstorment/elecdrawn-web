@@ -1,10 +1,11 @@
 import { DrawTool } from '../draw-tools/draw-tools.js';
 import CanvasState from '../canvas/canvas-state.js';
-import { backgroundColor, fillColor, linecapSelect, strokeColor, strokeSlider } from '../sidebar/sidebar.js';
+import { backgroundColor, dashLengthInput, dashSpaceInput, fillColor, linecapSelect, strokeColor, strokeSlider } from '../sidebar/sidebar.js';
 import { getKey } from './util.js';
 
 const width = 1920;
 const height = 1080;
+
 
 // CANVAS - this is where drawings will show up
 let canvas = document.querySelector('#canvas');
@@ -53,6 +54,14 @@ document.querySelector('#restore-button').addEventListener('click', e => {
     setupContext(context);
     setupContext(previewContext);
 
+    context.shadowColor = 'light blue';
+    context.lineJoin = 'round';
+    context.shadowBlur = 500;
+    // context.globalAlpha = 0.5;
+    // context.setLineDash([10, 10, 10]);
+    // previewContext.setLineDash([10, 10, 10]);
+
+
     const imageURL = localStorage.getItem("canvas");
     const image = new Image;
     image.src = imageURL;
@@ -60,6 +69,18 @@ document.querySelector('#restore-button').addEventListener('click', e => {
         context.drawImage(image, 0, 0);
     }
 })();
+
+function setupContext(ctx = context, strokeStyle = strokeColor.value, 
+    lineWidth = strokeSlider.value, lineCap = linecapSelect.value, 
+    fillStyle = fillColor.value, dashLength = dashLengthInput.value,
+    dashSpace = dashSpaceInput.value) {
+    ctx.beginPath();
+    ctx.strokeStyle = strokeStyle;
+    ctx.lineWidth = lineWidth;
+    ctx.lineCap = lineCap;
+    ctx.fillStyle = fillStyle;
+    ctx.setLineDash([dashLength, dashSpace]);
+}
 
 
 // Sloppy undo/redo shortcuts for now
@@ -125,16 +146,4 @@ function checkScrollDirection(event) {
 function scrollIsUp(event) {
     if (event.wheelDelta) { return event.wheelDelta > 0; }
     return event.deltaY < 0;
-}
-
-function clearContext(ctx) {
-    ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-}
-
-function setupContext(ctx = context, strokeStyle = strokeColor.value, lineWidth = strokeSlider.value, lineCap = linecapSelect.value, fillStyle = fillColor.value) {
-    ctx.beginPath();
-    ctx.strokeStyle = strokeStyle;
-    ctx.lineWidth = lineWidth;
-    ctx.lineCap = lineCap;
-    ctx.fillStyle = fillStyle;
 }

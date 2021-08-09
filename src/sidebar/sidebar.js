@@ -40,6 +40,20 @@ linecapSelect.addEventListener('change', e => {
     previewContext.lineCap = e.target.value;
 });
 
+
+export let dashLengthInput = document.querySelector('#dash-length');
+export let dashSpaceInput = document.querySelector('#dash-space');
+
+const setDash = e => {
+    let dashLength = parseInt(dashLengthInput.value);
+    let dashSpace = parseInt(dashSpaceInput.value);
+    context.setLineDash([dashLength, dashSpace]);
+    previewContext.setLineDash([dashLength, dashSpace]);
+}
+
+dashLengthInput.addEventListener('change', setDash);
+dashSpaceInput.addEventListener('change', setDash);
+
 export let downloadCanvas = document.querySelector('#download-canvas');
 downloadCanvas.addEventListener('click', function (e) {
     // draw the canvas to the background just when we save so eveything from the canvas shows up

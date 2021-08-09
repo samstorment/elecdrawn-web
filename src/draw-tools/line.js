@@ -6,7 +6,7 @@ export default class LineTool extends Tool {
 
     constructor(context) {
         super(context);
-        // init a sizeless rect, get the preview context, and get the shift key
+        // init a sizeless rect and get the shift key
         this.shift = getKey('Shift');
         this.rectangle = new Rectangle(0, 0, 0);
     }

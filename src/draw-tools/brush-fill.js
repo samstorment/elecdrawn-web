@@ -44,9 +44,9 @@ export default class BrushFillTool extends Tool {
         this.previewContext.lineTo(mouseX, mouseY);
         this.previewContext.stroke();
 
-        // these two lines help to smooth the line
-        this.previewContext.beginPath();
-        this.previewContext.moveTo(mouseX, mouseY);
+        // these two lines help to smooth the line, commented for better dash performance
+        // this.previewContext.beginPath();
+        // this.previewContext.moveTo(mouseX, mouseY);
     }
 
     finish(event) {
