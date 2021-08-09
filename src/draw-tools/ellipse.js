@@ -55,6 +55,14 @@ export default class EllipseTool extends Tool {
     finish(event) {
         super.finish(event);
 
+        let { mouseX, mouseY } = getMouse(event, this.context.canvas);
+
+        if (mouseX === this.rectangle.startX && mouseY === this.rectangle.startY) {
+            this.drawHoverCursor(event, this.context);
+            this.resetStroke();
+            return;
+        }
+
         // get rid of the black guideline box around the circle
         this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
 

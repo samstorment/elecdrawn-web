@@ -51,13 +51,21 @@ export default class RectangleTool extends Tool {
     finish(event) {
         super.finish(event);
 
+        let { mouseX, mouseY } = getMouse(event, this.context.canvas);
+
+        if (mouseX === this.rectangle.startX && mouseY === this.rectangle.startY) {
+            this.drawHoverCursor(event, this.context);
+            this.resetStroke();
+            return;
+        }
+
         // draw a rectangle with a stroke border on top of a filled rectangle
         this.rectangle.drawFill(this.context.fillStyle, this.context);
         this.rectangle.drawStroke(this.context.lineWidth, this.context.strokeStyle, this.context);
     }
 
 
-    drawHoverCursor(event) {
+    drawHoverCursor(event, context=this.previewContext) {
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
 
         // clear the preview canvas anytime we move, but draw right after
@@ -70,7 +78,7 @@ export default class RectangleTool extends Tool {
         let yStart =  mouseY-length/2;
 
         let rect = new Rectangle(xStart, yStart, length);
-        rect.drawFill(this.context.strokeStyle, this.previewContext);
+        rect.drawFill(this.context.strokeStyle, context);
     }
 
     // for now we just have one radius input box so all radii will be the same

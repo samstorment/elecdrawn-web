@@ -56,7 +56,7 @@ export default class Tool {
         this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
     }
 
-    drawHoverCursor(event) {
+    drawHoverCursor(event, context=this.previewContext) {
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
 
         // clear the preview canvas anytime we move, but draw right after
@@ -65,13 +65,20 @@ export default class Tool {
 
         let radius = this.context.lineWidth / 2;
         let ellipse = new Ellipse(mouseX, mouseY, radius);
-        ellipse.drawFill(this.context.strokeStyle, this.previewContext);
+        ellipse.drawFill(this.context.strokeStyle, context);
     }
 
     resetStroke() {
+        const strokeWeigth = document.querySelector('#stroke-slider').value;
+        const strokeColor = document.querySelector('#stroke-color').value;
+        const fillColor = document.querySelector('#fill-color').value;
         // reset preview stroke color and weight
-        this.previewContext.lineWidth = document.querySelector('#stroke-slider').value;
-        this.previewContext.strokeStyle = document.querySelector('#stroke-color').value;
+        this.previewContext.lineWidth = strokeWeigth;
+        this.previewContext.strokeStyle = strokeColor;
+        this.context.lineWidth = strokeWeigth;
+        this.context.strokeStyle = strokeColor;
+        this.context.fillStyle = fillColor;
+
     }
 
     mouseUp() {

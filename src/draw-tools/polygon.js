@@ -60,6 +60,13 @@ export default class PolygonTool extends Tool {
         let width = mouseX - this.rectangle.startX;
         let height = mouseY - this.rectangle.startY;
 
+        // if mouse didn't move
+        if (width === 0 && height === 0) {
+            this.drawHoverCursor(event, this.context);
+            this.resetStroke();
+            return;
+        }
+
         // because we are drawing a PERFECT square around the polygon, width and height will be the same (max of the actual width and height)
         width = height = Math.max(Math.abs(width), Math.abs(height));
         // if width or height is actually negative, lets account for that
@@ -78,7 +85,7 @@ export default class PolygonTool extends Tool {
         poly.drawStroke(this.context.lineWidth, this.context.strokeStyle, this.context);
     }
 
-    drawHoverCursor(event) {
+    drawHoverCursor(event, context=this.previewContext) {
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
         this.setSides();
 
@@ -90,7 +97,7 @@ export default class PolygonTool extends Tool {
 
         let poly = new Polygon(mouseX, mouseY);
         poly.getRegularPolygon(this.numSides, radius);
-        poly.drawFill(this.context.strokeStyle, this.previewContext);
+        poly.drawFill(this.context.strokeStyle, context);
      
     }
 
