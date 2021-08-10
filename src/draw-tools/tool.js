@@ -1,7 +1,7 @@
 import CanvasState from '../canvas/canvas-state.js';
 import { Ellipse } from '../canvas/shape.js';
 import { getMouse } from '../canvas/util.js';
-import { opacitySlider, shadowBlur, shadowOffsetX, shadowOffsetY } from '../sidebar/sidebar.js';
+import { compositeOperation, opacitySlider, shadowBlur, shadowOffsetX, shadowOffsetY } from '../sidebar/sidebar.js';
 
 // super class for drawing tools
 export default class Tool {
@@ -90,6 +90,8 @@ export default class Tool {
         this.previewContext.shadowBlur = 0;
         this.previewContext.shadowOffsetX = 0;
         this.previewContext.shadowOffsetY = 0;
+        this.context.globalCompositeOperation = "source-over";
+        this.previewContext.globalCompositeOperation = "source-over";
     }
 
     restoreAlphaShadow() {
@@ -101,6 +103,8 @@ export default class Tool {
         this.previewContext.shadowBlur = shadowBlur.value;
         this.previewContext.shadowOffsetX = shadowOffsetX.value;
         this.previewContext.shadowOffsetY = shadowOffsetY.value;
+        this.context.globalCompositeOperation = compositeOperation.value;
+        this.previewContext.globalCompositeOperation = compositeOperation.value;
     }
 
     mouseUp() {

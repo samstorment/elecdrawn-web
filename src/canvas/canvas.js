@@ -1,6 +1,6 @@
 import { DrawTool } from '../draw-tools/draw-tools.js';
 import CanvasState from '../canvas/canvas-state.js';
-import { backgroundColor, dashLengthInput, dashSpaceInput, fillColor, linecapSelect, lineJoinSelect, opacitySlider, shadowBlur, shadowColor, shadowOffsetX, shadowOffsetY, strokeColor, strokeSlider } from '../sidebar/sidebar.js';
+import { backgroundColor, compositeOperation, dashLengthInput, dashSpaceInput, fillColor, linecapSelect, lineJoinSelect, opacitySlider, shadowBlur, shadowColor, shadowOffsetX, shadowOffsetY, strokeColor, strokeSlider } from '../sidebar/sidebar.js';
 import { getKey } from './util.js';
 
 const width = 1920;
@@ -74,7 +74,8 @@ function setupContext(ctx = context, strokeStyle = strokeColor.value,
     lineJoin = lineJoinSelect.value, fillStyle = fillColor.value,
     dashLength = dashLengthInput.value, dashSpace = dashSpaceInput.value,
     shadowColorStyle = shadowColor.value, shadowBlurStyle = shadowBlur.value,
-    shadowX = shadowOffsetX.value, shadowY = shadowOffsetY.value) {
+    shadowX = shadowOffsetX.value, shadowY = shadowOffsetY.value,
+    globalCompositeOperation = compositeOperation.value) {
     ctx.beginPath();
     ctx.strokeStyle = strokeStyle;
     ctx.lineWidth = lineWidth;
@@ -86,6 +87,7 @@ function setupContext(ctx = context, strokeStyle = strokeColor.value,
     ctx.shadowBlur = shadowBlurStyle;
     ctx.shadowOffsetX = shadowX;
     ctx.shadowOffsetY = shadowY;
+    ctx.globalCompositeOperation = globalCompositeOperation;
 }
 
 

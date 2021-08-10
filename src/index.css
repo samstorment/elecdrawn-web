@@ -105,7 +105,7 @@ main {
     color: white;
     z-index: 10000;
     overflow: auto;
-    min-width: 225px;
+    min-width: 250px;
     max-width: 400px;
     resize: horizontal;
 }
@@ -196,6 +196,14 @@ main {
 
 .arrow-button:hover {
     background-color: gray;
+}
+
+.font-row {
+    justify-content: space-evenly;
+}
+
+.font-button {
+    padding: 5px 10px;
 }
 
 button {

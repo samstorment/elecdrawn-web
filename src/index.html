@@ -27,6 +27,40 @@
                     <div class="sidebar-row">
                         <div class="sidebar-main-row">
                             <button class="arrow-button arrow-closed"><i class="fa fa-angle-right"></i></button>
+                            <label for="composite-operation">Compositing</label>
+                            <select id="composite-operation">
+                                <option value="source-over">Default</option>
+                                <option value="destination-over">Destination Over</option>
+                                <option value="lighter">Lighter</option>
+                                <option value="copy">Copy</option>
+                                <option value="xor">Xor</option>
+                                <option value="multiply">Multiply</option>
+                                <option value="screen">Screen</option>
+                                <option value="overlay">Overlay</option>
+                                <option value="darken">Darken</option>
+                                <option value="lighten">Lighten</option>
+                                <option value="color-dodge">Color Dodge</option>
+                                <option value="color-burn">Color Burn</option>
+                                <option value="hard-light">Hard Light</option>
+                                <option value="soft-light">Soft Light</option>
+                                <option value="difference">Difference</option>
+                                <option value="exclusion">Exclusion</option>
+                                <option value="hue">Hue</option>
+                                <option value="saturation">Saturation</option>
+                                <option value="color">Color</option>
+                                <option value="luminosity">Luminosity</option>
+                            </select>
+                        </div>
+                        <div class="sidebar-subrow">
+                            <a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation#types" target="_blank" rel="noopener noreferrer">
+                                Help
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-row">
+                        <div class="sidebar-main-row">
+                            <button class="arrow-button arrow-closed"><i class="fa fa-angle-right"></i></button>
                             <label for="select-check">Select</label>
                             <input type="radio" class="sidebar-radio" id="select-check" name="draw-type" value="select">
                         </div>
@@ -37,6 +71,74 @@
                             <button class="arrow-button arrow-closed"><i class="fa fa-angle-right"></i></button>
                             <label for="lasso-check">Lasso</label>
                             <input type="radio" class="sidebar-radio" id="lasso-check" name="draw-type" value="lasso">
+                        </div>
+                    </div>
+
+                    <div class="sidebar-row">
+                        <div class="sidebar-main-row">
+                            <button class="arrow-button arrow-closed"><i class="fa fa-angle-right"></i></button>
+                            <label for="text-check">Text</label>
+                            <input type="radio" class="sidebar-radio " id="text-check" name="draw-type" value="text">
+                        </div>
+
+                        <div class="sidebar-subrow font-row">
+                            <button class="font-button">
+                                <i class="fa fa-bold"></i>
+                            </button>
+                            <button class="font-button">
+                                <i class="fa fa-italic"></i>
+                            </button>
+                            <button class="font-button">
+                                <i class="fa fa-underline"></i>
+                            </button>
+                        </div>
+
+                        <div class="sidebar-subrow">
+                            <label for="text-value">Value</label>
+                            <input type="text" id="text-value">
+                                
+                            </input>
+                        </div>
+
+                        <div class="sidebar-subrow">
+                            <label for="text-font">Font</label>
+                            <select id="text-font">
+                                <option value="serif">Serif</option>
+                            </select>
+                        </div>
+
+                        <div class="sidebar-subrow">
+                            <label for="text-size">Size</label>
+                            <input type="number" class="sidebar-number" id="text-size" min="0" max="1500" value="0">
+                        </div>
+                        
+                        <div class="sidebar-subrow">
+                            <label for="text-align">Align</label>
+                            <select id="text-align">
+                                <option value="left">Left</option>
+                                <option value="middle">Middle</option>
+                                <option value="right">Right</option>
+                            </select>
+                        </div>
+
+                        <div class="sidebar-subrow">
+                            <label for="text-baseline">Baseline</label>
+                            <select id="text-baseline">
+                                <option value="middle">Middle</option>
+                                <option value="alphabetic">Alphabetic</option>
+                                <option value="top">Top</option>
+                                <option value="bottom">Bottom</option>
+                                <option value="ideographic">Ideographic</option>
+                                <option value="hanging">Hanging</option>
+                            </select>
+                        </div>
+
+                        <div class="sidebar-subrow">
+                            <label for="text-variant">Variant</label>
+                            <select id="text-variant">
+                                <option value="middle">Normal</option>
+                                <option value="small-caps">Small Capitals</option>
+                            </select>
                         </div>
                     </div>
 
@@ -216,7 +318,6 @@
                     <button class="sidebar-button" id="canvas-clear">Clear</button>
                     <a href="#" id="download-canvas" class="sidebar-button" download="image.png">Download</a>
                 
-
                 </div>
                 <div id="hotkeys-container">
                     <h1>Hot Keys</h1>

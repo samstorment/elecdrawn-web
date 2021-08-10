@@ -9,8 +9,6 @@ let previewContext = previewCanvas.getContext('2d');
 let backgroundCanvas = document.querySelector('#background-canvas');
 let backgroundContext = backgroundCanvas.getContext('2d');
 
-console.log('wow');
-
 // Sidebar change listeners
 export let strokeColor = document.querySelector('#stroke-color');
 strokeColor.addEventListener('input', () => {
@@ -90,6 +88,12 @@ export let opacitySlider = document.querySelector('#opacity');
 opacitySlider.addEventListener('change', e => {
     context.globalAlpha = parseFloat(e.target.value);
     previewContext.globalAlpha = parseFloat(e.target.value);
+});
+
+export let compositeOperation = document.querySelector('#composite-operation');
+compositeOperation.addEventListener('change', e => {
+    context.globalCompositeOperation = e.target.value;
+    previewContext.globalCompositeOperation = e.target.value;
 });
 
 export let clearButton = document.querySelector('#canvas-clear');

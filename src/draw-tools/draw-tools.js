@@ -9,6 +9,7 @@ import LassoTool from './lasso.js';
 import BucketTool from './bucket.js';
 import PickerTool from './picker.js';
 import BrushFillTool from './brush-fill.js';
+import TextTool from './text.js';
 
 // manager for all drawing tools
 export class DrawTool {
@@ -21,6 +22,7 @@ export class DrawTool {
 
     setTools(context) {
         this.tools = {
+            text: new TextTool(context),
             brush: new BrushTool(context),
             brushFill: new BrushFillTool(context),
             rectangle: new RectangleTool(context),
