@@ -1,6 +1,6 @@
 import { DrawTool } from '../draw-tools/draw-tools.js';
 import CanvasState from '../canvas/canvas-state.js';
-import { backgroundColor, dashLengthInput, dashSpaceInput, fillColor, linecapSelect, lineJoinSelect, shadowBlur, shadowColor, shadowOffsetX, shadowOffsetY, strokeColor, strokeSlider } from '../sidebar/sidebar.js';
+import { backgroundColor, dashLengthInput, dashSpaceInput, fillColor, linecapSelect, lineJoinSelect, opacitySlider, shadowBlur, shadowColor, shadowOffsetX, shadowOffsetY, strokeColor, strokeSlider } from '../sidebar/sidebar.js';
 import { getKey } from './util.js';
 
 const width = 1920;
@@ -55,14 +55,18 @@ document.querySelector('#restore-button').addEventListener('click', e => {
     setupContext(previewContext);
 
     // context.globalAlpha = 0.5;
-    context.strokeRect(200, 200, 50, 50)
+    // context.strokeRect(200, 200, 50, 50);
 
     const imageURL = localStorage.getItem("canvas");
     const image = new Image;
     image.src = imageURL;
     image.onload = () => {
         context.drawImage(image, 0, 0);
+        // set these after or image will get more faded every time we reload page
+        context.globalAlpha = opacitySlider.value;
+        previewContext.globalAlpha = opacitySlider.value;
     }
+
 })();
 
 function setupContext(ctx = context, strokeStyle = strokeColor.value, 

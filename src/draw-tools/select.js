@@ -30,6 +30,8 @@ export default class SelectTool extends Tool {
         this.painting = true;
 
         this.context.beginPath();
+
+        this.ignoreAlphaShadow();
         
         // set the start point of the rectangle to the position of the first mouse click
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
@@ -148,10 +150,14 @@ export default class SelectTool extends Tool {
             // put the image to the preview context so the background color data doesnt override the main context. comment the next to lines out to see what i mean. 
             this.previewContext.putImageData(this.selectedImage, mouseX - imageXOffset, mouseY - imageYOffset);
 
+            
             // draw the image data from the preview context onto the main canvas, then reset the preview context
             this.context.drawImage(this.previewContext.canvas, 0, 0);
             this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height); // clear the preview so the selection we made doesn't linger
-            
+
+            // we ignored opacity and shadow at the start of select, now we restore it after drawing
+            this.restoreAlphaShadow();
+
             // select box no longer drawn and we stop dragging
             this.selectDrawn = false;
             this.dragging = false;
@@ -202,6 +208,7 @@ export default class SelectTool extends Tool {
         this.scaleClicked = false;
         this.scaling = false;
         this.context.canvas.style.cursor = 'default';
+        this.restoreAlphaShadow();
     }
 
     // drag the selected image around the screen

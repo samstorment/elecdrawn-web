@@ -9,6 +9,8 @@ let previewContext = previewCanvas.getContext('2d');
 let backgroundCanvas = document.querySelector('#background-canvas');
 let backgroundContext = backgroundCanvas.getContext('2d');
 
+console.log('wow');
+
 // Sidebar change listeners
 export let strokeColor = document.querySelector('#stroke-color');
 strokeColor.addEventListener('input', () => {
@@ -22,17 +24,6 @@ fillColor.addEventListener('input', () => {
     previewContext.fillStyle = fillColor.value;
 });
 
-export let backgroundColor = document.querySelector('#background-color');
-backgroundColor.addEventListener('input', e => {
-    backgroundContext.fillStyle = backgroundColor.value;
-    backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
-});
-
-export let strokeSlider = document.querySelector('#stroke-slider');
-strokeSlider.addEventListener('change', () => {
-    context.lineWidth = strokeSlider.value;
-    previewContext.lineWidth = strokeSlider.value;
-});
 
 export let linecapSelect = document.querySelector('#line-caps');
 linecapSelect.addEventListener('change', e => {
@@ -83,6 +74,31 @@ shadowOffsetY.addEventListener('change', e => {
     previewContext.shadowOffsetY = e.target.value;
 });
 
+export let backgroundColor = document.querySelector('#background-color');
+backgroundColor.addEventListener('input', e => {
+    backgroundContext.fillStyle = backgroundColor.value;
+    backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
+});
+
+export let strokeSlider = document.querySelector('#stroke-slider');
+strokeSlider.addEventListener('change', () => {
+    context.lineWidth = strokeSlider.value;
+    previewContext.lineWidth = strokeSlider.value;
+});
+
+export let opacitySlider = document.querySelector('#opacity');
+opacitySlider.addEventListener('change', e => {
+    context.globalAlpha = parseFloat(e.target.value);
+    previewContext.globalAlpha = parseFloat(e.target.value);
+});
+
+export let clearButton = document.querySelector('#canvas-clear');
+clearButton.addEventListener('click', () => {
+    let imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    CanvasState.pushUndoStack(imageData);
+    context.clearRect(0, 0, canvas.width, canvas.height);
+});
+
 export let downloadCanvas = document.querySelector('#download-canvas');
 downloadCanvas.addEventListener('click', function (e) {
     // draw the canvas to the background just when we save so eveything from the canvas shows up
@@ -91,13 +107,6 @@ downloadCanvas.addEventListener('click', function (e) {
     downloadCanvas.href = dataURL;
     backgroundContext.fillStyle = backgroundColor.value;
     backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
-});
-
-export let clearButton = document.querySelector('#canvas-clear');
-clearButton.addEventListener('click', () => {
-    let imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-    CanvasState.pushUndoStack(imageData);
-    context.clearRect(0, 0, canvas.width, canvas.height);
 });
 
 // setup the arrow dropdowns for each row

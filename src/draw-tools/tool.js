@@ -1,6 +1,7 @@
 import CanvasState from '../canvas/canvas-state.js';
 import { Ellipse } from '../canvas/shape.js';
 import { getMouse } from '../canvas/util.js';
+import { opacitySlider, shadowBlur, shadowOffsetX, shadowOffsetY } from '../sidebar/sidebar.js';
 
 // super class for drawing tools
 export default class Tool {
@@ -78,7 +79,28 @@ export default class Tool {
         this.context.lineWidth = strokeWeigth;
         this.context.strokeStyle = strokeColor;
         this.context.fillStyle = fillColor;
+    }
 
+    ignoreAlphaShadow() {
+        this.context.globalAlpha = 1;
+        this.context.shadowBlur = 0;
+        this.context.shadowOffsetX = 0;
+        this.context.shadowOffsetY = 0;
+        this.previewContext.globalAlpha = 1;
+        this.previewContext.shadowBlur = 0;
+        this.previewContext.shadowOffsetX = 0;
+        this.previewContext.shadowOffsetY = 0;
+    }
+
+    restoreAlphaShadow() {
+        this.context.globalAlpha = opacitySlider.value;
+        this.context.shadowBlur = shadowBlur.value;
+        this.context.shadowOffsetX = shadowOffsetX.value;
+        this.context.shadowOffsetY = shadowOffsetY.value;
+        this.previewContext.globalAlpha = opacitySlider.value;
+        this.previewContext.shadowBlur = shadowBlur.value;
+        this.previewContext.shadowOffsetX = shadowOffsetX.value;
+        this.previewContext.shadowOffsetY = shadowOffsetY.value;
     }
 
     mouseUp() {

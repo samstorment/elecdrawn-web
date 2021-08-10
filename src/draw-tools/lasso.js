@@ -26,6 +26,9 @@ export default class LassoTool extends Tool {
         // set up the preview context
         this.previewContext.lineWidth = 1;
         this.previewContext.strokeStyle = 'black';
+
+        // set opacity and shadow to default values
+        this.ignoreAlphaShadow();
       
         // set the start point of the rectangle to the position of the first mouse click
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
@@ -132,6 +135,9 @@ export default class LassoTool extends Tool {
             // clear the preview so the selection we made doesn't double up (1 on the canvas, 1 on the preview canvas makes it look too thick temporarily)
             this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
 
+            // set alpha and shadow back to user selected values since we ignored it at start
+            this.restoreAlphaShadow();
+
             // clear the array of clip points so we dont redraw all of the clipping points from previous lassos - just the current ones
             this.points = [];
 
@@ -184,6 +190,8 @@ export default class LassoTool extends Tool {
         this.context.restore();
         // fix the stroke weight and color
         this.resetStroke();
+        // fix the shadow and opacity
+        this.restoreAlphaShadow();
     }
 
     // this does draw the clipped area at the 
