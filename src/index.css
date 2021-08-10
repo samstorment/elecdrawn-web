@@ -105,7 +105,9 @@ main {
     color: white;
     z-index: 10000;
     overflow: auto;
-    width: 215px;
+    min-width: 225px;
+    max-width: 400px;
+    resize: horizontal;
 }
 
 .sidebar-row:hover {

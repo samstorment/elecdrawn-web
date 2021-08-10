@@ -126,13 +126,22 @@
                             <label for="stroke-picker" class="eye-dropper">Pick Color<i class="fa fa-eyedropper"></i></label>
                             <input type="radio" class="sidebar-radio color-picker" id="stroke-picker" name="draw-type" value="strokePicker">
                         </div>
-                        <div class="sidebar-subrow">
 
+                        <div class="sidebar-subrow">
                             <label for="line-caps">Line Cap</label>
                             <select id="line-caps">
                                 <option value="round">Round</option>
                                 <option value="square">Square</option>
                                 <option value="butt">Butt</option>
+                            </select>
+                        </div>
+
+                        <div class="sidebar-subrow">
+                            <label for="line-joins">Line Join</label>
+                            <select id="line-joins">
+                                <option value="miter">Miter</option>
+                                <option value="round">Round</option>
+                                <option value="bevel">Bevel</option>
                             </select>
                         </div>
 
@@ -145,7 +154,7 @@
                             <label for="dash-space">Dash Space</label>
                             <input type="number" class="sidebar-number" id="dash-space" min="0" max="1000" value="0">
                         </div>
-                        
+        
                     </div>
 
                     <div class="sidebar-row">
@@ -157,6 +166,29 @@
                         <div class="sidebar-subrow">
                             <label for="fill-picker" class="eye-dropper">Pick Color<i class="fa fa-eyedropper"></i></label>
                             <input type="radio" class="sidebar-radio color-picker" id="fill-picker" name="draw-type" value="fillPicker">
+                        </div>
+                    </div>
+
+                    <div class="sidebar-row">
+                        <div class="sidebar-main-row">
+                            <button class="arrow-button arrow-closed"><i class="fa fa-angle-right"></i></button>
+                            <label for="shadow-color">Shadow</label>
+                            <input type="color" class="sidebar-color" id="shadow-color" value="#222222">
+                        </div>
+
+                        <div class="sidebar-subrow">
+                            <label for="shadow-blur">Blur</label>
+                            <input type="number" class="sidebar-number" id="shadow-blur" min="0" max="1000" value="0">
+                        </div>
+
+                        <div class="sidebar-subrow">
+                            <label for="shadow-offset-x">Offset X</label>
+                            <input type="number" class="sidebar-number" id="shadow-offset-x" min="-1000" max="1000" value="0">
+                        </div>
+
+                        <div class="sidebar-subrow">
+                            <label for="shadow-offset-y">Offset Y</label>
+                            <input type="number" class="sidebar-number" id="shadow-offset-y" min="-1000" max="1000" value="0">
                         </div>
                     </div>
 

@@ -40,6 +40,11 @@ linecapSelect.addEventListener('change', e => {
     previewContext.lineCap = e.target.value;
 });
 
+export let lineJoinSelect = document.querySelector('#line-joins');
+lineJoinSelect.addEventListener('change', e => {
+    context.lineJoin = e.target.value;
+    previewContext.lineJoin = e.target.value;
+});
 
 export let dashLengthInput = document.querySelector('#dash-length');
 export let dashSpaceInput = document.querySelector('#dash-space');
@@ -53,6 +58,30 @@ const setDash = e => {
 
 dashLengthInput.addEventListener('change', setDash);
 dashSpaceInput.addEventListener('change', setDash);
+
+export let shadowColor = document.querySelector('#shadow-color');
+shadowColor.addEventListener('change', e => {
+    context.shadowColor = e.target.value;
+    previewContext.shadowColor = e.target.value;
+});
+
+export let shadowBlur = document.querySelector('#shadow-blur');
+shadowBlur.addEventListener('change', e => {
+    context.shadowBlur = e.target.value;
+    previewContext.shadowBlur = e.target.value;
+});
+
+export let shadowOffsetX = document.querySelector('#shadow-offset-x');
+shadowOffsetX.addEventListener('change', e => {
+    context.shadowOffsetX = e.target.value;
+    previewContext.shadowOffsetX = e.target.value;
+});
+
+export let shadowOffsetY = document.querySelector('#shadow-offset-y');
+shadowOffsetY.addEventListener('change', e => {
+    context.shadowOffsetY = e.target.value;
+    previewContext.shadowOffsetY = e.target.value;
+});
 
 export let downloadCanvas = document.querySelector('#download-canvas');
 downloadCanvas.addEventListener('click', function (e) {

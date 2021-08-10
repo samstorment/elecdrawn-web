@@ -1,6 +1,6 @@
 import { DrawTool } from '../draw-tools/draw-tools.js';
 import CanvasState from '../canvas/canvas-state.js';
-import { backgroundColor, dashLengthInput, dashSpaceInput, fillColor, linecapSelect, strokeColor, strokeSlider } from '../sidebar/sidebar.js';
+import { backgroundColor, dashLengthInput, dashSpaceInput, fillColor, linecapSelect, lineJoinSelect, shadowBlur, shadowColor, shadowOffsetX, shadowOffsetY, strokeColor, strokeSlider } from '../sidebar/sidebar.js';
 import { getKey } from './util.js';
 
 const width = 1920;
@@ -54,13 +54,8 @@ document.querySelector('#restore-button').addEventListener('click', e => {
     setupContext(context);
     setupContext(previewContext);
 
-    context.shadowColor = 'light blue';
-    context.lineJoin = 'round';
-    context.shadowBlur = 500;
     // context.globalAlpha = 0.5;
-    // context.setLineDash([10, 10, 10]);
-    // previewContext.setLineDash([10, 10, 10]);
-
+    context.strokeRect(200, 200, 50, 50)
 
     const imageURL = localStorage.getItem("canvas");
     const image = new Image;
@@ -72,14 +67,21 @@ document.querySelector('#restore-button').addEventListener('click', e => {
 
 function setupContext(ctx = context, strokeStyle = strokeColor.value, 
     lineWidth = strokeSlider.value, lineCap = linecapSelect.value, 
-    fillStyle = fillColor.value, dashLength = dashLengthInput.value,
-    dashSpace = dashSpaceInput.value) {
+    lineJoin = lineJoinSelect.value, fillStyle = fillColor.value,
+    dashLength = dashLengthInput.value, dashSpace = dashSpaceInput.value,
+    shadowColorStyle = shadowColor.value, shadowBlurStyle = shadowBlur.value,
+    shadowX = shadowOffsetX.value, shadowY = shadowOffsetY.value) {
     ctx.beginPath();
     ctx.strokeStyle = strokeStyle;
     ctx.lineWidth = lineWidth;
     ctx.lineCap = lineCap;
     ctx.fillStyle = fillStyle;
     ctx.setLineDash([dashLength, dashSpace]);
+    ctx.lineJoin = lineJoin;
+    ctx.shadowColor = shadowColorStyle;
+    ctx.shadowBlur = shadowBlurStyle;
+    ctx.shadowOffsetX = shadowX;
+    ctx.shadowOffsetY = shadowY;
 }
 
 
