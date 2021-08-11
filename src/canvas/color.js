@@ -26,3 +26,30 @@ export function getPixelColor(x, y, context) {
     let rgbColor = [ pixel[0], pixel[1], pixel[2], pixel[3] ];
     return rgbToHex(rgbColor);
 }
+
+// takes picker and slider ids and returns css rgba function
+export const pickerSliderToRgba = (picker, slider) => {
+    const colorPicker = document.querySelector(`#${picker}`);
+    const opacitySlider = document.querySelector(`#${slider}`);
+
+    const [r,g,b] = hexToRGB(colorPicker.value);
+    const a = opacitySlider.value;
+
+    return `rgba(${r}, ${g}, ${b}, ${a})`;
+}
+
+export const getStrokeColor = () => {
+    return pickerSliderToRgba('stroke-color', 'stroke-opacity');
+}
+
+export const getFillColor = () => {
+    return pickerSliderToRgba('fill-color', 'fill-opacity');
+}
+
+export const setStrokeColor = (context) => {
+    context.strokeStyle = getStrokeColor();
+}
+
+export const setFillColor = (context) => {
+    context.fillStyle = getFillColor();
+}

@@ -13,14 +13,13 @@ export default class RectangleTool extends Tool {
 
     start(event) {
         super.start(event);
-        this.setRadius();
         // set the start point of the rectangle to the position of the first mouse click
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
         this.rectangle = new Rectangle(mouseX, mouseY, 0);
+        this.setRadius();
     }
 
     draw(event) { 
-
         super.draw(event);
         // if painting is false, the mouse isn't clicked so we shouldn't draw
         if (!this.painting) { return; }
@@ -29,8 +28,6 @@ export default class RectangleTool extends Tool {
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
         let width = mouseX - this.rectangle.startX;
         let height = mouseY - this.rectangle.startY;
-
-        console.log(width, this.rectangle.width, height, this.rectangle.height);
 
         // if shift is down, draw a perfect square
         if (this.shift.isDown) {
@@ -60,6 +57,9 @@ export default class RectangleTool extends Tool {
         // draw a rectangle with a stroke border on top of a filled rectangle
         this.rectangle.drawFill(this.context);
         this.rectangle.drawStroke(this.context);
+
+        // clear the preview rectangle
+        this.clear();
     }
 
 

@@ -1,4 +1,5 @@
 import CanvasState from '../canvas/canvas-state.js';
+import { pickerSliderToRgba, setFillColor, setStrokeColor } from '../canvas/color.js';
 
 let canvas = document.querySelector('#canvas');
 let context = canvas.getContext('2d');
@@ -10,8 +11,6 @@ let backgroundCanvas = document.querySelector('#background-canvas');
 let backgroundContext = backgroundCanvas.getContext('2d');
 
 const canvasProperties = {
-    strokeStyle: 'stroke-color',
-    fillStyle: 'fill-color',
     lineCap: 'line-caps',
     lineJoin: 'line-joins',
     shadowColor: 'shadow-color',
@@ -43,10 +42,11 @@ export const setUp = () => {
     setDash();
     setFont();
     setupBackground();
+    setColors();
 }
 
-export let dashLengthInput = document.querySelector('#dash-length');
-export let dashSpaceInput = document.querySelector('#dash-space');
+let dashLengthInput = document.querySelector('#dash-length');
+let dashSpaceInput = document.querySelector('#dash-space');
 
 const setDash = e => {
     let dashLength = parseInt(dashLengthInput.value);
@@ -65,7 +65,7 @@ let textFontFamily = document.querySelector('#text-font');
 let textSize = document.querySelector('#text-size');
 let textVariant = document.querySelector('#text-variant');
 
-export const setFont = () => {
+const setFont = () => {
     const bold = boldButton.classList.contains('clicked');
     const italic = italicButton.classList.contains('clicked');
     const fontFamily = textFontFamily.value;
@@ -103,31 +103,44 @@ fonts.forEach(font => {
     fontSelect.appendChild(option);
 });
 
+const setColors = () => {
+    setFillColor(context);
+    setStrokeColor(context);
+    setFillColor(previewContext);
+    setStrokeColor(previewContext);
+}
 
-export let backgroundColor = document.querySelector('#background-color');
+const colorChangeIds = ['stroke-color', 'stroke-opacity', 'fill-color', 'fill-opacity'];
+colorChangeIds.forEach(ele => {
+    document.querySelector(`#${ele}`).addEventListener('change', setColors);
+});
+
+let backgroundColor = document.querySelector('#background-color');
+let backgroundOpacity = document.querySelector('#background-opacity');
 const setupBackground = () => {
-    backgroundContext.fillStyle = backgroundColor.value;
+    const backgroundStyle = pickerSliderToRgba('background-color', 'background-opacity');
+    console.log(backgroundStyle);
+    backgroundContext.fillStyle = backgroundStyle;
+    backgroundContext.clearRect(0, 0, canvas.width, canvas.height);
     backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
 }
 backgroundColor.addEventListener('input', setupBackground);
+backgroundOpacity.addEventListener('input', setupBackground);
 
-export let strokeSlider = document.querySelector('#stroke-slider');
-
-export let clearButton = document.querySelector('#canvas-clear');
+let clearButton = document.querySelector('#canvas-clear');
 clearButton.addEventListener('click', () => {
     let imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     CanvasState.pushUndoStack(imageData);
     context.clearRect(0, 0, canvas.width, canvas.height);
 });
 
-export let downloadCanvas = document.querySelector('#download-canvas');
+let downloadCanvas = document.querySelector('#download-canvas');
 downloadCanvas.addEventListener('click', function (e) {
     // draw the canvas to the background just when we save so eveything from the canvas shows up
     backgroundContext.drawImage(canvas, 0, 0);
     let dataURL = backgroundCanvas.toDataURL('image/png');
     downloadCanvas.href = dataURL;
-    backgroundContext.fillStyle = backgroundColor.value;
-    backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
+    setupBackground();
 });
 
 // setup the arrow dropdowns for each row

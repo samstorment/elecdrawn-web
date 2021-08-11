@@ -11,6 +11,7 @@
         <script defer src="https://unpkg.com/@panzoom/panzoom@4.4.1/dist/panzoom.min.js"></script>
         <script defer src="./canvas/canvas.js" type="module"></script>
         <script defer src="./titlebar/titlebar.js" type="module"></script>
+        <script defer src="./canvas/util.js" type="module"></script>
     </head>
     <body>
         <div id="app">
@@ -228,6 +229,11 @@
                         </div>
 
                         <div class="sidebar-subrow">
+                            <label for="stroke-opacity">Opacity</label>
+                            <input type="range" class="sidebar-slider" id="stroke-opacity" min="0" max="1" value="1" step=".005">
+                        </div>
+
+                        <div class="sidebar-subrow">
                             <label for="line-caps">Line Cap</label>
                             <select id="line-caps">
                                 <option value="round">Round</option>
@@ -267,6 +273,10 @@
                             <label for="fill-picker" class="eye-dropper">Pick Color<i class="fa fa-eyedropper"></i></label>
                             <input type="radio" class="sidebar-radio color-picker" id="fill-picker" name="draw-type" value="fillPicker">
                         </div>
+                        <div class="sidebar-subrow">
+                            <label for="fill-opacity">Opacity</label>
+                            <input type="range" class="sidebar-slider" id="fill-opacity" min="0" max="1" value="1" step=".005">
+                        </div>
                     </div>
 
                     <div class="sidebar-row">
@@ -294,21 +304,26 @@
 
                     <div class="sidebar-row">
                         <div class="sidebar-main-row">
+                            <button class="arrow-button arrow-closed"><i class="fa fa-angle-right"></i></button>
                             <label for="background-color">Background</label>
                             <input type="color" class="sidebar-color" id="background-color" value="#ffffff">
+                        </div>
+                        <div class="sidebar-subrow">
+                            <label for="background-opacity">Opacity</label>
+                            <input type="range" class="sidebar-slider" id="background-opacity" min="0" max="1" value="1" step=".005">
                         </div>
                     </div>
 
                     <div class="sidebar-row">
                         <div class="sidebar-main-row">
-                            <label for="stroke-slider">Weight</label>
+                            <label for="stroke-slider">Line Width</label>
                             <input type="range" class="sidebar-slider" id="stroke-slider" min="1" max="100" value="15">
                         </div>
                     </div>
 
                     <div class="sidebar-row">
                         <div class="sidebar-main-row">
-                            <label for="opacity">Opacity</label>
+                            <label for="opacity">Global Opacity</label>
                             <input type="range" class="sidebar-slider" id="opacity" min="0" max="1" value="1" step=".005">
                         </div>
                     </div>

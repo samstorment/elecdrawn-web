@@ -68,7 +68,8 @@ main {
 }
 
 #preview-canvas { 
-    pointer-events:none; 
+    pointer-events:none;
+    box-shadow: 0px 0px 200px 20px black;
 }
 
 #hotkeys-container {
@@ -105,7 +106,7 @@ main {
     color: white;
     z-index: 10000;
     overflow: auto;
-    min-width: 250px;
+    min-width: 275px;
     max-width: 400px;
     resize: horizontal;
 }

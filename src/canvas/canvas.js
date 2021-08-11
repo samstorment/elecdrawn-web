@@ -1,11 +1,10 @@
 import { DrawTool } from '../draw-tools/draw-tools.js';
 import CanvasState from '../canvas/canvas-state.js';
-import { strokeSlider, setUp} from '../sidebar/sidebar.js';
+import { setUp} from '../sidebar/sidebar.js';
 import { getKey } from './util.js';
 
 const width = 1920;
 const height = 1080;
-
 
 // CANVAS - this is where drawings will show up
 let canvas = document.querySelector('#canvas');
@@ -16,9 +15,9 @@ let previewCanvas = document.querySelector('#preview-canvas');
 let previewContext = previewCanvas.getContext('2d');
 
 let backgroundCanvas = document.querySelector('#background-canvas');
-let backgroundContext = backgroundCanvas.getContext('2d');
 
 let canvasContainer = document.querySelector("#canvas-container");
+let strokeSlider = document.querySelector('#stroke-slider');
 
 function setCanvasSize() {
     canvas.width             = width;
@@ -56,6 +55,7 @@ document.querySelector('#restore-button').addEventListener('click', e => {
         context.drawImage(image, 0, 0);
         // set these after or image will get more faded every time we reload page;
         setUp();
+
     }
 
     let myFont = new FontFace(

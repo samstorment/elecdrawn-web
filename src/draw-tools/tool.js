@@ -1,4 +1,5 @@
 import CanvasState from '../canvas/canvas-state.js';
+import { setFillColor, setStrokeColor } from '../canvas/color.js';
 import { Ellipse } from '../canvas/shape.js';
 import { getMouse } from '../canvas/util.js';
 
@@ -72,15 +73,13 @@ export default class Tool {
 
     resetStroke() {        
         const strokeWeigth = document.querySelector('#stroke-slider').value;
-        const strokeColor = document.querySelector('#stroke-color').value;
-        const fillColor = document.querySelector('#fill-color').value;
         // reset preview stroke color and weight
         this.previewContext.lineWidth = strokeWeigth;
-        this.previewContext.strokeStyle = strokeColor;
-        this.previewContext.fillStyle = fillColor;
         this.context.lineWidth = strokeWeigth;
-        this.context.strokeStyle = strokeColor;
-        this.context.fillStyle = fillColor;
+        setFillColor(this.context);
+        setStrokeColor(this.context);
+        setFillColor(this.previewContext);
+        setStrokeColor(this.previewContext);
     }
 
     ignoreAlphaShadow() {

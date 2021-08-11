@@ -1,3 +1,5 @@
+import { getFillColor, getStrokeColor } from "./color.js";
+
 // super class for default shape behaviors
 class Shape {
     
@@ -9,21 +11,13 @@ class Shape {
 
     drawFill(context, color) {
         context.beginPath();
-        context.fillStyle = color || this.getFillStyle();
+        context.fillStyle = color || getFillColor();
     }
 
     drawStroke(context, color, lineWidth) {
         context.beginPath();
-        context.strokeStyle = color || this.getStrokeStyle();
+        context.strokeStyle = color || getStrokeColor();
         context.lineWidth = lineWidth || this.getLineWidth();
-    }
-
-    getStrokeStyle() {
-        return document.querySelector('#stroke-color').value;
-    }
-
-    getFillStyle() {
-        return document.querySelector('#fill-color').value;
     }
 
     getLineWidth() {
