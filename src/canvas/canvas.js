@@ -1,6 +1,6 @@
 import { DrawTool } from '../draw-tools/draw-tools.js';
 import CanvasState from '../canvas/canvas-state.js';
-import { backgroundColor, compositeOperation, dashLengthInput, dashSpaceInput, fillColor, linecapSelect, lineJoinSelect, opacitySlider, shadowBlur, shadowColor, shadowOffsetX, shadowOffsetY, strokeColor, strokeSlider } from '../sidebar/sidebar.js';
+import { strokeSlider, setUp} from '../sidebar/sidebar.js';
 import { getKey } from './util.js';
 
 const width = 1920;
@@ -48,47 +48,39 @@ document.querySelector('#restore-button').addEventListener('click', e => {
 
 (function initCanvas() {
     setCanvasSize();
-    backgroundContext.fillStyle = backgroundColor.value;
-    backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
-    // set the inital canvas styles
-    setupContext(context);
-    setupContext(previewContext);
-
-    // context.globalAlpha = 0.5;
-    // context.strokeRect(200, 200, 50, 50);
 
     const imageURL = localStorage.getItem("canvas");
     const image = new Image;
     image.src = imageURL;
     image.onload = () => {
         context.drawImage(image, 0, 0);
-        // set these after or image will get more faded every time we reload page
-        context.globalAlpha = opacitySlider.value;
-        previewContext.globalAlpha = opacitySlider.value;
+        // set these after or image will get more faded every time we reload page;
+        setUp();
     }
+
 
 })();
 
-function setupContext(ctx = context, strokeStyle = strokeColor.value, 
-    lineWidth = strokeSlider.value, lineCap = linecapSelect.value, 
-    lineJoin = lineJoinSelect.value, fillStyle = fillColor.value,
-    dashLength = dashLengthInput.value, dashSpace = dashSpaceInput.value,
-    shadowColorStyle = shadowColor.value, shadowBlurStyle = shadowBlur.value,
-    shadowX = shadowOffsetX.value, shadowY = shadowOffsetY.value,
-    globalCompositeOperation = compositeOperation.value) {
-    ctx.beginPath();
-    ctx.strokeStyle = strokeStyle;
-    ctx.lineWidth = lineWidth;
-    ctx.lineCap = lineCap;
-    ctx.fillStyle = fillStyle;
-    ctx.setLineDash([dashLength, dashSpace]);
-    ctx.lineJoin = lineJoin;
-    ctx.shadowColor = shadowColorStyle;
-    ctx.shadowBlur = shadowBlurStyle;
-    ctx.shadowOffsetX = shadowX;
-    ctx.shadowOffsetY = shadowY;
-    ctx.globalCompositeOperation = globalCompositeOperation;
-}
+// function setupContext(ctx = context, strokeStyle = strokeColor.value, 
+//     lineWidth = strokeSlider.value, lineCap = linecapSelect.value, 
+//     lineJoin = lineJoinSelect.value, fillStyle = fillColor.value,
+//     dashLength = dashLengthInput.value, dashSpace = dashSpaceInput.value,
+//     shadowColorStyle = shadowColor.value, shadowBlurStyle = shadowBlur.value,
+//     shadowX = shadowOffsetX.value, shadowY = shadowOffsetY.value,
+//     globalCompositeOperation = compositeOperation.value) {
+//     ctx.beginPath();
+//     ctx.strokeStyle = strokeStyle;
+//     ctx.lineWidth = lineWidth;
+//     ctx.lineCap = lineCap;
+//     ctx.fillStyle = fillStyle;
+//     ctx.setLineDash([dashLength, dashSpace]);
+//     ctx.lineJoin = lineJoin;
+//     ctx.shadowColor = shadowColorStyle;
+//     ctx.shadowBlur = shadowBlurStyle;
+//     ctx.shadowOffsetX = shadowX;
+//     ctx.shadowOffsetY = shadowY;
+//     ctx.globalCompositeOperation = globalCompositeOperation;
+// }
 
 
 // Sloppy undo/redo shortcuts for now

@@ -1,7 +1,6 @@
 import CanvasState from '../canvas/canvas-state.js';
 import { Ellipse } from '../canvas/shape.js';
 import { getMouse } from '../canvas/util.js';
-import { compositeOperation, opacitySlider, shadowBlur, shadowOffsetX, shadowOffsetY } from '../sidebar/sidebar.js';
 
 // super class for drawing tools
 export default class Tool {
@@ -95,6 +94,12 @@ export default class Tool {
     }
 
     restoreAlphaShadow() {
+        const opacitySlider = document.querySelector('#opacity');
+        const shadowBlur = document.querySelector('#shadow-blur');
+        const shadowOffsetX = document.querySelector('#shadow-offset-x');
+        const shadowOffsetY = document.querySelector('#shadow-offset-y');
+        const compositeOperation = document.querySelector('#composite-operation');
+
         this.context.globalAlpha = opacitySlider.value;
         this.context.shadowBlur = shadowBlur.value;
         this.context.shadowOffsetX = shadowOffsetX.value;

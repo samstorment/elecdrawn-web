@@ -9,31 +9,40 @@ let previewContext = previewCanvas.getContext('2d');
 let backgroundCanvas = document.querySelector('#background-canvas');
 let backgroundContext = backgroundCanvas.getContext('2d');
 
-// Sidebar change listeners
-export let strokeColor = document.querySelector('#stroke-color');
-strokeColor.addEventListener('input', () => {
-    context.strokeStyle = strokeColor.value;
-    previewContext.strokeStyle = strokeColor.value;
-});
+const canvasProperties = {
+    strokeStyle: 'stroke-color',
+    fillStyle: 'fill-color',
+    lineCap: 'line-caps',
+    lineJoin: 'line-joins',
+    shadowColor: 'shadow-color',
+    shadowBlur: 'shadow-blur',
+    shadowOffsetX: 'shadow-offset-x',
+    shadowOffsetY: 'shadow-offset-y',
+    lineWidth: 'stroke-slider',
+    globalAlpha: 'opacity',
+    globalCompositeOperation: 'composite-operation',
+    textAlign: 'text-align',
+    textBaseline: 'text-baseline'
+}
 
-export let fillColor = document.querySelector('#fill-color');
-fillColor.addEventListener('input', () => {
-    context.fillStyle = fillColor.value;
-    previewContext.fillStyle = fillColor.value;
-});
+export const setUp = () => {
 
+    for (let prop in canvasProperties) {
+        const id = `#${canvasProperties[prop]}`;
+        const element = document.querySelector(id);
+        context[prop] = element.value;
+        previewContext[prop] = element.value;
+        
+        element.addEventListener('change', e => {
+            context[prop] = e.target.value;
+            previewContext[prop] = e.target.value;
+        });
+    }
 
-export let linecapSelect = document.querySelector('#line-caps');
-linecapSelect.addEventListener('change', e => {
-    context.lineCap = e.target.value;
-    previewContext.lineCap = e.target.value;
-});
-
-export let lineJoinSelect = document.querySelector('#line-joins');
-lineJoinSelect.addEventListener('change', e => {
-    context.lineJoin = e.target.value;
-    previewContext.lineJoin = e.target.value;
-});
+    setDash();
+    setFont();
+    setupBackground();
+}
 
 export let dashLengthInput = document.querySelector('#dash-length');
 export let dashSpaceInput = document.querySelector('#dash-space');
@@ -48,53 +57,48 @@ const setDash = e => {
 dashLengthInput.addEventListener('change', setDash);
 dashSpaceInput.addEventListener('change', setDash);
 
-export let shadowColor = document.querySelector('#shadow-color');
-shadowColor.addEventListener('change', e => {
-    context.shadowColor = e.target.value;
-    previewContext.shadowColor = e.target.value;
+let boldButton = document.querySelector(`#text-bold`);
+let italicButton = document.querySelector(`#text-italic`);
+let underlineButton = document.querySelector(`#text-underline`);
+let textFontFamily = document.querySelector('#text-font');
+let textSize = document.querySelector('#text-size');
+let textVariant = document.querySelector('#text-variant');
+
+export const setFont = () => {
+    const bold = boldButton.classList.contains('clicked');
+    const italic = italicButton.classList.contains('clicked');
+    const fontFamily = textFontFamily.value;
+    const size = textSize.value;
+    const variant = textVariant.value;
+    const font = `${italic ? 'italic' : ''} ${bold ? 'bold' : ''} ${variant} ${size}px ${fontFamily}`;
+    context.font = font;
+    previewContext.font = font;
+}
+
+const textButtonClick = e => {
+    e.target.classList.toggle('clicked');
+    setFont();
+}
+
+boldButton.addEventListener('click', textButtonClick);
+italicButton.addEventListener('click', textButtonClick);
+underlineButton.addEventListener('click', textButtonClick);
+
+const fontChangers = ['text-bold', 'text-italic', 'text-font', 'text-size', 'text-variant'];
+fontChangers.forEach(id => {
+    document.querySelector(`#${id}`).addEventListener('change', setFont);
 });
 
-export let shadowBlur = document.querySelector('#shadow-blur');
-shadowBlur.addEventListener('change', e => {
-    context.shadowBlur = e.target.value;
-    previewContext.shadowBlur = e.target.value;
-});
-
-export let shadowOffsetX = document.querySelector('#shadow-offset-x');
-shadowOffsetX.addEventListener('change', e => {
-    context.shadowOffsetX = e.target.value;
-    previewContext.shadowOffsetX = e.target.value;
-});
-
-export let shadowOffsetY = document.querySelector('#shadow-offset-y');
-shadowOffsetY.addEventListener('change', e => {
-    context.shadowOffsetY = e.target.value;
-    previewContext.shadowOffsetY = e.target.value;
-});
 
 export let backgroundColor = document.querySelector('#background-color');
-backgroundColor.addEventListener('input', e => {
+const setupBackground = () => {
     backgroundContext.fillStyle = backgroundColor.value;
     backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
-});
+}
+backgroundColor.addEventListener('input', setupBackground);
+
 
 export let strokeSlider = document.querySelector('#stroke-slider');
-strokeSlider.addEventListener('change', () => {
-    context.lineWidth = strokeSlider.value;
-    previewContext.lineWidth = strokeSlider.value;
-});
-
-export let opacitySlider = document.querySelector('#opacity');
-opacitySlider.addEventListener('change', e => {
-    context.globalAlpha = parseFloat(e.target.value);
-    previewContext.globalAlpha = parseFloat(e.target.value);
-});
-
-export let compositeOperation = document.querySelector('#composite-operation');
-compositeOperation.addEventListener('change', e => {
-    context.globalCompositeOperation = e.target.value;
-    previewContext.globalCompositeOperation = e.target.value;
-});
 
 export let clearButton = document.querySelector('#canvas-clear');
 clearButton.addEventListener('click', () => {
