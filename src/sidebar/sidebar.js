@@ -89,6 +89,19 @@ fontChangers.forEach(id => {
     document.querySelector(`#${id}`).addEventListener('change', setFont);
 });
 
+const fonts = [
+    'Serif', 'Trebuchet MS', 'Verdana', 'Avantgarde', 'Brush Script MT', 
+    'Comic Sans MS', 'Impact', 'Courier',
+    'Pangolin',
+];
+const fontSelect = document.querySelector('#text-font');
+fonts.forEach(font => {
+    const option = document.createElement('option');
+    option.innerHTML = font;
+    option.value = font;
+    fontSelect.appendChild(option);
+});
+
 
 export let backgroundColor = document.querySelector('#background-color');
 const setupBackground = () => {
@@ -96,7 +109,6 @@ const setupBackground = () => {
     backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
 }
 backgroundColor.addEventListener('input', setupBackground);
-
 
 export let strokeSlider = document.querySelector('#stroke-slider');
 

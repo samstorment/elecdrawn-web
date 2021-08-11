@@ -58,30 +58,16 @@ document.querySelector('#restore-button').addEventListener('click', e => {
         setUp();
     }
 
-
+    let myFont = new FontFace(
+        "Pangolin",
+        "url(https://fonts.gstatic.com/s/pangolin/v6/cY9GfjGcW0FPpi-tWMfN79z4i6BH.woff2)"
+      );
+      
+    myFont.load().then((font) => {
+        document.fonts.add(font);
+        console.log("Font loaded");
+    });
 })();
-
-// function setupContext(ctx = context, strokeStyle = strokeColor.value, 
-//     lineWidth = strokeSlider.value, lineCap = linecapSelect.value, 
-//     lineJoin = lineJoinSelect.value, fillStyle = fillColor.value,
-//     dashLength = dashLengthInput.value, dashSpace = dashSpaceInput.value,
-//     shadowColorStyle = shadowColor.value, shadowBlurStyle = shadowBlur.value,
-//     shadowX = shadowOffsetX.value, shadowY = shadowOffsetY.value,
-//     globalCompositeOperation = compositeOperation.value) {
-//     ctx.beginPath();
-//     ctx.strokeStyle = strokeStyle;
-//     ctx.lineWidth = lineWidth;
-//     ctx.lineCap = lineCap;
-//     ctx.fillStyle = fillStyle;
-//     ctx.setLineDash([dashLength, dashSpace]);
-//     ctx.lineJoin = lineJoin;
-//     ctx.shadowColor = shadowColorStyle;
-//     ctx.shadowBlur = shadowBlurStyle;
-//     ctx.shadowOffsetX = shadowX;
-//     ctx.shadowOffsetY = shadowY;
-//     ctx.globalCompositeOperation = globalCompositeOperation;
-// }
-
 
 // Sloppy undo/redo shortcuts for now
 document.onkeydown = e => {
