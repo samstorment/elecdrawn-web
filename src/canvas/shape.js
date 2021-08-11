@@ -7,17 +7,27 @@ class Shape {
         this.startY = startY;
     }
 
-    // any fill will need to set the fill color and a context to draw to
-    drawFill(color, context) { 
+    drawFill(context, color) {
         context.beginPath();
-        context.fillStyle = color;
+        context.fillStyle = color || this.getFillStyle();
     }
 
-    // any stroke will need to set a stroke weight, stroke color, and a context to draw to
-    drawStroke(lineWeight, color, context) {
+    drawStroke(context, color, lineWidth) {
         context.beginPath();
-        context.lineWidth = lineWeight;    
-        context.strokeStyle = color;
+        context.strokeStyle = color || this.getStrokeStyle();
+        context.lineWidth = lineWidth || this.getLineWidth();
+    }
+
+    getStrokeStyle() {
+        return document.querySelector('#stroke-color').value;
+    }
+
+    getFillStyle() {
+        return document.querySelector('#fill-color').value;
+    }
+
+    getLineWidth() {
+        return document.querySelector('#stroke-slider').value;
     }
 
     // returns true if the given x,y coordinate is inside of the shape
@@ -35,14 +45,14 @@ export class Rectangle extends Shape {
         this.setRadius(radius);
     }
 
-    drawFill(color, context) {
-        super.drawFill(color, context);
+    drawFill(context, color) {
+        super.drawFill(context, color);
         this._draw(context);
         context.fill();
     }
 
-    drawStroke(lineWeight, color, context) {
-        super.drawStroke(lineWeight, color, context);
+    drawStroke(context, color, lineWidth) {
+        super.drawStroke(context, color, lineWidth);
         this._draw(context);
         context.stroke();
     }
@@ -85,18 +95,6 @@ export class Rectangle extends Shape {
             }
         }
     }
-
-    // THESE two are for a regular canvas rectangle with no consideration of border radii
-
-    // drawFill(color, context) {
-    //     super.drawFill(color, context);
-    //     context.fillRect(this.startX, this.startY, this.width, this.height);
-    // }
-
-    // drawStroke(lineWeight, color, context) {
-    //     super.drawStroke(lineWeight, color, context);
-    //     context.strokeRect(this.startX, this.startY, this.width, this.height);
-    // }
 
     // returns the coordinates from top left corner of the rectangle. this is different than normal startX, startY because those could be in any corner
     getCoords() {
@@ -164,14 +162,14 @@ export class Ellipse extends Shape {
         this.counterClockwise = counterClockwise;
     }
 
-    drawFill(color, context) {
-        super.drawFill(color, context);
+    drawFill(context, color) {
+        super.drawFill(context, color);
         context.ellipse(this.startX, this.startY, this.radiusX, this.radiusY, this.rotation, this.startAngle, this.endAngle, this.counterClockwise);
         context.fill();
     }
 
-    drawStroke(lineWeight, color, context) {
-        super.drawStroke(lineWeight, color, context);
+    drawStroke(context, color, lineWidth) {
+        super.drawStroke(context, color, lineWidth);
         context.ellipse(this.startX, this.startY, this.radiusX, this.radiusY, this.rotation, this.startAngle, this.endAngle, this.counterClockwise);
         context.stroke();
     }
@@ -197,21 +195,15 @@ export class Polygon extends Shape {
         this.points = points;
     }
 
-    drawFill(color, context) {
-        super.drawFill(color, context);
-
+    drawFill(context, color) {
+        super.drawFill(context, color);
         this._draw(context);
-
-        // actually put the lines on screen
         context.fill();
     }
 
-    drawStroke(lineWeight, color, context) {
-        super.drawStroke(lineWeight, color, context);
-
+    drawStroke(context, color, lineWidth) {
+        super.drawStroke(context, color, lineWidth);
         this._draw(context);
-        
-        // actually put the lines on screen
         context.stroke();
     }
 

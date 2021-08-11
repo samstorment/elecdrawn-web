@@ -17,13 +17,6 @@ export default class BucketTool extends Tool {
         this.context.beginPath();    // start a new path so we don't mess our other tools don't start at weird spot
     }
 
-    // define an empty draw functions to override super class because we don't want to draw a gover cursor
-    draw(event) {}
-
-    finish(event) {
-        super.finish(event);
-    }
-
     floodFill(startX, startY, hexFillColor, context, range = 1) {
 
         // fillColor needs to be converted to RGB since we get it from color input as a hex val
@@ -38,7 +31,6 @@ export default class BucketTool extends Tool {
         // get the color of the first pixel we clicked on
         const targetColor = this.getPixel(startX, startY, imageData);
 
-    
         // if the target color we tried to fill is identical to our fill color, we're done
         if (this.colorsIdentical(targetColor, fillColor)) { return; }
     
@@ -70,7 +62,6 @@ export default class BucketTool extends Tool {
         }
         // draw the updated imageData back to the screen
         context.putImageData(imageData, 0, 0);
-        
     }
     
     // returns the RGB color array of the pixel at (x, y)
@@ -108,5 +99,7 @@ export default class BucketTool extends Tool {
     colorsIdentical(clr1, clr2) {
         return clr1[0] == clr2[0] && clr1[1] == clr2[1] && clr1[2] == clr2[2] && clr1[3] == clr2[3];
     }
-    
+
+    // never want a hover cursor for bucket
+    drawHoverCursor() {}   
 }

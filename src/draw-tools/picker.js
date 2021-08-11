@@ -34,15 +34,6 @@ export default class PickerTool extends Tool {
         }
     }
 
-    // define empty draw so we don't call super for hover cursor
-    draw(event) { 
-      
-    }
-
-    // we are no longer painting when we finish
-    finish(event) {
-        super.finish(event);
-    }
-
-
+    // we never want a hover cursor with this tool
+    drawHoverCursor() {}
 }

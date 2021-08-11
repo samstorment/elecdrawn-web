@@ -52,7 +52,6 @@ export default class LassoTool extends Tool {
     }
 
     draw(event) { 
-
         // if painting is false, the mouse isn't clicked so we shouldn't draw
         if (!this.painting) { return; }
         
@@ -62,7 +61,7 @@ export default class LassoTool extends Tool {
         if (this.lassoDrawn) {
 
             // clear the preview context like any draw
-            this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+            this.clear();
 
             // get the coords of the rectangle surrounding the lasso'd selection. this lets us determine how to drag the lasso'd selection relative to our mouse position
             let { topLeftX, topLeftY, botRightX, botRightY } = this.lassoCoords;
@@ -98,9 +97,7 @@ export default class LassoTool extends Tool {
 
             // draw the lines to the ghost as well so we can pt the black lasso line there. This way when we move the lasso'd region, there is a black outline
             this.ghostContext.lineTo(mouseX, mouseY);
-
         }
-
     }
 
     finish(event) {
@@ -120,7 +117,7 @@ export default class LassoTool extends Tool {
             this.ghostContext.putImageData(this.selectedImage, 0, 0);
 
             // do one more DRAW call (exactly like drawLasso()) so we draw the clipped canvas region without the black lasso line
-            this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+            this.clear();
             let { topLeftX, topLeftY, botRightX, botRightY } = this.lassoCoords;
             let imageXOffset = this.mouseStart.x - topLeftX;
             let imageYOffset = this.mouseStart.y - topLeftY;
@@ -133,7 +130,7 @@ export default class LassoTool extends Tool {
             this.context.drawImage(this.previewContext.canvas, 0, 0);
             
             // clear the preview so the selection we made doesn't double up (1 on the canvas, 1 on the preview canvas makes it look too thick temporarily)
-            this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+            this.clear();
 
             // set alpha and shadow back to user selected values since we ignored it at start
             this.restoreAlphaShadow();
@@ -171,7 +168,7 @@ export default class LassoTool extends Tool {
     leave(event) {
         // remove the hover cursor if we leave and we aren't painting
         if (!this.painting && !this.lassoDrawn) {
-            this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+            this.clear();
         }
 
         // warn the user they've exited canvas
@@ -188,8 +185,6 @@ export default class LassoTool extends Tool {
         this.points = [];
         // restore the full context since we clipped it to the lasso region
         this.context.restore();
-        // fix the stroke weight and color
-        this.resetStroke();
         // fix the shadow and opacity
         this.restoreAlphaShadow();
     }
@@ -238,7 +233,7 @@ export default class LassoTool extends Tool {
         let del = getKey("Delete");
         del.press = () => {
             if (this.lassoDrawn) {
-                this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
+                this.clear(this.context);
                 this.lassoDrawn = false;
                 this.cleanup();
             }

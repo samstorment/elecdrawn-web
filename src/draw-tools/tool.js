@@ -15,12 +15,10 @@ export default class Tool {
     // painting is true once we start using a tool. Push the current canvas state to the undo stack since we will be modifying it right after
     start(event) {
         this.painting = true;
-
         // push the state to the undo stack
         const imageData = this.context.getImageData(0, 0, this.context.canvas.width, this.context.canvas.height);
         CanvasState.pushUndoStack(imageData);
         CanvasState.resetRedoStack();
-        
     }
 
     draw(event) { 
@@ -38,7 +36,7 @@ export default class Tool {
     leave(event) {
         // remove the hover cursor if we leave and we aren't painting
         if (!this.painting) {
-            this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+            this.clear();
         }
 
         if (this.painting) {
@@ -53,28 +51,33 @@ export default class Tool {
 
     cleanup() {
         this.resetStroke();
-        this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+        this.clear();
     }
 
     drawHoverCursor(event, context=this.previewContext) {
-        let { mouseX, mouseY } = getMouse(event, this.context.canvas);
-
+        let { mouseX, mouseY } = getMouse(event, context.canvas);
+        
         // clear the preview canvas anytime we move, but draw right after
-        this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
-        this.previewContext.beginPath();
+        this.clear();
+        context.beginPath();
 
         let radius = this.context.lineWidth / 2;
         let ellipse = new Ellipse(mouseX, mouseY, radius);
-        ellipse.drawFill(this.context.strokeStyle, context);
+        ellipse.drawFill(context, context.strokeStyle);
     }
 
-    resetStroke() {
+    clear(context=this.previewContext, x=0, y=0, width=context.canvas.width, height=context.canvas.height) {
+        context.clearRect(x, y, width, height);
+    }
+
+    resetStroke() {        
         const strokeWeigth = document.querySelector('#stroke-slider').value;
         const strokeColor = document.querySelector('#stroke-color').value;
         const fillColor = document.querySelector('#fill-color').value;
         // reset preview stroke color and weight
         this.previewContext.lineWidth = strokeWeigth;
         this.previewContext.strokeStyle = strokeColor;
+        this.previewContext.fillStyle = fillColor;
         this.context.lineWidth = strokeWeigth;
         this.context.strokeStyle = strokeColor;
         this.context.fillStyle = fillColor;
@@ -117,7 +120,7 @@ export default class Tool {
             // check if painting because painting will be false only if we mouseup outside of the canvas
             if (this.painting) {                
                 this.painting = false;
-                this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+                this.clear();
                 this.context.canvas.style.backgroundColor = "rgb(0,0,0,0)";
             }
         });

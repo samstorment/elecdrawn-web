@@ -12,7 +12,6 @@ export default class LineTool extends Tool {
     }
 
     start(event) {
-
         super.start(event);
 
         this.context.beginPath();
@@ -20,7 +19,7 @@ export default class LineTool extends Tool {
       
         // we'll use a rectangle to track our line's start and size
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
-        this.rectangle.setStart(mouseX, mouseY);
+        this.rectangle = new Rectangle(mouseX, mouseY, 0);
     }
 
     draw(event) { 

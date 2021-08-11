@@ -30,6 +30,7 @@ export const setUp = () => {
     for (let prop in canvasProperties) {
         const id = `#${canvasProperties[prop]}`;
         const element = document.querySelector(id);
+        
         context[prop] = element.value;
         previewContext[prop] = element.value;
         

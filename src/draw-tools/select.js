@@ -8,7 +8,6 @@ import { Rectangle } from '../canvas/shape.js';
 //          keep the select box around selection after we finish moving selection so we can keep moving it if need
 //          add a copy paste to selection
 //          add a rotate tool to selection
-//          add a delete tool for selection
 export default class SelectTool extends Tool {
 
     constructor(context) {
@@ -25,19 +24,14 @@ export default class SelectTool extends Tool {
     }
 
     start(event) {
-        
         // we don't call super.start because we don't want to save the canvas state to the undo stack immeditaely
         this.painting = true;
-
-        this.context.beginPath();
-
         this.ignoreAlphaShadow();
         
         // set the start point of the rectangle to the position of the first mouse click
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
         this.mouseStart.x = mouseX;
         this.mouseStart.y = mouseY;
-
         
         if (this.selectDrawn) {
             
@@ -48,7 +42,7 @@ export default class SelectTool extends Tool {
             // if we click outside of the select rectangle and the anchors, end the selection and clear the rectangle
             if (!this.select.isInside(mouseX, mouseY) && !anchor) {
                 this.selectDrawn = false;
-                this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+                this.clear();
                 // remove the canvas state that we pushed needlessly since we didn't move the selection
                 CanvasState.popUndoStack();
             } 
@@ -83,7 +77,7 @@ export default class SelectTool extends Tool {
             // we start scaling if we draw while scaleClicked is true
             this.scaling = true;
 
-            this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+            this.clear();
             
             // clear the context at the inital point where the select rect was drawn
             this.context.beginPath();
@@ -94,7 +88,7 @@ export default class SelectTool extends Tool {
         
             // draw the black outline of the changing scale rect
             let scaleRect = new Rectangle(this.mouseStart.x, this.mouseStart.y, width, height);
-            scaleRect.drawStroke(1, '#000000', this.previewContext);
+            scaleRect.drawStroke(this.previewContext, 'black', 2);
             
             // draw the anchors as we move the scale rect
             let anchors = new Anchors(scaleRect, 10);
@@ -123,7 +117,7 @@ export default class SelectTool extends Tool {
         if (this.scaleClicked) {
 
             // clear the preview context so the scale rect/anchors disappear when we end
-            this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+            this.clear();
 
             // draw the scaled up ghost context image to the main context
             this.context.drawImage(this.ghostContext.canvas, this.mouseStart.x, this.mouseStart.y, width, height);
@@ -145,15 +139,14 @@ export default class SelectTool extends Tool {
             let imageYOffset = this.mouseStart.y - topLeftY;
 
             // clear the preview context so the we putImageData below to an empty canvas
-            this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+            this.clear();
 
             // put the image to the preview context so the background color data doesnt override the main context. comment the next to lines out to see what i mean. 
             this.previewContext.putImageData(this.selectedImage, mouseX - imageXOffset, mouseY - imageYOffset);
-
             
             // draw the image data from the preview context onto the main canvas, then reset the preview context
             this.context.drawImage(this.previewContext.canvas, 0, 0);
-            this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height); // clear the preview so the selection we made doesn't linger
+            this.clear();
 
             // we ignored opacity and shadow at the start of select, now we restore it after drawing
             this.restoreAlphaShadow();
@@ -169,8 +162,7 @@ export default class SelectTool extends Tool {
 
             // if the width or height is 0 we want to clear the drawn select rect and return
             if (this.select.width === 0 || this.select.height === 0) {
-                this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
-                return;
+                return this.clear();
             }
         
             // get the image data inside the selection rectangle that was drawn
@@ -191,7 +183,7 @@ export default class SelectTool extends Tool {
     leave(event) {
         // remove the hover cursor if we leave and we aren't painting
         if (!this.painting && !this.selectDrawn) {
-            this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+            this.clear();
         }
 
         if (this.painting) {
@@ -233,7 +225,7 @@ export default class SelectTool extends Tool {
         // draw a clearRect at the exact spot where we picked up our selection so we dont copy it. Remove these 2 lines and we'll create a copy
         this.context.beginPath();
         this.context.clearRect(this.select.startX, this.select.startY, this.select.width, this.select.height);
-        this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+        this.clear();
 
         // top left coords of the dragged select rectangle
         let newTopLeftX = mouseX - rectXOffset;
@@ -241,16 +233,15 @@ export default class SelectTool extends Tool {
 
         // draw a rect and the selected image at the current mouse position, but account for the initial click's offset
         let rect = new Rectangle(newTopLeftX, newTopLeftY, this.select.width, this.select.height);
-        rect.drawStroke(3, '#000000', this.previewContext);
-
+        rect.drawStroke(this.previewContext, 'black', 2);
         this.previewContext.putImageData(this.selectedImage, mouseX - imageXOffset, mouseY - imageYOffset);
     }
 
     // draw the thin black selection box to the preview context
     drawSelectRect(width, height) {
-        this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+        this.clear();
         this.select = new Rectangle(this.mouseStart.x, this.mouseStart.y, width, height);
-        this.select.drawStroke(1, '#000000', this.previewContext);
+        this.select.drawStroke(this.previewContext, 'black', 2);
     }
 
     // if the select rect is drawn, we change to cursor to a drag arrow if hovering anchor. Move arrow if hovering select box
@@ -278,7 +269,7 @@ export default class SelectTool extends Tool {
         del.press = () => {
             if (this.selectDrawn) {
                 this.context.clearRect(this.select.startX, this.select.startY, this.select.width, this.select.height);
-                this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+                this.clear();
                 this.context.canvas.style.cursor = 'default';
                 this.selectDrawn = false;
             }
@@ -297,7 +288,7 @@ export default class SelectTool extends Tool {
                 // reset select state
                 this.cleanup();
                 // clear black select box
-                this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+                this.clear();
                 // remove red warning color
                 this.context.canvas.style.backgroundColor = "rgb(0,0,0,0)";
             }
@@ -327,10 +318,10 @@ class Anchors {
 
     // draws the 4 rectangles with the chosen color
     drawAnchors(context, color) {
-        this.topLeft.drawFill(color, context);
-        this.topRight.drawFill(color, context);
-        this.botLeft.drawFill(color, context);
-        this.botRight.drawFill(color, context);
+        this.topLeft.drawFill(context, color);
+        this.topRight.drawFill(context, color);
+        this.botLeft.drawFill(context, color);
+        this.botRight.drawFill(context, color);
     }
 
     // returns a number corresponding to the anchor that the mouse is inside. returns 0 if mouse is in no anchor

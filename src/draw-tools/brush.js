@@ -28,9 +28,11 @@ export default class BrushTool extends Tool {
         this.context.lineTo(mouseX, mouseY);
         this.context.stroke();
         
-        // // these two lines help to smooth the line, commented for better dash performance
-        // this.context.beginPath();
-        // this.context.moveTo(mouseX, mouseY);
-    
+        // these lines help to smooth the line
+        const [,space] = this.context.getLineDash();
+        if (space === 0) {    
+            this.context.beginPath();
+            this.context.moveTo(mouseX, mouseY);
+        }
     }
 }

@@ -14,11 +14,9 @@ export default class RectangleTool extends Tool {
     start(event) {
         super.start(event);
         this.setRadius();
-        this.context.beginPath();
-
         // set the start point of the rectangle to the position of the first mouse click
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
-        this.rectangle.setStart(mouseX, mouseY);
+        this.rectangle = new Rectangle(mouseX, mouseY, 0);
     }
 
     draw(event) { 
@@ -32,6 +30,8 @@ export default class RectangleTool extends Tool {
         let width = mouseX - this.rectangle.startX;
         let height = mouseY - this.rectangle.startY;
 
+        console.log(width, this.rectangle.width, height, this.rectangle.height);
+
         // if shift is down, draw a perfect square
         if (this.shift.isDown) {
             width = height = Math.max(Math.abs(width), Math.abs(height));
@@ -40,45 +40,43 @@ export default class RectangleTool extends Tool {
         }
       
         // clear the preview context before each draw so we don't stack rectangles
-        this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+        this.clear();
 
         // draw the rectangle to the preview context at its current size
         this.rectangle.setSize(width, height);
-        this.rectangle.drawFill(this.context.fillStyle, this.previewContext);
-        this.rectangle.drawStroke(this.context.lineWidth, this.context.strokeStyle, this.previewContext);
+        this.rectangle.drawFill(this.previewContext);
+        this.rectangle.drawStroke(this.previewContext);
     }
 
     finish(event) {
         super.finish(event);
 
-        let { mouseX, mouseY } = getMouse(event, this.context.canvas);
-
-        if (mouseX === this.rectangle.startX && mouseY === this.rectangle.startY) {
+        if (this.rectangle.width === 0 && this.rectangle.height === 0) {
             this.drawHoverCursor(event, this.context);
             this.resetStroke();
             return;
         }
 
         // draw a rectangle with a stroke border on top of a filled rectangle
-        this.rectangle.drawFill(this.context.fillStyle, this.context);
-        this.rectangle.drawStroke(this.context.lineWidth, this.context.strokeStyle, this.context);
+        this.rectangle.drawFill(this.context);
+        this.rectangle.drawStroke(this.context);
     }
 
 
     drawHoverCursor(event, context=this.previewContext) {
-        let { mouseX, mouseY } = getMouse(event, this.context.canvas);
+        let { mouseX, mouseY } = getMouse(event, context.canvas);
 
         // clear the preview canvas anytime we move, but draw right after
-        this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
-        this.previewContext.beginPath();
+        this.clear();
+        context.beginPath();
         
         // draw a rect the size of the stroke wherever the cursor is
-        let length = this.context.lineWidth;
+        let length = context.lineWidth;
         let xStart = mouseX-length/2; 
         let yStart =  mouseY-length/2;
 
         let rect = new Rectangle(xStart, yStart, length);
-        rect.drawFill(this.context.strokeStyle, context);
+        rect.drawFill(context, context.strokeStyle);
     }
 
     // for now we just have one radius input box so all radii will be the same

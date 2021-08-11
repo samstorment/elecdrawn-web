@@ -38,15 +38,18 @@ export default class BrushFillTool extends Tool {
         this.points.push({x: mouseX, y: mouseY});
         
         let poly = new Polygon(0, 0, this.points);
-        poly.drawFill(this.context.fillStyle, this.context);
+        poly.drawFill(this.context);
 
         // draw a line to the current mouse cooridnates
         this.previewContext.lineTo(mouseX, mouseY);
         this.previewContext.stroke();
 
-        // these two lines help to smooth the line, commented for better dash performance
-        // this.previewContext.beginPath();
-        // this.previewContext.moveTo(mouseX, mouseY);
+        // these lines help to smooth the line
+        const [,space] = this.context.getLineDash();
+        if (space === 0) {
+            this.previewContext.beginPath();
+            this.previewContext.moveTo(mouseX, mouseY);
+        }
     }
 
     finish(event) {
@@ -77,7 +80,7 @@ export default class BrushFillTool extends Tool {
             if (this.painting) {                
                 this.painting = false;
                 // clear the preview
-                this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+                this.clear(this.previewContext);
                 // effectively clearing the main context by undoing the most recent draw to it
                 CanvasState.undo(this.context);
                 // clear backgrond color

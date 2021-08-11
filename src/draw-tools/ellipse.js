@@ -18,7 +18,7 @@ export default class EllipseTool extends Tool {
       
         // set the start point of the rectangle to the position of the first mouse click
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
-        this.rectangle.setStart(mouseX, mouseY);
+        this.rectangle = new Rectangle(mouseX, mouseY, 0);
     }
 
     draw(event) { 
@@ -39,35 +39,31 @@ export default class EllipseTool extends Tool {
         }
       
         // clear the preview context before each draw so we don't stack rectangles
-        this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
-
+        this.clear();
         // draw an ellipse based on current mouse position
         this.ellipse.setStart(this.rectangle.startX + width/2, this.rectangle.startY + height/2);
         this.ellipse.setSize(Math.abs(width/2), Math.abs(height/2));
-        this.ellipse.drawFill(this.context.fillStyle, this.previewContext);
-        this.ellipse.drawStroke(this.context.lineWidth, this.context.strokeStyle, this.previewContext);
+        this.ellipse.drawFill(this.previewContext);
+        this.ellipse.drawStroke(this.previewContext);
 
         // draw a rectangle to indicate the outer bounds of the ellipse
         this.rectangle.setSize(width, height);
-        this.rectangle.drawStroke(2, 'black', this.previewContext);
+        this.rectangle.drawStroke(this.previewContext, 'black', 2);
     }
 
     finish(event) {
         super.finish(event);
 
-        let { mouseX, mouseY } = getMouse(event, this.context.canvas);
-
-        if (mouseX === this.rectangle.startX && mouseY === this.rectangle.startY) {
+        if (this.rectangle.width === 0 && this.rectangle.height === 0) {
             this.drawHoverCursor(event, this.context);
             this.resetStroke();
             return;
         }
 
         // get rid of the black guideline box around the circle
-        this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
-
+        this.clear();
         // draw an ellipse with a stroke border on top of a filled ellipse
-        this.ellipse.drawFill(this.context.fillStyle, this.context);
-        this.ellipse.drawStroke(this.context.lineWidth, this.context.strokeStyle, this.context);
+        this.ellipse.drawFill(this.context);
+        this.ellipse.drawStroke(this.context);
     }
 }
