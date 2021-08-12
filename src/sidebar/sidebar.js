@@ -119,7 +119,6 @@ let backgroundColor = document.querySelector('#background-color');
 let backgroundOpacity = document.querySelector('#background-opacity');
 const setupBackground = () => {
     const backgroundStyle = pickerSliderToRgba('background-color', 'background-opacity');
-    console.log(backgroundStyle);
     backgroundContext.fillStyle = backgroundStyle;
     backgroundContext.clearRect(0, 0, canvas.width, canvas.height);
     backgroundContext.fillRect(0, 0, canvas.width, canvas.height);

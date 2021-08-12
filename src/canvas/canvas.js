@@ -55,7 +55,7 @@ document.querySelector('#restore-button').addEventListener('click', e => {
         context.drawImage(image, 0, 0);
         // set these after or image will get more faded every time we reload page;
         setUp();
-
+        previewCanvas.style.boxShadow = '0px 0px 50px 5px black'
     }
 
     let myFont = new FontFace(

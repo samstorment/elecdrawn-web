@@ -119,6 +119,7 @@ export default class Tool {
             // check if painting because painting will be false only if we mouseup outside of the canvas
             if (this.painting) {                
                 this.painting = false;
+                this.finish(e);
                 this.clear();
                 this.context.canvas.style.backgroundColor = "rgb(0,0,0,0)";
             }

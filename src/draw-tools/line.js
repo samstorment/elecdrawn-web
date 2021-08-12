@@ -32,17 +32,29 @@ export default class LineTool extends Tool {
         let width = mouseX - this.rectangle.startX;
         let height = mouseY - this.rectangle.startY;
 
-        // if shift is held we want to draw a straight line from the start to the larger of the width and height
+        // if shift is held we want to snap to straight lines every 15 degrees
         if (this.shift.isDown) {
-            if (Math.abs(width) > Math.abs(height)) { height = 0; } 
-            else                                    { width = 0;  }
+            // the length of our drawn line on screen
+            let hypotenuse = Math.sqrt(width*width + height*height);
+
+            // these two lines find the real angle of our line at current mouse position
+            let angle = (Math.atan2(height, width) / Math.PI * 180);
+            angle = (angle) % 360 + 180;
+
+            // these two lines convert the raw angle to the nearest 15 degrees
+            angle = parseInt(((angle + 7.5) % 360 ) / 15 ) * 15;
+            angle -= 180;
+
+            // calculate new width and height given angle and line length
+            width = hypotenuse * Math.cos(angle * Math.PI / 180);
+            height = hypotenuse * Math.sin(angle * Math.PI / 180);
         }
       
         // set the rectangle's size to track current width/height
         this.rectangle.setSize(width, height);
 
         // clear the preview context before each draw so we don't stack rectangles
-        this.previewContext.clearRect(0, 0, this.previewContext.canvas.width, this.previewContext.canvas.height);
+        this.clear();
         
         // draw the preview line to each time we move the mouse
         this.previewContext.moveTo(this.rectangle.startX, this.rectangle.startY);
@@ -55,9 +67,9 @@ export default class LineTool extends Tool {
 
     finish(event) {
         super.finish(event);
-
         this.context.moveTo(this.rectangle.startX, this.rectangle.startY);
         this.context.lineTo(this.rectangle.startX + this.rectangle.width, this.rectangle.startY + this.rectangle.height);
         this.context.stroke();
+        this.clear();
     }
 }

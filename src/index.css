@@ -69,7 +69,6 @@ main {
 
 #preview-canvas { 
     pointer-events:none;
-    box-shadow: 0px 0px 200px 20px black;
 }
 
 #hotkeys-container {
