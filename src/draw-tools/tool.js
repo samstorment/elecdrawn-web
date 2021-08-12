@@ -82,7 +82,7 @@ export default class Tool {
         setStrokeColor(this.previewContext);
     }
 
-    ignoreAlphaShadow() {
+    ignore() {
         this.context.globalAlpha = 1;
         this.context.shadowBlur = 0;
         this.context.shadowOffsetX = 0;
@@ -95,7 +95,7 @@ export default class Tool {
         this.previewContext.globalCompositeOperation = "source-over";
     }
 
-    restoreAlphaShadow() {
+    restore() {
         const opacitySlider = document.querySelector('#opacity');
         const shadowBlur = document.querySelector('#shadow-blur');
         const shadowOffsetX = document.querySelector('#shadow-offset-x');

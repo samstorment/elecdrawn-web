@@ -10,6 +10,7 @@ import BucketTool from './bucket.js';
 import PickerTool from './picker.js';
 import BrushFillTool from './brush-fill.js';
 import TextTool from './text.js';
+import EraserTool from './eraser.js';
 
 // manager for all drawing tools
 export class DrawTool {
@@ -23,6 +24,7 @@ export class DrawTool {
     setTools(context) {
         this.tools = {
             text: new TextTool(context),
+            eraser: new EraserTool(context),
             brush: new BrushTool(context),
             brushFill: new BrushFillTool(context),
             rectangle: new RectangleTool(context),

@@ -26,7 +26,7 @@ export default class SelectTool extends Tool {
     start(event) {
         // we don't call super.start because we don't want to save the canvas state to the undo stack immeditaely
         this.painting = true;
-        this.ignoreAlphaShadow();
+        this.ignore();
         
         // set the start point of the rectangle to the position of the first mouse click
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
@@ -149,7 +149,7 @@ export default class SelectTool extends Tool {
             this.clear();
 
             // we ignored opacity and shadow at the start of select, now we restore it after drawing
-            this.restoreAlphaShadow();
+            this.restore();
 
             // select box no longer drawn and we stop dragging
             this.selectDrawn = false;
@@ -200,7 +200,7 @@ export default class SelectTool extends Tool {
         this.scaleClicked = false;
         this.scaling = false;
         this.context.canvas.style.cursor = 'default';
-        this.restoreAlphaShadow();
+        this.restore();
     }
 
     // drag the selected image around the screen

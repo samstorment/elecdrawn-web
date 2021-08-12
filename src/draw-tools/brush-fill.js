@@ -62,12 +62,12 @@ export default class BrushFillTool extends Tool {
         }
 
         // we need to ignore here or the shadow/opacity will be applied twice
-        this.ignoreAlphaShadow();
+        this.ignore();
 
         // draw the preview to the main canvas since the main line was drawn to the preview so it shows over the polygon fill
         this.context.drawImage(this.previewContext.canvas, 0, 0);
 
-        this.restoreAlphaShadow();
+        this.restore();
 
         // reset the points
         this.points = [];
