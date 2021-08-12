@@ -177,6 +177,14 @@ export class Ellipse extends Shape {
         this.radiusX = radiusX;
         this.radiusY = radiusY;
     }
+
+    setRotation(rotation) {
+        this.rotation = rotation * Math.PI / 180;
+    }
+
+    setAngle(angle) {
+        this.endAngle = angle * Math.PI / 180;
+    }
 }
 
 

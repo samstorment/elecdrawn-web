@@ -40,6 +40,9 @@ export default class EllipseTool extends Tool {
       
         // clear the preview context before each draw so we don't stack rectangles
         this.clear();
+
+        this.setAngleRotation();
+
         // draw an ellipse based on current mouse position
         this.ellipse.setStart(this.rectangle.startX + width/2, this.rectangle.startY + height/2);
         this.ellipse.setSize(Math.abs(width/2), Math.abs(height/2));
@@ -65,5 +68,12 @@ export default class EllipseTool extends Tool {
         // draw an ellipse with a stroke border on top of a filled ellipse
         this.ellipse.drawFill(this.context);
         this.ellipse.drawStroke(this.context);
+    }
+
+    setAngleRotation() {
+        let angle = document.querySelector('#circle-angle');
+        let rotation = document.querySelector('#circle-rotation');
+        this.ellipse.setAngle(parseInt(angle.value));
+        this.ellipse.setRotation(parseInt(rotation.value));
     }
 }
