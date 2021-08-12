@@ -1,6 +1,6 @@
 import Tool from './tool.js';
 import CanvasState from '../canvas/canvas-state.js';
-import { getKey } from '../canvas/util.js';
+import { exitUnwarn, exitWarn, getKey } from '../canvas/util.js';
 import { getMouse } from '../canvas/util.js';
 import { Rectangle } from '../canvas/shape.js';
 
@@ -187,7 +187,7 @@ export default class SelectTool extends Tool {
         }
 
         if (this.painting) {
-            this.context.canvas.style.backgroundColor = "rgb(255,0,0,0.25)";
+           exitWarn();
         }
     }
 
@@ -290,7 +290,7 @@ export default class SelectTool extends Tool {
                 // clear black select box
                 this.clear();
                 // remove red warning color
-                this.context.canvas.style.backgroundColor = "rgb(0,0,0,0)";
+                exitUnwarn();
             }
         });
     }

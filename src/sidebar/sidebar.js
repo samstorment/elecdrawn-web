@@ -24,18 +24,25 @@ const canvasProperties = {
     textBaseline: 'text-baseline'
 }
 
+const compositeSetup = (prop, value) => {
+    const specialCompositeTypes = ['source-in', 'source-out', 'source-atop', 'destination-in', 'destination-out'];
+    context[prop] = value;
+    previewContext[prop] = value;
+    if (prop === 'globalCompositeOperation' && specialCompositeTypes.includes(value)) {
+        previewContext[prop] = 'source-over';
+    }
+}
+
 export const setUp = () => {
 
     for (let prop in canvasProperties) {
         const id = `#${canvasProperties[prop]}`;
         const element = document.querySelector(id);
         
-        context[prop] = element.value;
-        previewContext[prop] = element.value;
+        compositeSetup(prop, element.value);
         
         element.addEventListener('change', e => {
-            context[prop] = e.target.value;
-            previewContext[prop] = e.target.value;
+            compositeSetup(prop, e.target.value);
         });
     }
 

@@ -1,7 +1,7 @@
 import CanvasState from '../canvas/canvas-state.js';
 import { setFillColor, setStrokeColor } from '../canvas/color.js';
 import { Ellipse } from '../canvas/shape.js';
-import { getMouse } from '../canvas/util.js';
+import { exitUnwarn, exitWarn, getMouse } from '../canvas/util.js';
 
 // super class for drawing tools
 export default class Tool {
@@ -41,13 +41,13 @@ export default class Tool {
         }
 
         if (this.painting) {
-            this.context.canvas.style.backgroundColor = "rgb(255,0,0,0.25)";
+            exitWarn();
         }
     }
 
     enter(event) {
         this.context.beginPath();
-        this.context.canvas.style.backgroundColor = "rgb(0,0,0,0)";
+        exitUnwarn();
     }
 
     cleanup() {
@@ -121,7 +121,8 @@ export default class Tool {
                 this.painting = false;
                 this.finish(e);
                 this.clear();
-                this.context.canvas.style.backgroundColor = "rgb(0,0,0,0)";
+                exitUnwarn();
+                CanvasState.saveLocally(this.context);
             }
         });
     }

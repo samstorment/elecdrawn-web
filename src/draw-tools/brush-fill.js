@@ -61,33 +61,22 @@ export default class BrushFillTool extends Tool {
             this.previewContext.stroke();
         }
 
+        // we need to ignore here or the shadow/opacity will be applied twice
+        this.ignoreAlphaShadow();
+
         // draw the preview to the main canvas since the main line was drawn to the preview so it shows over the polygon fill
         this.context.drawImage(this.previewContext.canvas, 0, 0);
 
+        this.restoreAlphaShadow();
+
         // reset the points
         this.points = [];
+
+        this.clear();
     }
 
     setDrawClosingLine() {
         let checkbox = document.querySelector('#closing-line-checkbox');
         this.drawClosingLine = checkbox.checked;
     }
-
-    // need special mouse up because we draw polygon straight to the canvas
-    // mouseUp() {
-    //     document.body.addEventListener('mouseup', e => {
-    //         // check if painting so we only fire this on mouse up outside of canvas. painting will be false inside canvas as canvas mouseup event fires first
-    //         if (this.painting) {                
-    //             this.painting = false;
-    //             // clear the preview
-    //             this.clear(this.previewContext);
-    //             // effectively clearing the main context by undoing the most recent draw to it
-    //             CanvasState.undo(this.context);
-    //             // clear backgrond color
-    //             this.context.canvas.style.backgroundColor = "rgb(0,0,0,0)";
-    //             // reset the points in the polygon
-    //             this.points = [];
-    //         }
-    //     });
-    // }
 }

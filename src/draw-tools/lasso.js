@@ -1,6 +1,6 @@
 import Tool from './tool.js';
 import CanvasState from '../canvas/canvas-state.js';
-import { getKey, getMouse } from '../canvas/util.js';
+import { exitUnwarn, exitWarn, getKey, getMouse } from '../canvas/util.js';
 
 export default class LassoTool extends Tool {
 
@@ -162,7 +162,7 @@ export default class LassoTool extends Tool {
 
     // override the normal enter function because it calls context.beginPath();
     enter() {
-        this.context.canvas.style.backgroundColor = "rgb(0,0,0,0)";
+        exitUnwarn();
     }
 
     leave(event) {
@@ -173,7 +173,7 @@ export default class LassoTool extends Tool {
 
         // warn the user they've exited canvas
         if (this.painting) {
-            this.context.canvas.style.backgroundColor = "rgb(255,0,0,0.25)";
+            exitWarn();
         }
     }
 
@@ -224,7 +224,7 @@ export default class LassoTool extends Tool {
                 // cleanup to a fresh lasso state
                 this.cleanup();
                 // reset the red warning color to nothing
-                this.context.canvas.style.backgroundColor = "rgb(0,0,0,0)";
+                exitWarn();
             }
         });
     }

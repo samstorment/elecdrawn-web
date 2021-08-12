@@ -1,7 +1,6 @@
 import { DrawTool } from '../draw-tools/draw-tools.js';
 import CanvasState from '../canvas/canvas-state.js';
 import { setUp} from '../sidebar/sidebar.js';
-import { getKey } from './util.js';
 
 const width = 1920;
 const height = 1080;
@@ -32,17 +31,14 @@ function setCanvasSize() {
 const panzoom = Panzoom(canvasContainer, {
     handleStartEvent: e => {
         if (e.button === 0) {
-            throw 'error';
+            panzoom.setOptions({disablePan: true});
         } else {
+            panzoom.setOptions({disablePan: false});
             e.preventDefault();
             e.stopPropagation();
         }
     },
     cursor: 'default'
-});
-
-document.querySelector('#restore-button').addEventListener('click', e => {
-    panzoom.reset();
 });
 
 (function initCanvas() {
@@ -55,7 +51,6 @@ document.querySelector('#restore-button').addEventListener('click', e => {
         context.drawImage(image, 0, 0);
         // set these after or image will get more faded every time we reload page;
         setUp();
-        previewCanvas.style.boxShadow = '0px 0px 50px 5px black'
     }
 
     let myFont = new FontFace(
@@ -86,12 +81,16 @@ canvas.addEventListener('mousedown', e => {
 
 canvas.addEventListener('mousemove', e => {
     drawTools.selectedTool.draw(e);
+    // don't save while painting because save impacts performance
+    if (drawTools.selectedTool.painting) {
+        clearTimeout(CanvasState.timeout);
+    }
 });
 
 canvas.addEventListener('mouseup', e => { 
     drawTools.selectedTool.finish(e);
-    // after drawing is finished, update the localstorage image
-    localStorage.setItem("canvas", canvas.toDataURL());
+    // save the canvas to local storage
+    CanvasState.saveLocally(context);
 });
 
 // SCREEN ENTER AND LEAVE -- these don't work well in all aspects. especially leaving the canvas while drawing the lasso
@@ -103,13 +102,14 @@ document.body.onmouseleave = e => { drawTools.selectedTool.leave(e); }
 canvas.addEventListener('contextmenu', e => e.preventDefault());
 
 // UPDATES HOVER CURSOR and ZOOM
-const shift = getKey('Shift');
-canvas.parentElement.addEventListener('wheel', e => {
-    if (shift.isDown) {
+canvasContainer.addEventListener('wheel', e => {
+
+    if (e.shiftKey) {
         panzoom.zoomWithWheel(e);
-    } else {
-        checkScrollDirection(e);
+        return;
     }
+    
+    checkScrollDirection(e);
 });
 
 
@@ -132,3 +132,15 @@ function scrollIsUp(event) {
     if (event.wheelDelta) { return event.wheelDelta > 0; }
     return event.deltaY < 0;
 }
+
+document.querySelector('#restore-button').addEventListener('click', e => {
+    panzoom.reset();
+});
+
+document.querySelector('#zoom-in-button').addEventListener('click', e => {
+    panzoom.zoomIn();
+});
+
+document.querySelector('#zoom-out-button').addEventListener('click', e => {
+    panzoom.zoomOut();
+});
