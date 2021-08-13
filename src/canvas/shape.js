@@ -121,14 +121,9 @@ export class Rectangle extends Shape {
 
     // returns true if the given (x, y) are inside the rectangle
     isInside(x, y) { 
-
         let { topLeftX, topLeftY, botRightX, botRightY } = this.getCoords();
 
-        if (!(x > topLeftX && x < botRightX && y > topLeftY && y < botRightY)) {
-            return false;
-        }
-
-        return true;
+        return x > topLeftX && x < botRightX && y > topLeftY && y < botRightY;
     }
 
     setStart(startX, startY) {
@@ -223,9 +218,26 @@ export class Polygon extends Shape {
         context.closePath();
     }
 
+    drawPoints(context, radius, lineWidth, fill=false) {
+        // get the first point and the remaining point. Move to the first point and loop through the rest below
+        const [ firstPoint, ...points ] = this.points;
+
+        let ellipse = new Ellipse(this.startX + firstPoint.x, this.startY + firstPoint.y, radius);
+        ellipse.drawFill(context);
+        ellipse.drawStroke(context, context.strokeStyle, lineWidth);
+        
+        // draw a line to each point in the array. add the startX and Y to the point for an offset 
+        points.forEach(point => {
+            let ellipse = new Ellipse(this.startX + point.x, this.startY + point.y, radius);
+            ellipse.drawFill(context);
+            ellipse.drawStroke(context, context.strokeStyle, lineWidth);
+        });
+        
+    }
+
     // return the points for a REGULAR polygon. One with equilateral side lengths and equiangular interior/exterior angles
     // radius is the distance from the polygon's center to any of the polygon's vertices
-    getRegularPolygon(numSides, radius) {
+    getRegularPolygon(numSides, radius, angle) {
         let points = [];
 
         for (let i = 0; i < numSides; i++) {
@@ -235,9 +247,9 @@ export class Polygon extends Shape {
 
             // calculate a rotation for each point so we draw triangles, pentagons, etc with the flat side down
             let interiorAngle = ((numSides - 2) * 180) / numSides;
-            let rotationAngle = 90 - interiorAngle;
+            let adjustedAngle = angle + (interiorAngle / 2);
 
-            let rotatedPoint = this.rotatePoint(x, y, rotationAngle * Math.PI / 180);
+            let rotatedPoint = this.rotatePoint(x, y, adjustedAngle * Math.PI / 180);
             points.push(rotatedPoint);
         }
 
@@ -246,7 +258,7 @@ export class Polygon extends Shape {
     }
 
     // return a set of points with a rotation applied
-    rotatePoint(x, y, angle){
+    rotatePoint(x, y, angle) {
         let s = Math.sin(angle); // angle is in radians
         let c = Math.cos(angle); // angle is in radians
 

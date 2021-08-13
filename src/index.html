@@ -203,6 +203,22 @@
                     <div class="sidebar-row">
                         <div class="sidebar-main-row">
                             <button class="arrow-button arrow-closed"><i class="fa fa-angle-right"></i></button>
+                            <label for="mirror-check">Mirror</label>
+                            <input type="radio" class="sidebar-radio " id="mirror-check" name="draw-type" value="mirror">
+                        </div>
+                        <div class="sidebar-subrow">
+                            <label for="num-mirrors">Mirrors</label>
+                            <input type="number" class="sidebar-number" id="num-mirrors" min="3" max="20" value="3">
+                        </div>
+                        <div class="sidebar-subrow">
+                            <label for="mirror-line-width">Line Width</label>
+                            <input type="range" class="sidebar-slider" id="mirror-line-width" min="1" max="100" value="2">
+                        </div>
+                    </div>
+
+                    <div class="sidebar-row">
+                        <div class="sidebar-main-row">
+                            <button class="arrow-button arrow-closed"><i class="fa fa-angle-right"></i></button>
                             <label for="rect-check">Rectangle</label>
                             <input type="radio" class="sidebar-radio " id="rect-check" name="draw-type" value="rectangle">
                         </div>

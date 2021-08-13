@@ -11,6 +11,7 @@ import PickerTool from './picker.js';
 import BrushFillTool from './brush-fill.js';
 import TextTool from './text.js';
 import EraserTool from './eraser.js';
+import MirrorTool from './mirror.js';
 
 // manager for all drawing tools
 export class DrawTool {
@@ -31,6 +32,7 @@ export class DrawTool {
             ellipse: new EllipseTool(context),
             line: new LineTool(context),
             radial: new RadialTool(context),
+            mirror: new MirrorTool(context),
             polygon: new PolygonTool(context),
             select: new SelectTool(context),
             lasso: new LassoTool(context),
