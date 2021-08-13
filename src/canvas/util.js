@@ -26,12 +26,6 @@ export function getMouse(event, element) {
     let clientX = event.clientX;
     let clientY = event.clientY;
 
-    // // if it was a touch event
-    // if (event.touches) {
-    //     clientX = event.touches[0].pageX;
-    //     clientY = event.touches[0].pageY;
-    // }
-
     return {
         mouseX: (clientX - x) / scale,   
         mouseY: (clientY - y) / scale

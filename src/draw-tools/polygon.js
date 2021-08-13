@@ -22,6 +22,9 @@ export default class PolygonTool extends Tool {
         super.draw(event);
 
         if (!this.painting) { return; }
+
+        // be sure we have the correct number of sides
+        this.setSides();
         
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
         let width = mouseX - this.rectangle.startX;

@@ -87,16 +87,15 @@ const move = e => {
 }
 
 const end = e => {
-    drawTools.selectedTool.finish(e);
-    // save the canvas to local storage
-    CanvasState.saveLocally(context);
+    // only finish if painting, otherwise finish can be called without ever starting or drawing
+    if (drawTools.selectedTool.painting) {
+        drawTools.selectedTool.finish(e);
+        // save the canvas to local storage
+        CanvasState.saveLocally(context);
+    }
 }
 
 // MAIN DRAWING EVENT LISTENERS
-canvas.addEventListener('touchstart', start);
-canvas.addEventListener('touchmove', move);
-canvas.addEventListener('touchend', end);
-
 canvas.addEventListener('mousedown', start);
 canvas.addEventListener('mousemove', move);
 canvas.addEventListener('mouseup', end);
@@ -106,9 +105,28 @@ canvas.addEventListener('mouseenter', e => { drawTools.selectedTool.enter(e); })
 canvas.addEventListener('mouseleave', e => { drawTools.selectedTool.leave(e); });
 document.body.onmouseleave = e => { drawTools.selectedTool.leave(e); }    
 
-canvas.addEventListener('touchcancel', e => drawTools.selectedTool.leave(e));
 // disables the right click menu on the canvas
 canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+canvas.addEventListener('touchstart', e => {
+    e.clientX = e.touches[0].pageX;
+    e.clientY = e.touches[0].pageY;
+    start(e);
+});
+
+canvas.addEventListener('touchmove', e => {
+    e.clientX = e.touches[0].pageX;
+    e.clientY = e.touches[0].pageY;
+    move(e);
+});
+
+canvas.addEventListener('touchend', e => {
+    e.clientX = e.changedTouches[e.changedTouches.length-1].pageX;
+    e.clientY = e.changedTouches[e.changedTouches.length-1].pageY;
+    end(e);
+});
+
+canvas.addEventListener('touchcancel', e => drawTools.selectedTool.leave(e));
 
 // UPDATES HOVER CURSOR and ZOOM
 canvasContainer.addEventListener('wheel', e => {

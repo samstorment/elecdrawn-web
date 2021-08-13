@@ -224,7 +224,7 @@ export default class LassoTool extends Tool {
                 // cleanup to a fresh lasso state
                 this.cleanup();
                 // reset the red warning color to nothing
-                exitWarn();
+                exitUnwarn();
             }
         });
     }

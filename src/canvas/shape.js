@@ -235,7 +235,7 @@ export class Polygon extends Shape {
 
             // calculate a rotation for each point so we draw triangles, pentagons, etc with the flat side down
             let interiorAngle = ((numSides - 2) * 180) / numSides;
-            let rotationAngle = 90 - interiorAngle;;
+            let rotationAngle = 90 - interiorAngle;
 
             let rotatedPoint = this.rotatePoint(x, y, rotationAngle * Math.PI / 180);
             points.push(rotatedPoint);
@@ -247,7 +247,6 @@ export class Polygon extends Shape {
 
     // return a set of points with a rotation applied
     rotatePoint(x, y, angle){
-
         let s = Math.sin(angle); // angle is in radians
         let c = Math.cos(angle); // angle is in radians
 
