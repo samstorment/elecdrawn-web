@@ -46,7 +46,6 @@ main {
     color: white;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
     background-color: inherit;
     border: none;
 }
@@ -81,6 +80,7 @@ main {
     flex: 1;
     padding: 10px;
     text-align: center;
+    overflow: auto;
 }
 
 #hotkeys-container h1 {
@@ -241,4 +241,19 @@ footer {
     pointer-events: none;
     touch-action: none;
     box-shadow: 0px 0px 200px 0px black;
+}
+
+@media screen and (max-width: 800px) {
+    main {
+        position: relative;
+    }
+
+    #sidebar {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        resize: none;
+        opacity: 98%;
+        box-shadow: 4px 0px 20px 5px black;
+    }
 }
