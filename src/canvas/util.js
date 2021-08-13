@@ -23,9 +23,18 @@ export function getMouse(event, element) {
     // Get the canvas X and Y coordinates so we knwow where to draw
     let { x, y, scale } = getElementPosition(element);
 
+    let clientX = event.clientX;
+    let clientY = event.clientY;
+
+    // // if it was a touch event
+    // if (event.touches) {
+    //     clientX = event.touches[0].pageX;
+    //     clientY = event.touches[0].pageY;
+    // }
+
     return {
-        mouseX: (event.clientX - x)  / scale,   
-        mouseY: (event.clientY - y) / scale
+        mouseX: (clientX - x) / scale,   
+        mouseY: (clientY - y) / scale
     };
 }
 

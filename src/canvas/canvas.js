@@ -74,30 +74,39 @@ document.onkeydown = e => {
 // manager for drawing tools
 let drawTools = new DrawTool(context);
 
-// MAIN DRAWING EVENT LISTENERS
-canvas.addEventListener('mousedown', e => {
+const start = e => {
     drawTools.selectedTool.start(e);
-});
+}
 
-canvas.addEventListener('mousemove', e => {
+const move = e => {
     drawTools.selectedTool.draw(e);
     // don't save while painting because save impacts performance
     if (drawTools.selectedTool.painting) {
         clearTimeout(CanvasState.timeout);
     }
-});
+}
 
-canvas.addEventListener('mouseup', e => { 
+const end = e => {
     drawTools.selectedTool.finish(e);
     // save the canvas to local storage
     CanvasState.saveLocally(context);
-});
+}
+
+// MAIN DRAWING EVENT LISTENERS
+canvas.addEventListener('touchstart', start);
+canvas.addEventListener('touchmove', move);
+canvas.addEventListener('touchend', end);
+
+canvas.addEventListener('mousedown', start);
+canvas.addEventListener('mousemove', move);
+canvas.addEventListener('mouseup', end);
 
 // SCREEN ENTER AND LEAVE -- these don't work well in all aspects. especially leaving the canvas while drawing the lasso
 canvas.addEventListener('mouseenter', e => { drawTools.selectedTool.enter(e); });
 canvas.addEventListener('mouseleave', e => { drawTools.selectedTool.leave(e); });
 document.body.onmouseleave = e => { drawTools.selectedTool.leave(e); }    
 
+canvas.addEventListener('touchcancel', e => drawTools.selectedTool.leave(e));
 // disables the right click menu on the canvas
 canvas.addEventListener('contextmenu', e => e.preventDefault());
 
