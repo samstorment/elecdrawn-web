@@ -82,6 +82,15 @@ export function getKey(value) {
     return key;
 }
 
+export const readFile = (file) => {
+    return new Promise((res, rej) => {
+        const reader = new FileReader();
+        reader.onload = () => res(reader.result);
+        reader.onerror = rej;
+        reader.readAsDataURL(file);
+    });
+}
+
 const exitWarningLayer = document.querySelector('#exit-warning-layer');
 export const exitWarn = () => {
     exitWarningLayer.style.backgroundColor = 'rgb(255,0,0,0.25)';

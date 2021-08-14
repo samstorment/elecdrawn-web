@@ -153,9 +153,11 @@ downloadCanvas.addEventListener('click', function (e) {
 let rows = document.querySelectorAll('.sidebar-row');
 rows.forEach(row => {
     const arrowButton = row.querySelector('.arrow-button');
-    const subrows = row.querySelectorAll('.sidebar-subrow');
-
+    
     arrowButton && arrowButton.addEventListener('click', e => {
+
+        const subrows = row.querySelectorAll('.sidebar-subrow');
+        
         // toggle the arrow and display the subrow or hide it
         if (e.target.classList.contains("arrow-closed")) {
             e.target.classList.remove("arrow-closed");

@@ -12,6 +12,7 @@ import BrushFillTool from './brush-fill.js';
 import TextTool from './text.js';
 import EraserTool from './eraser.js';
 import MirrorTool from './mirror.js';
+import ImageTool from './image.js';
 
 // manager for all drawing tools
 export class DrawTool {
@@ -25,6 +26,7 @@ export class DrawTool {
     setTools(context) {
         this.tools = {
             text: new TextTool(context),
+            image: new ImageTool(context),
             eraser: new EraserTool(context),
             brush: new BrushTool(context),
             brushFill: new BrushFillTool(context),

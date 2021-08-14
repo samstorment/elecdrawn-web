@@ -215,6 +215,39 @@ main {
     border: 2px solid black;
 }
 
+#image-upload {
+    display: none;
+}
+
+#image-upload-label {
+    cursor: pointer;
+}
+
+.image-subrow {
+    border: none;
+    border-top: 1px solid gray;
+    width: 100%;
+}
+
+.image-subrow span {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    margin-right: 10px;
+    pointer-events: none;
+}
+
+.image-icon {
+    max-height: 32px;
+    pointer-events: none;
+    box-shadow: 0px 0px 5px 0px gray;
+}
+
+.image-selected {
+    background-color: rgb(41, 82, 219);
+    color: white;
+}
+
 button {
     cursor: pointer;
 }

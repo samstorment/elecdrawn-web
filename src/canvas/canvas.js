@@ -45,7 +45,7 @@ const panzoom = Panzoom(canvasContainer, {
     setCanvasSize();
 
     const imageURL = localStorage.getItem("canvas");
-    const image = new Image;
+    const image = new Image();
     image.src = imageURL;
     image.onload = () => {
         context.drawImage(image, 0, 0);
