@@ -6,6 +6,7 @@ export default class ImageTool extends Tool {
     constructor(context) {
         super(context);
         this.image = new Image();
+        this.image.crossOrigin = "Anonymous";
         this.uploadClick();
         this.fileDrop();
     }
@@ -61,7 +62,10 @@ export default class ImageTool extends Tool {
             const imageHtml = document.createElement('div');
             imageHtml.innerHTML = urlData;
             const img = imageHtml.querySelector('img');
-            if (img) src = img.getAttribute('src');
+            if (img) {
+                img.crossOrigin = "Anonymous";
+                src = img.getAttribute('src');
+            }
 
             if (files.length > 0) this.uploadFiles(files);
             else if (src) this.addImage('WOWO' || 'nameless', src);

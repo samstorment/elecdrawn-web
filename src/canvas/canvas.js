@@ -45,11 +45,16 @@ const panzoom = Panzoom(canvasContainer, {
     setCanvasSize();
 
     const imageURL = localStorage.getItem("canvas");
-    const image = new Image();
-    image.src = imageURL;
-    image.onload = () => {
-        context.drawImage(image, 0, 0);
-        // set these after or image will get more faded every time we reload page;
+
+    if (imageURL) {
+        const image = new Image();
+        image.src = imageURL;
+        image.onload = () => {
+            context.drawImage(image, 0, 0);
+            // set these after or image will get more faded every time we reload page;
+            setUp();
+        }
+    } else {
         setUp();
     }
 

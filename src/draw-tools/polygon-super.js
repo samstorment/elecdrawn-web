@@ -71,9 +71,6 @@ export default class PolygonTool extends Tool {
 
         // clear the preview context before each draw so we don't stack polygons
         this.clear();
-
-        // this.poly.drawFill(this.context);
-        // this.poly.drawStroke(this.context);
     }
 
     drawHoverCursor(event, context=this.previewContext) {
@@ -83,8 +80,6 @@ export default class PolygonTool extends Tool {
         // clear the preview canvas anytime we move, but draw right after
         this.clear();
         context.beginPath();
-
-        console.log(this.numSides);
 
         this.hover = new Polygon(mouseX, mouseY);
         this.hover.getRegularPolygon(this.numSides, this.context.lineWidth/2, 0);
