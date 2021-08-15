@@ -20,11 +20,10 @@ export function hexToRGB(hexString) {
     return [ red, green, blue, 255 ]; 
 }
 
-// returns hex color of given pixel
+// rgb color of particular pixel
 export function getPixelColor(x, y, context) {
     let pixel = context.getImageData(x, y, 1, 1).data;
-    let rgbColor = [ pixel[0], pixel[1], pixel[2], pixel[3] ];
-    return rgbToHex(rgbColor);
+    return Array.from(pixel);
 }
 
 // takes picker and slider ids and returns css rgba function

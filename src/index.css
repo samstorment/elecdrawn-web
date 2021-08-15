@@ -106,8 +106,8 @@ main {
     color: white;
     z-index: 10000;
     overflow: auto;
-    min-width: 275px;
-    max-width: 400px;
+    min-width: 300px;
+    max-width: 500px;
     resize: horizontal;
 }
 
@@ -119,6 +119,13 @@ main {
     display: flex;
     margin-right: 5px;
     align-items: center;
+    background-color: transparent;
+    color: inherit;
+    border: none;
+    font-size: inherit;
+    cursor: pointer;
+
+    
 }
 
 .sidebar-main-row label {
@@ -127,6 +134,7 @@ main {
     display: flex;
     align-items: center;
     padding: 8px 5px;
+    cursor: pointer;
 }
 
 .sidebar-subrow {
@@ -160,11 +168,6 @@ main {
 }
 
 .sidebar-radio {
-    width: 25px;
-    cursor: pointer;
-}
-
-.sidebar-checkbox {
     cursor: pointer;
 }
 
@@ -187,17 +190,16 @@ main {
     align-items: center;
 }
 
-.arrow-button {
-    font-size: larger;
-    background-color: transparent;
+.fa-eyedropper {
+    margin-right: 5px;
+}
+
+.dropdown-arrow {
+    font-size: x-large;
     padding: 5px 10px;
-    border: none;
     color: lightgray;
 }
 
-.arrow-button:hover {
-    background-color: gray;
-}
 
 .font-row {
     justify-content: space-evenly;
@@ -248,12 +250,15 @@ main {
     color: white;
 }
 
-button {
-    cursor: pointer;
+.color-button {
+    background-color: transparent;
+    color: white;
+    padding: 5px 10px;
+    font-size: small;
 }
 
-i {
-    pointer-events: none;
+button {
+    cursor: pointer;
 }
 
 footer {
@@ -284,9 +289,18 @@ footer {
     #sidebar {
         position: absolute;
         height: 100%;
-        width: 100%;
-        resize: none;
+        max-width: 100%;
         opacity: 98%;
         box-shadow: 4px 0px 20px 5px black;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    main {
+        position: relative;
+    }
+
+    #sidebar {
+        min-width: 100%;
     }
 }

@@ -56,7 +56,6 @@ export default class CanvasState {
         clearTimeout(this.timeout);
         
         this.timeout = setTimeout(() => {
-            console.log('we tried');
             try {
                 localStorage.setItem("canvas", context.canvas.toDataURL());
             } catch (err) {

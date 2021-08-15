@@ -55,6 +55,7 @@ export class DrawTool {
             tool.addEventListener('click', () => {
                 this.selectedTool.cleanup();
                 this.selectedTool = this.tools[tool.value];
+                this.selectedTool.setup();
             });
         });
     }

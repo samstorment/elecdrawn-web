@@ -1,5 +1,5 @@
 import CanvasState from '../canvas/canvas-state.js';
-import { pickerSliderToRgba, setFillColor, setStrokeColor } from '../canvas/color.js';
+import { getFillColor, getStrokeColor, pickerSliderToRgba, setFillColor, setStrokeColor } from '../canvas/color.js';
 
 let canvas = document.querySelector('#canvas');
 let context = canvas.getContext('2d');
@@ -118,9 +118,46 @@ const setColors = () => {
 }
 
 const colorChangeIds = ['stroke-color', 'stroke-opacity', 'fill-color', 'fill-opacity'];
-colorChangeIds.forEach(ele => {
-    document.querySelector(`#${ele}`).addEventListener('change', setColors);
+const colorElements = colorChangeIds.map(id => {
+    const ele = document.querySelector(`#${id}`);
+    ele.addEventListener('change', setColors);
+    return ele;
 });
+
+const [ strokeColor, strokeOpacity, fillColor, fillOpacity ] = colorElements;
+
+const strokeToFill = () => {
+    strokeColor.value = fillColor.value;
+    strokeOpacity.value = fillOpacity.value;
+    previewContext.strokeStyle = getFillColor();
+    context.strokeStyle = getFillColor();
+}
+
+document.querySelector('#set-fill-button').addEventListener('click', e => {
+    strokeToFill();
+});
+
+document.querySelector('#set-stroke-button').addEventListener('click', e => {
+    fillColor.value = strokeColor.value ;
+    fillOpacity.value = strokeOpacity.value;
+    context.fillStyle = getStrokeColor();
+    previewContext.fillStyle = getStrokeColor();
+});
+
+document.querySelector('#color-swap-button').addEventListener('click', e => {
+
+    let sC = strokeColor.value;
+    let sO = strokeOpacity.value;
+    let sS = getStrokeColor();
+
+    strokeToFill();
+
+    fillColor.value = sC ;
+    fillOpacity.value = sO;
+    context.fillStyle = sS;
+    previewContext.fillStyle = sS;
+});
+
 
 let backgroundColor = document.querySelector('#background-color');
 let backgroundOpacity = document.querySelector('#background-opacity');
@@ -149,31 +186,36 @@ downloadCanvas.addEventListener('click', function (e) {
     setupBackground();
 });
 
+// setup all inputs and buttons on sidebar main rows to stop propagation
+document.querySelectorAll('.sidebar-main-row > input, .sidebar-main-row > button, .sidebar-main-row select').forEach(ele => {
+    ele.addEventListener('click', e => e.stopPropagation());
+});
+
+// prevent the color labels from opening up the color picker
+let noClickLabels = ['stroke-color', 'fill-color', 'shadow-color', 'background-color'];
+noClickLabels = noClickLabels.map(l => {
+    return `label[for=${l}]`;
+});
+document.querySelectorAll(noClickLabels.join(', ')).forEach(ele => {
+    ele.addEventListener('click', e => e.preventDefault());
+})
+
 // setup the arrow dropdowns for each row
 let rows = document.querySelectorAll('.sidebar-row');
 rows.forEach(row => {
-    const arrowButton = row.querySelector('.arrow-button');
+    const arrow = row.querySelector('.dropdown-arrow');
+    const mainRow = row.querySelector('.sidebar-main-row');
     
-    arrowButton && arrowButton.addEventListener('click', e => {
-
-        const subrows = row.querySelectorAll('.sidebar-subrow');
+    arrow && mainRow.addEventListener('click', e => {
+        let style = 'none';
         
         // toggle the arrow and display the subrow or hide it
-        if (e.target.classList.contains("arrow-closed")) {
-            e.target.classList.remove("arrow-closed");
-            e.target.classList.add("arrow-open");
-            e.target.innerHTML = `<i class="fa fa-angle-down"></i>`;
-            subrows.forEach(subrow => {
-                subrow.style.display = 'flex';
-            });
-        } else {
-            e.target.classList.add("arrow-closed");
-            e.target.classList.remove("arrow-open");
-            e.target.innerHTML = `<i class="fa fa-angle-right"></i>`;
-            subrows.forEach(subrow => {
-                subrow.style.display = 'none';
-            });
-        }
+        if (arrow.classList.contains("fa-angle-right")) style = 'flex';
+
+        arrow.classList.toggle('fa-angle-right');
+        arrow.classList.toggle('fa-angle-down');
+           
+        row.querySelectorAll('.sidebar-subrow').forEach(subrow => subrow.style.display = style);
     });
 });
 

@@ -1,6 +1,6 @@
 import Tool from './tool.js';
 import { getMouse } from '../canvas/util.js';
-import { getPixelColor } from '../canvas/color.js';
+import { getPixelColor, rgbToHex } from '../canvas/color.js';
 
 // super class for drawing tools
 export default class PickerTool extends Tool {
@@ -13,24 +13,39 @@ export default class PickerTool extends Tool {
     start(event) {
         super.start(event);
 
-        // get the two color selectors so we can set their colors
+        // get the two color selectors and opacity sliders so we can set their values
         let strokeColor = document.querySelector('#stroke-color');
         let fillColor = document.querySelector('#fill-color');
+        let strokeOpacity = document.querySelector('#stroke-opacity');
+        let fillOpacity = document.querySelector('#fill-opacity');
 
-        // get the color slsected at the mouse position. This is currently flawed because you cant select from background color. We need a way to ignore canvas if color picked is transparent
+        // get the color slsected at the mouse position.
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
-        let colorPicked = getPixelColor(mouseX, mouseY, this.context);
+        let [ r, g, b, a ] = getPixelColor(mouseX, mouseY, this.context);
+
+        // if the canvas was transparent, try the background canvas
+        if (a === 0) {
+            const backgroundContext = document.querySelector("#background-canvas").getContext('2d');
+            [ r, g, b, a] = getPixelColor(mouseX, mouseY, backgroundContext);
+            if (a === 0) r = g = b = 255;
+        }
+
+        const colorPicked = rgbToHex([r,g,b,a]);
+        const opacityPicked = a / 255;        
+        const contextStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
 
         // set the stroke/fill based on the picker type
         if (this.pickerType === 'stroke') {
-            strokeColor.value = colorPicked; 
-            this.context.strokeStyle = colorPicked;
-            this.previewContext.strokeStyle = colorPicked;
+            strokeColor.value = colorPicked;
+            strokeOpacity.value = opacityPicked;
+            this.context.strokeStyle = contextStyle;
+            this.previewContext.strokeStyle = contextStyle;
         }
         else if (this.pickerType === 'fill') {
-            fillColor.value = colorPicked; 
-            this.context.fillStyle = colorPicked;
-            this.previewContext.fillStyle = colorPicked;
+            fillColor.value = colorPicked;
+            fillOpacity.value = opacityPicked;
+            this.context.fillStyle = contextStyle;
+            this.previewContext.fillStyle = contextStyle;
         }
     }
 

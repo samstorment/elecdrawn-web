@@ -13,6 +13,8 @@ export default class Tool {
         this.previewContext = document.querySelector("#preview-canvas").getContext('2d');
     }
 
+    setup() {}
+
     // painting is true once we start using a tool. Push the current canvas state to the undo stack since we will be modifying it right after
     start(event) {
         this.painting = true;
