@@ -186,28 +186,15 @@ downloadCanvas.addEventListener('click', function (e) {
     setupBackground();
 });
 
-// setup all inputs and buttons on sidebar main rows to stop propagation
-document.querySelectorAll('.sidebar-main-row > input, .sidebar-main-row > button, .sidebar-main-row select').forEach(ele => {
-    ele.addEventListener('click', e => e.stopPropagation());
-});
-
-// prevent the color labels from opening up the color picker
-let noClickLabels = ['stroke-color', 'fill-color', 'shadow-color', 'background-color'];
-noClickLabels = noClickLabels.map(l => {
-    return `label[for=${l}]`;
-});
-document.querySelectorAll(noClickLabels.join(', ')).forEach(ele => {
-    ele.addEventListener('click', e => e.preventDefault());
-})
-
 // setup the arrow dropdowns for each row
 let rows = document.querySelectorAll('.sidebar-row');
 rows.forEach(row => {
-    const arrow = row.querySelector('.dropdown-arrow');
-    const mainRow = row.querySelector('.sidebar-main-row');
+    const arrowButton = row.querySelector('.arrow-button');
     
-    arrow && mainRow.addEventListener('click', e => {
+    arrowButton && arrowButton.addEventListener('click', e => {
         let style = 'none';
+
+        const arrow = arrowButton.querySelector('i');
         
         // toggle the arrow and display the subrow or hide it
         if (arrow.classList.contains("fa-angle-right")) style = 'flex';

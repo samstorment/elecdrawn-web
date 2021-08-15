@@ -63,7 +63,9 @@ export default class ImageTool extends Tool {
             imageHtml.innerHTML = urlData;
             const img = imageHtml.querySelector('img');
             if (img) {
+                console.log(img);
                 img.crossOrigin = "Anonymous";
+                img.onerror = () => alert("bad image");
                 src = img.getAttribute('src');
             }
 

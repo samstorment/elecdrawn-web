@@ -118,14 +118,6 @@ main {
 .sidebar-main-row {
     display: flex;
     margin-right: 5px;
-    align-items: center;
-    background-color: transparent;
-    color: inherit;
-    border: none;
-    font-size: inherit;
-    cursor: pointer;
-
-    
 }
 
 .sidebar-main-row label {
@@ -133,8 +125,7 @@ main {
     flex: 1;
     display: flex;
     align-items: center;
-    padding: 8px 5px;
-    cursor: pointer;
+    padding: 5px;
 }
 
 .sidebar-subrow {
@@ -169,6 +160,7 @@ main {
 
 .sidebar-radio {
     cursor: pointer;
+    margin: auto;
 }
 
 .sidebar-number {
@@ -184,6 +176,10 @@ main {
     align-self: center;
 }
 
+#composite-operation {
+    margin: 8px 0px;
+}
+
 .eye-dropper {
     display: flex;
     justify-content: space-between;
@@ -194,12 +190,18 @@ main {
     margin-right: 5px;
 }
 
-.dropdown-arrow {
+.arrow-button {
     font-size: x-large;
-    padding: 5px 10px;
     color: lightgray;
+    background-color: transparent;
+    border: none;
+    padding: 5px 10px;
+    height: 100%;
 }
 
+.arrow-button:hover {
+    background-color: gray;
+}
 
 .font-row {
     justify-content: space-evenly;
@@ -259,6 +261,10 @@ main {
 
 button {
     cursor: pointer;
+}
+
+i {
+    pointer-events: none;
 }
 
 footer {

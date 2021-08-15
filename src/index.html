@@ -26,8 +26,8 @@
             <main>
                 <div id="sidebar">
                     <div class="sidebar-row">
-                        <a class="sidebar-main-row">
-                            <i class="fa fa-angle-right dropdown-arrow"></i>
+                        <div class="sidebar-main-row">
+                            <button class="arrow-button"><i class="fa fa-angle-right"></i></button>
                             <label for="composite-operation">Compositing</label>
                             <select id="composite-operation">
                                 <optgroup label="Standard">
@@ -61,7 +61,7 @@
                                     <option value="copy">Copy</option>
                                 </optgroup>
                             </select>
-                        </a>
+                        </div>
                         <div class="sidebar-subrow">
                             <a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation#types" target="_blank" rel="noopener noreferrer">
                                 Help
@@ -70,27 +70,27 @@
                     </div>
 
                     <div class="sidebar-row">
-                        <a class="sidebar-main-row">
-                            <i class="fa fa-angle-right dropdown-arrow"></i>
+                        <div class="sidebar-main-row">
+                            <button class="arrow-button"><i class="fa fa-angle-right"></i></button>
                             <label for="select-check">Select</label>
                             <input type="radio" class="sidebar-radio" id="select-check" name="draw-type" value="select">
-                        </a>
+                        </div>
                     </div>
 
                     <div class="sidebar-row">
-                        <a class="sidebar-main-row">
-                            <i class="fa fa-angle-right dropdown-arrow"></i>
+                        <div class="sidebar-main-row">
+                            <button class="arrow-button"><i class="fa fa-angle-right"></i></button>
                             <label for="lasso-check">Lasso</label>
                             <input type="radio" class="sidebar-radio" id="lasso-check" name="draw-type" value="lasso">
-                        </a>
+                        </div>
                     </div>
 
                     <div class="sidebar-row">
-                        <a class="sidebar-main-row">
-                            <i class="fa fa-angle-right dropdown-arrow"></i>
+                        <div class="sidebar-main-row">
+                            <button class="arrow-button"><i class="fa fa-angle-right"></i></button>
                             <label for="text-check">Text</label>
                             <input type="radio" class="sidebar-radio " id="text-check" name="draw-type" value="text">
-                        </a>
+                        </div>
 
                         <div class="sidebar-subrow font-row">
                             <button class="font-button" id="text-bold">
@@ -152,11 +152,11 @@
                     </div>
 
                     <div class="sidebar-row" id="image-row">
-                        <a class="sidebar-main-row">
-                            <i class="fa fa-angle-right dropdown-arrow"></i>
+                        <div class="sidebar-main-row">
+                            <button class="arrow-button"><i class="fa fa-angle-right"></i></button>
                             <label for="image-check">Image</label>
                             <input type="radio" class="sidebar-radio " id="image-check" name="draw-type" value="image">
-                        </a>
+                        </div>
                         <div class="sidebar-subrow">
                             <label for="image-upload" id="image-upload-label" class="sidebar-button">Upload</label>
                             <input type="file" id="image-upload" accept="image/*" multiple></input>
@@ -164,27 +164,27 @@
                     </div>
 
                     <div class="sidebar-row">
-                        <a class="sidebar-main-row">
-                            <i class="fa fa-angle-right dropdown-arrow"></i>
+                        <div class="sidebar-main-row">
+                            <button class="arrow-button"><i class="fa fa-angle-right"></i></button>
                             <label for="eraser-check">Eraser</label>
                             <input type="radio" class="sidebar-radio " id="eraser-check" name="draw-type" value="eraser">
-                        </a>
+                        </div>
                     </div>
 
                     <div class="sidebar-row">
-                        <a class="sidebar-main-row">
-                            <i class="fa fa-angle-right dropdown-arrow"></i>
+                        <div class="sidebar-main-row">
+                            <button class="arrow-button"><i class="fa fa-angle-right"></i></button>
                             <label for="brush-check">Brush</label>
                             <input type="radio" class="sidebar-radio " id="brush-check" name="draw-type" value="brush" checked="true">
-                        </a>
+                        </div>
                     </div>
 
                     <div class="sidebar-row">
-                        <a class="sidebar-main-row">
-                            <i class="fa fa-angle-right dropdown-arrow"></i>
+                        <div class="sidebar-main-row">
+                            <button class="arrow-button"><i class="fa fa-angle-right"></i></button>
                             <label for="brush-fill-check">Brush Fill</label>
                             <input type="radio" class="sidebar-radio " id="brush-fill-check" name="draw-type" value="brushFill">
-                        </a>
+                        </div>
                         <div class="sidebar-subrow">
                             <label for="closing-line-checkbox">Add Closing Line</label>
                             <input type="checkbox" id="closing-line-checkbox" class="sidebar-checkbox">
@@ -192,27 +192,27 @@
                     </div>
 
                     <div class="sidebar-row">
-                        <a class="sidebar-main-row">
-                            <i class="fa fa-angle-right dropdown-arrow"></i>
+                        <div class="sidebar-main-row">
+                            <button class="arrow-button"><i class="fa fa-angle-right"></i></button>
                             <label for="line-check">Line</label>
                             <input type="radio" class="sidebar-radio " id="line-check" name="draw-type" value="line">
-                        </a>
+                        </div>
                     </div>
 
                     <div class="sidebar-row">
-                        <a class="sidebar-main-row">
-                            <i class="fa fa-angle-right dropdown-arrow"></i>
+                        <div class="sidebar-main-row">
+                            <button class="arrow-button"><i class="fa fa-angle-right"></i></button>
                             <label for="radial-check">Radial</label>
                             <input type="radio" class="sidebar-radio " id="radial-check" name="draw-type" value="radial">
-                        </a>
+                        </div>
                     </div>
 
                     <div class="sidebar-row">
-                        <a class="sidebar-main-row">
-                            <i class="fa fa-angle-right dropdown-arrow"></i>
+                        <div class="sidebar-main-row">
+                            <button class="arrow-button"><i class="fa fa-angle-right"></i></button>
                             <label for="mirror-check">Mirror</label>
                             <input type="radio" class="sidebar-radio " id="mirror-check" name="draw-type" value="mirror">
-                        </a>
+                        </div>
                         <div class="sidebar-subrow">
                             <label for="num-mirrors">Mirrors</label>
                             <input type="number" class="sidebar-number" id="num-mirrors" min="3" max="20" value="10">
@@ -224,11 +224,11 @@
                     </div>
 
                     <div class="sidebar-row">
-                        <a class="sidebar-main-row">
-                            <i class="fa fa-angle-right dropdown-arrow"></i>
+                        <div class="sidebar-main-row">
+                            <button class="arrow-button"><i class="fa fa-angle-right"></i></button>
                             <label for="rect-check">Rectangle</label>
                             <input type="radio" class="sidebar-radio " id="rect-check" name="draw-type" value="rectangle">
-                        </a>
+                        </div>
                         <div class="sidebar-subrow">
                             <label for="rectangle-radius">Radius</label>
                             <input type="number" class="sidebar-number " id="rectangle-radius" min="-1000" max="1000" value="0">
@@ -236,11 +236,11 @@
                     </div>
 
                     <div class="sidebar-row">
-                        <a class="sidebar-main-row">
-                            <i class="fa fa-angle-right dropdown-arrow"></i>
+                        <div class="sidebar-main-row">
+                            <button class="arrow-button"><i class="fa fa-angle-right"></i></button>
                             <label for="circle-check">Circle</label>
                             <input type="radio" class="sidebar-radio " id="circle-check" name="draw-type" value="ellipse">
-                        </a>
+                        </div>
                         <div class="sidebar-subrow">
                             <label for="circle-angle">Angle</label>
                             <input type="number" class="sidebar-number" id="circle-angle" min="0" max="360" value="360">
@@ -252,11 +252,11 @@
                     </div>
                         
                     <div class="sidebar-row">
-                        <a class="sidebar-main-row">
-                            <i class="fa fa-angle-right dropdown-arrow"></i>
+                        <div class="sidebar-main-row">
+                            <button class="arrow-button"><i class="fa fa-angle-right"></i></button>
                             <label for="polygon-check">Polygon</label>
                             <input type="radio" class="sidebar-radio " id="polygon-check" name="draw-type" value="polygon">
-                        </a>
+                        </div>
                         <div class="sidebar-subrow">
                             <label for="polygon-sides">Sides</label>
                             <input type="number" class="sidebar-number " id="polygon-sides" min="3" max="20" value="3">
@@ -264,21 +264,21 @@
                     </div>
 
                     <div class="sidebar-row">
-                        <a class="sidebar-main-row">
-                            <i class="fa fa-angle-right dropdown-arrow"></i>
+                        <div class="sidebar-main-row">
+                            <button class="arrow-button"><i class="fa fa-angle-right"></i></button>
                             <label for="fill-check">Bucket</label>
                             <input type="radio" class="sidebar-radio" id="fill-check" name="draw-type" value="bucket">
-                        </a>
+                        </div>
                     </div>
 
                     <div class="sidebar-row">
-                        <a class="sidebar-main-row">
-                            <i class="fa fa-angle-right dropdown-arrow"></i>
+                        <div class="sidebar-main-row">
+                            <button class="arrow-button"><i class="fa fa-angle-right"></i></button>
                             <label for="stroke-color">Stroke</label>
                             <button class="sidebar-button color-button" id="color-swap-button" title="Swap Stroke and Fill"><i class="fa fa-arrows-v"></i></button>
                             <button class="sidebar-button color-button" id="set-fill-button">Set Fill</button>
                             <input type="color" class="sidebar-color" id="stroke-color" value="#00aadd">
-                        </a>
+                        </div>
                         <div class="sidebar-subrow">
                             <label for="stroke-picker" class="eye-dropper">Pick Color<i class="fa fa-eyedropper"></i></label>
                             <input type="radio" class="sidebar-radio color-picker" id="stroke-picker" name="draw-type" value="strokePicker">
@@ -319,12 +319,12 @@
                     </div>
 
                     <div class="sidebar-row">
-                        <a class="sidebar-main-row">
-                            <i class="fa fa-angle-right dropdown-arrow"></i>
+                        <div class="sidebar-main-row">
+                            <button class="arrow-button"><i class="fa fa-angle-right"></i></button>
                             <label for="fill-color">Fill</label>
                             <button class="sidebar-button color-button" id="set-stroke-button">Set Stroke</button>
                             <input type="color" class="sidebar-color" id="fill-color" value="#ff0034">
-                        </a>
+                        </div>
                         <div class="sidebar-subrow">
                             <label for="fill-picker" class="eye-dropper">Pick Color<i class="fa fa-eyedropper"></i></label>
                             <input type="radio" class="sidebar-radio color-picker" id="fill-picker" name="draw-type" value="fillPicker">
@@ -336,11 +336,11 @@
                     </div>
 
                     <div class="sidebar-row">
-                        <a class="sidebar-main-row">
-                            <i class="fa fa-angle-right dropdown-arrow"></i>
+                        <div class="sidebar-main-row">
+                            <button class="arrow-button"><i class="fa fa-angle-right"></i></button>
                             <label for="shadow-color">Shadow</label>
                             <input type="color" class="sidebar-color" id="shadow-color" value="#222222">
-                        </a>
+                        </div>
 
                         <div class="sidebar-subrow">
                             <label for="shadow-blur">Blur</label>
@@ -359,11 +359,11 @@
                     </div>
 
                     <div class="sidebar-row">
-                        <a class="sidebar-main-row">
-                            <i class="fa fa-angle-right dropdown-arrow"></i>
+                        <div class="sidebar-main-row">
+                            <button class="arrow-button"><i class="fa fa-angle-right"></i></button>
                             <label for="background-color">Background</label>
                             <input type="color" class="sidebar-color" id="background-color" value="#ffffff">
-                        </a>
+                        </div>
                         <div class="sidebar-subrow">
                             <label for="background-opacity">Opacity</label>
                             <input type="range" class="sidebar-slider" id="background-opacity" min="0" max="1" value="0" step=".005">
@@ -371,17 +371,17 @@
                     </div>
 
                     <div class="sidebar-row">
-                        <a class="sidebar-main-row">
+                        <div class="sidebar-main-row">
                             <label for="stroke-slider">Line Width</label>
                             <input type="range" class="sidebar-slider" id="stroke-slider" min="1" max="100" value="15">
-                        </a>
+                        </div>
                     </div>
 
                     <div class="sidebar-row">
-                        <a class="sidebar-main-row">
+                        <div class="sidebar-main-row">
                             <label for="opacity">Global Opacity</label>
                             <input type="range" class="sidebar-slider" id="opacity" min="0" max="1" value="1" step=".005">
-                        </a>
+                        </div>
                     </div>
 
                     <button class="sidebar-button" id="canvas-clear">Clear</button>
