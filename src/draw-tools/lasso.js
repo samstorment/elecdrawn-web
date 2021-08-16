@@ -1,6 +1,6 @@
 import Tool from './tool.js';
 import CanvasState from '../canvas/canvas-state.js';
-import { exitUnwarn, exitWarn, getKey, getMouse } from '../canvas/util.js';
+import { getKey, getMouse } from '../canvas/util.js';
 
 export default class LassoTool extends Tool {
 
@@ -19,10 +19,6 @@ export default class LassoTool extends Tool {
 
         super.start(event);
 
-        // reset the path from the last lasso selection for the context and preview context
-        this.context.beginPath();
-        this.previewContext.beginPath();
-
         // set up the preview context
         this.previewContext.lineWidth = 1;
         this.previewContext.strokeStyle = 'black';
@@ -35,6 +31,14 @@ export default class LassoTool extends Tool {
         this.mouseStart.x = mouseX;
         this.mouseStart.y = mouseY;
 
+        // if the lasso is drawn and we dont click inside the lassoed area
+        if (this.lassoDrawn && !this.mouseInLasso(mouseX, mouseY)) {
+            this.lassoDrawn = false;
+            this.clear();
+            this.context.restore();
+            this.points = [];
+        }
+
         if (!this.lassoDrawn) {
             // create the ghost canvas at the canvas size each time we draw
             this.ghostContext = document.createElement("canvas").getContext('2d');
@@ -45,18 +49,29 @@ export default class LassoTool extends Tool {
             this.selectedImage = this.context.getImageData(0, 0, this.context.canvas.width, this.context.canvas.height); // save the current state of the canvas so we can draw it to the ghost canvas without the black lasso line
             this.ghostContext.drawImage(this.context.canvas, 0, 0);     // copy the main canvas to the ghost so we can clip the main canvas and clear it while still being able to reference the data on the ghost
             this.context.save();    // save the current state of the context so that we can restore it after we clip it
+            
         }
-
-        // we need some conditional to here to actually check if the click is in the clipped area
-        // if (lassoDrawn && !previewContext.isPointInPath(mouseX, mouseY))  { lassoDrawn = false; }
+        // reset the path from the last lasso selection for the context and preview context
+        this.context.beginPath();
+        this.previewContext.beginPath();
     }
 
     draw(event) { 
+
+        super.draw();
+
+        // get the current mouse coordinates on the canvas
+        let { mouseX, mouseY } = getMouse(event, this.context.canvas);
+ 
+        if (this.lassoDrawn && this.mouseInLasso(mouseX, mouseY)) {
+            this.context.canvas.style.cursor = "move";
+        } else {
+            this.context.canvas.style.cursor = "default";
+        }
+
         // if painting is false, the mouse isn't clicked so we shouldn't draw
         if (!this.painting) { return; }
         
-        // get the current mouse coordinates on the canvas
-        let { mouseX, mouseY } = getMouse(event, this.context.canvas);
         
         if (this.lassoDrawn) {
 
@@ -151,29 +166,15 @@ export default class LassoTool extends Tool {
             this.ghostContext.closePath();
             this.ghostContext.stroke(); 
 
+            // close the path so we can determine if mouse is in the clipper region of the path
+            this.previewContext.closePath();
+
             // This lets us draw only inside the clipped region of the canvas (the area we lasso'd). We can clear this area when we begin to move the lasso'd region, without clearing the whole canvas.
             this.context.clip();
 
             // when we finish drawing somehting, we reset the redo stack for all tools
             CanvasState.resetRedoStack();
             this.lassoDrawn = true;
-        }
-    }
-
-    // override the normal enter function because it calls context.beginPath();
-    enter() {
-        exitUnwarn();
-    }
-
-    leave(event) {
-        // remove the hover cursor if we leave and we aren't painting
-        if (!this.painting && !this.lassoDrawn) {
-            this.clear();
-        }
-
-        // warn the user they've exited canvas
-        if (this.painting) {
-            exitWarn();
         }
     }
 
@@ -213,22 +214,6 @@ export default class LassoTool extends Tool {
         ctx.closePath();
     }
 
-    mouseUp() {
-        document.body.addEventListener('mouseup', e => {
-            if (this.painting) {           
-                this.painting = false;
-                // if the lasso was drawn we want to undo the removal of the lasso'd area
-                if (this.lassoDrawn) {
-                    CanvasState.undo(this.context);
-                }
-                // cleanup to a fresh lasso state
-                this.cleanup();
-                // reset the red warning color to nothing
-                exitUnwarn();
-            }
-        });
-    }
-
     setDeleteListener() {
         let del = getKey("Delete");
         del.press = () => {
@@ -238,6 +223,10 @@ export default class LassoTool extends Tool {
                 this.cleanup();
             }
         }
+    }
+
+    mouseInLasso(x, y) {
+        return this.previewContext.isPointInPath(x, y);
     }
 
     // never want to draw a hover cursor for lasso

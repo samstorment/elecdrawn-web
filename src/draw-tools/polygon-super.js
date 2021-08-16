@@ -32,17 +32,18 @@ export default class PolygonTool extends Tool {
         let height = mouseY - this.poly.startY;
 
         // the length of our drawn line on screen
-        let hypotenuse = Math.sqrt(width*width + height*height);
-        let radius = hypotenuse;
+        let radius = Math.sqrt(width*width + height*height);
 
         // these two lines find the real angle of our line at current mouse position
         let angle = (Math.atan2(height, width) / Math.PI * 180);
         angle = (angle) % 360 + 180;
 
+        // makes it so our polygons always draw to a vertex
+        angle += this.poly.getInteriorAngle(this.numSides) / 2;
+
         if (this.shift.isDown) {
             // these two lines convert the raw angle to the nearest 15 degrees
             angle = parseInt(((angle + 7.5) % 360 ) / 15 ) * 15;
-            angle -= 140;
 
             // calculate new width and height given angle and line length
             width = radius * Math.cos(angle * Math.PI / 180);
@@ -82,7 +83,7 @@ export default class PolygonTool extends Tool {
         context.beginPath();
 
         this.hover = new Polygon(mouseX, mouseY);
-        this.hover.getRegularPolygon(this.numSides, this.context.lineWidth/2, 0);
+        this.hover.getRegularPolygon(this.numSides, this.context.lineWidth/2);
     }
 
     setSides() {

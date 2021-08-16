@@ -1,7 +1,7 @@
 import CanvasState from '../canvas/canvas-state.js';
 import { setFillColor, setStrokeColor } from '../canvas/color.js';
 import { Ellipse } from '../canvas/shape.js';
-import { exitUnwarn, exitWarn, getMouse } from '../canvas/util.js';
+import { getMouse } from '../canvas/util.js';
 
 // super class for drawing tools
 export default class Tool {
@@ -9,7 +9,7 @@ export default class Tool {
     constructor(context) {
         this.context = context;
         this.painting = false;
-        this.mouseUp();
+        // this.mouseUp();
         this.previewContext = document.querySelector("#preview-canvas").getContext('2d');
     }
 
@@ -36,22 +36,6 @@ export default class Tool {
         this.resetStroke();
     }
 
-    leave(event) {
-        // remove the hover cursor if we leave and we aren't painting
-        if (!this.painting) {
-            this.clear();
-        }
-
-        if (this.painting) {
-            exitWarn();
-        }
-    }
-
-    enter(event) {
-        this.context.beginPath();
-        exitUnwarn();
-    }
-
     cleanup() {
         this.resetStroke();
         this.clear();
@@ -74,10 +58,10 @@ export default class Tool {
     }
 
     resetStroke() {        
-        const strokeWeigth = document.querySelector('#stroke-slider').value;
+        const strokeWeight = document.querySelector('#stroke-slider').value;
         // reset preview stroke color and weight
-        this.previewContext.lineWidth = strokeWeigth;
-        this.context.lineWidth = strokeWeigth;
+        this.previewContext.lineWidth = strokeWeight;
+        this.context.lineWidth = strokeWeight;
         setFillColor(this.context);
         setStrokeColor(this.context);
         setFillColor(this.previewContext);
@@ -114,18 +98,5 @@ export default class Tool {
         this.previewContext.shadowOffsetY = shadowOffsetY.value;
         this.context.globalCompositeOperation = compositeOperation.value;
         this.previewContext.globalCompositeOperation = compositeOperation.value;
-    }
-
-    mouseUp() {
-        document.body.addEventListener('mouseup', e => {
-            // check if painting because painting will be false only if we mouseup outside of the canvas
-            if (this.painting) {                
-                this.painting = false;
-                this.finish(e);
-                this.clear();
-                exitUnwarn();
-                CanvasState.saveLocally(this.context);
-            }
-        });
     }
 }

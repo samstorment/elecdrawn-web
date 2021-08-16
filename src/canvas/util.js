@@ -90,14 +90,3 @@ export const readFile = (file) => {
         reader.readAsDataURL(file);
     });
 }
-
-const exitWarningLayer = document.querySelector('#exit-warning-layer');
-export const exitWarn = () => {
-    exitWarningLayer.style.backgroundColor = 'rgb(255,0,0,0.25)';
-    exitWarningLayer.style.boxShadow = '0px 0px 200px 5px rgb(255,0,0,0.75)';
-}
-
-export const exitUnwarn = () => {
-    exitWarningLayer.style.backgroundColor = 'rgb(0,0,0,0)';
-    exitWarningLayer.style.boxShadow = '0px 0px 200px 0px black';
-}

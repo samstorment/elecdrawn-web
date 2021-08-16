@@ -15,6 +15,7 @@ let previewContext = previewCanvas.getContext('2d');
 
 let backgroundCanvas = document.querySelector('#background-canvas');
 
+let drawingArea = document.querySelector('main');
 let canvasContainer = document.querySelector("#canvas-container");
 let strokeSlider = document.querySelector('#stroke-slider');
 
@@ -31,14 +32,18 @@ function setCanvasSize() {
 const panzoom = Panzoom(canvasContainer, {
     handleStartEvent: e => {
         if (e.button === 0) {
-            panzoom.setOptions({disablePan: true});
+            panzoom.setOptions({disablePan: true, cursor: 'default'});
         } else {
-            panzoom.setOptions({disablePan: false});
+            panzoom.setOptions({disablePan: false, cursor: 'grabbing'});
             e.preventDefault();
             e.stopPropagation();
         }
     },
     cursor: 'default'
+});
+
+canvasContainer.addEventListener('panzoomend', () => {
+    panzoom.setOptions({disablePan: true, cursor: 'default'});
 });
 
 (function initCanvas() {
@@ -53,6 +58,8 @@ const panzoom = Panzoom(canvasContainer, {
             context.drawImage(image, 0, 0);
             // set these after or image will get more faded every time we reload page;
             setUp();
+            // do this here because canvas isn't instantly correct size and this styling stands out
+            backgroundCanvas.style.boxShadow = "0px 0px 200px 0px black"
         }
     } else {
         setUp();
@@ -80,6 +87,11 @@ document.onkeydown = e => {
 let drawTools = new DrawTool(context);
 
 const start = e => {
+    // don't want to start if we clicked sidebar
+    const sidebar = document.querySelector('#sidebar');
+    if (e.target === sidebar || sidebar.contains(e.target)) {
+        return;
+    }
     drawTools.selectedTool.start(e);
 }
 
@@ -101,14 +113,9 @@ const end = e => {
 }
 
 // MAIN DRAWING EVENT LISTENERS
-canvas.addEventListener('mousedown', start);
-canvas.addEventListener('mousemove', move);
-canvas.addEventListener('mouseup', end);
-
-// SCREEN ENTER AND LEAVE -- these don't work well in all aspects. especially leaving the canvas while drawing the lasso
-canvas.addEventListener('mouseenter', e => { drawTools.selectedTool.enter(e); });
-canvas.addEventListener('mouseleave', e => { drawTools.selectedTool.leave(e); });
-document.body.onmouseleave = e => { drawTools.selectedTool.leave(e); }    
+drawingArea.addEventListener('mousedown', start);
+window.addEventListener('mousemove', move);
+window.addEventListener('mouseup', end);
 
 // disables the right click menu on the canvas
 canvas.addEventListener('contextmenu', e => e.preventDefault());

@@ -58,11 +58,6 @@ main {
     background-color: rgba(155, 155, 155, 0.336);
 }
 
-
-#canvas-container {
-    display: flex;
-}
-
 .canvas {
     position: absolute;
 }
@@ -278,14 +273,6 @@ footer {
     font-size: small;
 }
 
-#exit-warning-layer {
-    background-color: transparent;
-    width: 1920px;
-    height: 1080px;
-    pointer-events: none;
-    touch-action: none;
-    box-shadow: 0px 0px 200px 0px black;
-}
 
 @media screen and (max-width: 800px) {
     main {

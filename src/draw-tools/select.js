@@ -1,6 +1,6 @@
 import Tool from './tool.js';
 import CanvasState from '../canvas/canvas-state.js';
-import { exitUnwarn, exitWarn, getKey } from '../canvas/util.js';
+import { getKey } from '../canvas/util.js';
 import { getMouse } from '../canvas/util.js';
 import { Rectangle } from '../canvas/shape.js';
 
@@ -104,7 +104,6 @@ export default class SelectTool extends Tool {
     }
 
     finish(event) {
-        if (!this.painting) { return; }
         super.finish(event);
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
         let width = mouseX - this.mouseStart.x;
@@ -178,17 +177,6 @@ export default class SelectTool extends Tool {
 
         }
         this.updateCursor(mouseX, mouseY);
-    }
-
-    leave(event) {
-        // remove the hover cursor if we leave and we aren't painting
-        if (!this.painting && !this.selectDrawn) {
-            this.clear();
-        }
-
-        if (this.painting) {
-           exitWarn();
-        }
     }
 
     // reset anything we may have changed
@@ -274,25 +262,6 @@ export default class SelectTool extends Tool {
                 this.selectDrawn = false;
             }
         }
-    }
-
-    mouseUp() {
-        document.body.addEventListener('mouseup', e => {
-            // check if painting because painting will be false only if we mouseup outside of the canvas
-            if (this.painting) {           
-                this.painting = false;
-                // only undo if mouse comes up when scaling or dragging
-                if (this.scaling || this.dragging) {
-                    CanvasState.undo(this.context);
-                }
-                // reset select state
-                this.cleanup();
-                // clear black select box
-                this.clear();
-                // remove red warning color
-                exitUnwarn();
-            }
-        });
     }
 
     // never want to draw hover cursor for select

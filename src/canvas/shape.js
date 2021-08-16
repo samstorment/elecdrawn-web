@@ -207,6 +207,7 @@ export class Polygon extends Shape {
     _draw(context) {
         // get the first point and the remaining point. Move to the first point and loop through the rest below
         const [ firstPoint, ...points ] = this.points;
+        if (!firstPoint) return;
         context.moveTo(this.startX + firstPoint.x, this.startY + firstPoint.y);
 
         // draw a line to each point in the array. add the startX and Y to the point for an offset 
@@ -218,7 +219,7 @@ export class Polygon extends Shape {
         context.closePath();
     }
 
-    drawPoints(context, radius, lineWidth, fill=false) {
+    drawPoints(context, radius, lineWidth) {
         // get the first point and the remaining point. Move to the first point and loop through the rest below
         const [ firstPoint, ...points ] = this.points;
 
@@ -237,7 +238,7 @@ export class Polygon extends Shape {
 
     // return the points for a REGULAR polygon. One with equilateral side lengths and equiangular interior/exterior angles
     // radius is the distance from the polygon's center to any of the polygon's vertices
-    getRegularPolygon(numSides, radius, angle) {
+    getRegularPolygon(numSides, radius, angle=0) {
         let points = [];
 
         for (let i = 0; i < numSides; i++) {
@@ -246,7 +247,7 @@ export class Polygon extends Shape {
             let y = radius * Math.sin(2 * Math.PI * i / numSides) ;
 
             // calculate a rotation for each point so we draw triangles, pentagons, etc with the flat side down
-            let interiorAngle = ((numSides - 2) * 180) / numSides;
+            let interiorAngle = this.getInteriorAngle(numSides);
             let adjustedAngle = angle + (interiorAngle / 2);
 
             let rotatedPoint = this.rotatePoint(x, y, adjustedAngle * Math.PI / 180);
@@ -267,5 +268,10 @@ export class Polygon extends Shape {
         let ynew = x * s + y * c;
 
         return {x: xnew, y: ynew };
+    }
+
+    // interior angle for a REGULAR polygon of given size
+    getInteriorAngle(numSides) {
+        return ((numSides - 2) * 180) / numSides;
     }
 }
