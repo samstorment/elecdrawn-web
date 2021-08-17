@@ -221,8 +221,8 @@ export default class SelectTool extends Tool {
 
         // draw a rect and the selected image at the current mouse position, but account for the initial click's offset
         let rect = new Rectangle(newTopLeftX, newTopLeftY, this.select.width, this.select.height);
-        rect.drawStroke(this.previewContext, 'black', 2);
         this.previewContext.putImageData(this.selectedImage, mouseX - imageXOffset, mouseY - imageYOffset);
+        rect.drawStroke(this.previewContext, 'black', 2);
     }
 
     // draw the thin black selection box to the preview context
