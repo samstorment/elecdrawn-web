@@ -15,7 +15,7 @@ let previewContext = previewCanvas.getContext('2d');
 
 let backgroundCanvas = document.querySelector('#background-canvas');
 
-let drawingArea = document.querySelector('main');
+let drawingArea = document.querySelector('#drawing-area');
 let canvasContainer = document.querySelector("#canvas-container");
 let strokeSlider = document.querySelector('#stroke-slider');
 
@@ -39,7 +39,8 @@ const panzoom = Panzoom(canvasContainer, {
             e.stopPropagation();
         }
     },
-    cursor: 'default'
+    cursor: 'default',
+    canvas: true
 });
 
 canvasContainer.addEventListener('panzoomend', () => {
@@ -88,10 +89,6 @@ let drawTools = new DrawTool(context);
 
 const start = e => {
     // don't want to start if we clicked sidebar
-    const sidebar = document.querySelector('#sidebar');
-    if (e.target === sidebar || sidebar.contains(e.target)) {
-        return;
-    }
     drawTools.selectedTool.start(e);
 }
 
