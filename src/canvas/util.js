@@ -10,6 +10,7 @@ function getElementPosition(element) {
 
     const scale = dynamicWidth / staticWidth;
 
+
     return {
         x: offsetX,
         y: offsetY,
@@ -26,10 +27,11 @@ export function getMouse(event, element) {
     let clientX = event.clientX;
     let clientY = event.clientY;
 
-    return {
-        mouseX: (clientX - x) / scale,   
-        mouseY: (clientY - y) / scale
-    };
+    
+    let mouseX = Math.round((clientX - x) / scale);
+    let mouseY = Math.round((clientY - y) / scale);
+
+    return { mouseX, mouseY };
 }
 
 // we should get rid of this but a lot of stuff depends on it right now

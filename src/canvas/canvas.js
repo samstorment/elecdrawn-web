@@ -55,12 +55,6 @@ canvasContainer.addEventListener('panzoomend', () => {
     panzoom.setOptions({disablePan: true, cursor: 'default'});
 });
 
-// on zoom we want to prevent drawing
-canvasContainer.addEventListener("panzoomzoom", e => {
-    e.preventDefault();
-    e.stopPropagation();
-});
-
 (function initCanvas() {
     setCanvasSize();
 

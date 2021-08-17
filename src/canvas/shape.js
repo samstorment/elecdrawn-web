@@ -126,14 +126,27 @@ export class Rectangle extends Shape {
         return x > topLeftX && x < botRightX && y > topLeftY && y < botRightY;
     }
 
+    
     setStart(startX, startY) {
         this.startX = startX;
         this.startY = startY;
     }
-
+    
     setSize(width, height) {
         this.width = width;
         this.height = height;
+    }
+
+    getStart() {
+        return {
+            x: this.startX, y: this.startY
+        }
+    }
+
+    getSize() {
+        return {
+            width: this.width, height: this.height
+        }
     }
 }
 

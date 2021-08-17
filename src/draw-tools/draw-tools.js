@@ -13,6 +13,7 @@ import TextTool from './text.js';
 import EraserTool from './eraser.js';
 import MirrorTool from './mirror.js';
 import ImageTool from './image.js';
+import SelectorTool from './Selector.js';
 
 // manager for all drawing tools
 export class DrawTool {
@@ -37,6 +38,7 @@ export class DrawTool {
             mirror: new MirrorTool(context),
             polygon: new PolygonTool(context),
             select: new SelectTool(context),
+            // select: new SelectorTool(context),
             lasso: new LassoTool(context),
             bucket: new BucketTool(context),
             strokePicker: new PickerTool(context, 'stroke'),
