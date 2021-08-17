@@ -31,9 +31,16 @@ function setCanvasSize() {
 // Pan the canvas container with middle mouse button
 const panzoom = Panzoom(canvasContainer, {
     handleStartEvent: e => {
-        if (e.button === 0) {
+        // if we are on mobile, we want to be able to pan when clickable drawing area but not canvas
+        if (e.pointerType === 'touch' && e.target !== canvas) {
+            panzoom.setOptions({disablePan: false});
+            e.preventDefault();
+            e.stopPropagation();
+        } else if (e.button === 0) {
+            // if left click, we draw
             panzoom.setOptions({disablePan: true, cursor: 'default'});
         } else {
+            // if right click or mouse button, we pan
             panzoom.setOptions({disablePan: false, cursor: 'grabbing'});
             e.preventDefault();
             e.stopPropagation();
@@ -43,8 +50,15 @@ const panzoom = Panzoom(canvasContainer, {
     canvas: true
 });
 
+// on zoom end make the cursor default since we make it grab while panning
 canvasContainer.addEventListener('panzoomend', () => {
     panzoom.setOptions({disablePan: true, cursor: 'default'});
+});
+
+// on zoom we want to prevent drawing
+canvasContainer.addEventListener("panzoomzoom", e => {
+    e.preventDefault();
+    e.stopPropagation();
 });
 
 (function initCanvas() {
