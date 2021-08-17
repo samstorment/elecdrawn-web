@@ -10,6 +10,7 @@ export default class BucketTool extends Tool {
 
     start(event) {
         super.start(event);
+        if (event.target !== this.context.canvas) return;
         let { mouseX, mouseY } = getMouse(event, this.context.canvas);
         let x = Math.round(mouseX);
         let y = Math.round(mouseY);
