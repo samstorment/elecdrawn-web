@@ -177,14 +177,18 @@ clearButton.addEventListener('click', () => {
     context.clearRect(0, 0, canvas.width, canvas.height);
 });
 
-let downloadCanvas = document.querySelector('#download-canvas');
-downloadCanvas.addEventListener('click', function (e) {
+
+let downloadCanvasButton = document.querySelector('#download-canvas');
+const downloadCanvas = () => {
+    
     // draw the canvas to the background just when we save so eveything from the canvas shows up
     backgroundContext.drawImage(canvas, 0, 0);
     let dataURL = backgroundCanvas.toDataURL('image/png');
-    downloadCanvas.href = dataURL;
+    downloadCanvasButton.href = dataURL;
+
     setupBackground();
-});
+} 
+downloadCanvasButton.addEventListener('click', downloadCanvas);
 
 // setup the arrow dropdowns for each row
 let rows = document.querySelectorAll('.sidebar-row');

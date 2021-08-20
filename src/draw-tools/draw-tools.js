@@ -32,7 +32,7 @@ export class DrawTool {
             brush: new BrushTool(context),
             brushFill: new BrushFillTool(context),
             rectangle: new RectangleTool(context),
-            ellipse: new EllipseTool(context),
+            oval: new EllipseTool(context),
             line: new LineTool(context),
             radial: new RadialTool(context),
             mirror: new MirrorTool(context),
@@ -49,7 +49,16 @@ export class DrawTool {
         this.selectedTool = this.tools[checkedTool.value];
     }
 
+    setTool(toolName) {
+        this.selectedTool.cleanup();
+        const tool = document.querySelector(`#${toolName}`);
+        tool.checked = true;
+        this.selectedTool = this.tools[toolName];
+        this.selectedTool.setup();
+    }
+
     setToolChange() {
+
         let sidebarTools = document.querySelectorAll('.sidebar-radio');
         // add click event to all sidebar tools
         sidebarTools.forEach(tool => {

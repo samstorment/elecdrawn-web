@@ -1,6 +1,7 @@
 import { DrawTool } from '../draw-tools/draw-tools.js';
 import CanvasState from '../canvas/canvas-state.js';
 import { setUp} from '../sidebar/sidebar.js';
+import { shortcuts } from './shortcuts.js';
 
 const width = 1920;
 const height = 1080;
@@ -84,16 +85,13 @@ canvasContainer.addEventListener('panzoomend', () => {
     });
 })();
 
-// Sloppy undo/redo shortcuts for now
-document.onkeydown = e => {
-    if (e.ctrlKey) {
-        if (e.key === 'z' || e.key === 'Z') { CanvasState.undo(context); }
-        if (e.key === 'y' || e.key === 'Y') { CanvasState.redo(context); }
-    }
-}
-
 // manager for drawing tools
 let drawTools = new DrawTool(context);
+
+// Sloppy undo/redo shortcuts for now
+document.onkeydown = e => {
+    shortcuts(e, drawTools, context);
+}
 
 const start = e => {
     // don't want to start if we clicked sidebar
