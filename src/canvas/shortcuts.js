@@ -59,8 +59,8 @@ const setTip = (selector, tip, options={}) => {
             ]
         },
         zIndex: 999999,
+        delay: [700, 0],
         duration: 0,
-        followCursor: 'vertical',
         hideOnClick: false,
         touch: false,
         ...options
@@ -93,7 +93,9 @@ setTip('#download-canvas', 'Ctrl + S');
 const titlebarOptions = {followCursor: '', placement: 'bottom'};
 
 // titlebar
-setTip('#burger-button', '`', titlebarOptions);
-setTip('#restore-button', 'Spacebar', titlebarOptions);
-setTip('#undo-button', 'Ctrl + Z', titlebarOptions);
-setTip('#redo-button', 'Ctrl + Y', titlebarOptions);
+setTip('#burger-button', 'Toggle Sidebar (`)', titlebarOptions);
+setTip('#undo-button', 'Undo (Ctrl + Z)', titlebarOptions);
+setTip('#redo-button', 'Redo (Ctrl + Y)', titlebarOptions);
+setTip('#restore-button', 'Restore Canvas (Spacebar)', titlebarOptions);
+setTip('#zoom-in-button', 'Zoom In', titlebarOptions);
+setTip('#zoom-out-button', 'Zoom Out', titlebarOptions);
