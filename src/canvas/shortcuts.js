@@ -42,17 +42,31 @@ export const shortcuts = (e, drawTools, context) => {
     }
 }
 
-const setTip = (selector, tip) => {
-    const options = {
+const mediaQuery = window.matchMedia('(max-width: 800px)');
+
+const setTip = (selector, tip, options={}) => {
+    const defaultOptions = {
         content: 'none',
         placement: 'right',
+        popperOptions: {
+            modifiers: [
+                {
+                    name: 'flip',
+                    options: {
+                        fallbackPlacements: ['bottom', 'top', 'left'],
+                    }
+                }
+            ]
+        },
         zIndex: 999999,
-        duration: [0, 0],
+        duration: 0,
         followCursor: 'vertical',
-        hideOnClick: false
+        hideOnClick: false,
+        touch: false,
+        ...options
     }
     
-    tippy(selector, {...options, content: tip });
+    tippy(selector, {...defaultOptions, content: tip });
 }
 
 // sidebar tool tips
@@ -76,8 +90,10 @@ setTip('#select-row', 'V');
 setTip('#canvas-clear', 'Esc');
 setTip('#download-canvas', 'Ctrl + S');
 
+const titlebarOptions = {followCursor: '', placement: 'bottom'};
+
 // titlebar
-setTip('#burger-button', '`');
-setTip('#restore-button', 'Spacebar');
-setTip('#undo-button', 'Ctrl + Z');
-setTip('#redo-button', 'Ctrl + Y');
+setTip('#burger-button', '`', titlebarOptions);
+setTip('#restore-button', 'Spacebar', titlebarOptions);
+setTip('#undo-button', 'Ctrl + Z', titlebarOptions);
+setTip('#redo-button', 'Ctrl + Y', titlebarOptions);
