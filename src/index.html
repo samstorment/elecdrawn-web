@@ -14,6 +14,7 @@
         <script defer src="./canvas/canvas.js" type="module"></script>
         <script defer src="./titlebar/titlebar.js" type="module"></script>
         <script defer src="./canvas/grid-canvas.js" type="module"></script>
+        <script defer src="./canvas/layers.js" type="module"></script>
     </head>
     <body>
         <div id="app">
@@ -27,7 +28,6 @@
                 <button class="title-button" id="hotkeys-button">Hot Keys</button>
             </header>
             <main>
-                <canvas id="grid-canvas"></canvas>
                 <div id="sidebar">
                     <div class="sidebar-row">
                         <div class="sidebar-main-row">
@@ -435,19 +435,160 @@
 
                     <button id="hotkeys-close">Close</button>
                 </div>
-                <div id="drawing-area">
-                    <div id="canvas-container">
-                        <canvas class="canvas" id="background-canvas"></canvas>
-                        <canvas class="canvas" id="canvas"></canvas>
-                        <canvas class="canvas" id="preview-canvas"></canvas>
+                <div id="activity-container">
+                    <div id="drawing-area">
+                        <div id="canvas-container">
+                            <canvas class="canvas" id="background-canvas"></canvas>
+                            <canvas class="canvas" id="canvas"></canvas>
+                            <canvas class="canvas" id="preview-canvas"></canvas>
+                        </div>
+                        <div id="popup-container">
+                            <div id="popup">
+                                <button class="popup-button" id="popup-confirm"><i class="fa fa-check"></i></button>
+                                <button class="popup-button" id="popup-deny"><i class="fa fa-remove"></i></button>
+                            </div>
+                        </div>
                     </div>
-                    <div id="popup-container">
-                        <div id="popup">
-                            <button class="popup-button" id="popup-confirm"><i class="fa fa-check"></i></button>
-                            <button class="popup-button" id="popup-deny"><i class="fa fa-remove"></i></button>
+
+                    <div id="layer-container">
+                        <div id="layer-rows-container">
+                            <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>    <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>    <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>    <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>    <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>    <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>    <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>    <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>    <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>    <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>    <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>    <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>    <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>    <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>    <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>    <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>    <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>    <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>    <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>    <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>    <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>    <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>    <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>    <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>
+                            <div class="layer-row">
+                                <button class="title-button"><i class="fa fa-eye"></i></button>
+                                <button class="title-button"><i class="fa fa-lock"></i></button>
+                                <button class="title-button"><i class="fa fa-trash-o"></i></button>
+                                <input type="text" class="layer-input" value="layer"/>
+                            </div>
+                        </div>
+                        <div id="layer-controls">
+                            <button class="title-button"><i class="fa fa-chevron-up"></i></button>
+                            <button class="title-button"><i class="fa fa-chevron-down"></i></button>
+                            <button class="title-button"><i class="fa fa-plus"></i></button>
                         </div>
                     </div>
                 </div>
+
+                <canvas id="grid-canvas"></canvas>
             </main>
 
             <footer>Sam Storment 2021</footer>

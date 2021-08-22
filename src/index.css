@@ -25,6 +25,7 @@ main {
 
 #grid-canvas {
     position: absolute;
+    z-index: -1;
 }
 
 .title-bar {
@@ -58,7 +59,13 @@ main {
 }
 
 .title-button:hover {
-    background-color: rgba(155, 155, 155, 0.336);
+    background-color: rgb(100, 100, 100);
+}
+
+#activity-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 #drawing-area {
@@ -109,6 +116,61 @@ main {
     box-shadow: 3px 2px 0px 0px black, inset 0px 0px 3px 1px gray;
 }
 
+#layer-container {
+    min-height: 5px;
+    color: white;
+    background-color: rgb(75, 75, 75);
+    display: flex;
+    flex-direction: column;
+    display: relative;
+    display: none;
+}
+
+#layer-container::before {
+    flex-shrink: 0;
+    content: '';
+    height: 5px;
+    background-color: rgb(60, 60, 60);
+    cursor: ns-resize;
+    display: block;
+    /* so it overlaps the controls */
+    z-index: 1;
+}
+
+#layer-rows-container {
+    overflow: auto;
+    flex: 1;
+}
+
+.layer-row {
+    display: flex;
+    height: 30px;
+    border-bottom: 1px solid gray;
+}
+
+.layer-row:hover {
+    background-color: rgb(65, 65, 65);
+}
+
+#layer-controls {
+    flex-shrink: 0;
+    display: flex;
+    height: 30px;
+    border-top: 1px solid gray;
+    background-color: rgb(60, 60, 60);
+}
+
+.layer-input {
+    box-sizing: border-box;
+    display: inline-block;
+    background-color: transparent;
+    border: none;
+    color: white;
+    padding: 0px 5px;
+    border-left: 1px solid gray;
+    border-right: 1px solid gray;
+}
+
 
 .canvas {
     position: absolute;
@@ -151,7 +213,6 @@ main {
     flex-direction: column;
     background-color: rgb(75, 75, 75);
     color: white;
-    z-index: 10000;
     overflow: auto;
     min-width: 300px;
     max-width: 500px;
@@ -159,7 +220,7 @@ main {
 }
 
 .sidebar-row:hover {
-    background-color: rgba(155, 155, 155, 0.336);
+    background-color: rgb(100, 100, 100);
 }
 
 .sidebar-main-row {
