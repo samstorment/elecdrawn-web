@@ -17,10 +17,14 @@ html, body {
 
 main {
     display: flex;
+    position: relative;
     flex: 1;
-    background-color: gray;
-    background-image: url("./images/grid.jpg");
+    background-color: transparent;
     overflow: hidden;
+}
+
+#grid-canvas {
+    position: absolute;
 }
 
 .title-bar {
@@ -198,6 +202,11 @@ main {
     font-size: medium;
     text-decoration: none;
     margin: 5px;
+    padding: 5px;
+}
+
+.subrow-button {
+    flex: 1;
     padding: 5px;
 }
 

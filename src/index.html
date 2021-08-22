@@ -13,6 +13,7 @@
         <script src="https://unpkg.com/tippy.js@6"></script>
         <script defer src="./canvas/canvas.js" type="module"></script>
         <script defer src="./titlebar/titlebar.js" type="module"></script>
+        <script defer src="./canvas/grid-canvas.js" type="module"></script>
     </head>
     <body>
         <div id="app">
@@ -26,6 +27,7 @@
                 <button class="title-button" id="hotkeys-button">Hot Keys</button>
             </header>
             <main>
+                <canvas id="grid-canvas"></canvas>
                 <div id="sidebar">
                     <div class="sidebar-row">
                         <div class="sidebar-main-row">
@@ -370,6 +372,28 @@
                             <label for="background-opacity">Opacity</label>
                             <input type="range" class="sidebar-slider" id="background-opacity" min="0" max="1" value="0" step=".005">
                         </div>
+
+                        <div class="sidebar-subrow">
+                            <label for="grid-color-1">Grid Color 1</label>
+                            <!-- default gray -->
+                            <input type="color" class="sidebar-color" id="grid-color-1" value="#808080"> 
+                        </div>
+
+                        <div class="sidebar-subrow">
+                            <label for="grid-color-2">Grid Color 2</label>
+                            <!-- default lightgray -->
+                            <input type="color" class="sidebar-color" id="grid-color-2" value="#d3d3d3">
+                        </div>
+
+                        <div class="sidebar-subrow">
+                            <label for="grid-color-2">Grid Square Size</label>
+                            <input type="number" class="sidebar-color" id="grid-square-size" min="5" max="800" value="15">
+                        </div>
+
+                        <div class="sidebar-subrow">
+                            <button id="grid-reset-button" class="subrow-button">Reset Grid</button>
+                        </div>
+
                     </div>
 
                     <div class="sidebar-row">
