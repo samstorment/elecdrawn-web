@@ -217,6 +217,7 @@ main {
     min-width: 300px;
     max-width: 500px;
     resize: horizontal;
+    z-index: 100;
 }
 
 .sidebar-row:hover {
