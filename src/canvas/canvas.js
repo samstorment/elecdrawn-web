@@ -48,7 +48,11 @@ const panzoom = Panzoom(canvasContainer, {
         }
     },
     cursor: 'default',
-    canvas: true
+    canvas: true,
+    // origin: "0px 0px",
+    // startScale: 0.5,
+    // startX: 30,
+    // startY: 30
 });
 
 // on zoom end make the cursor default since we make it grab while panning

@@ -59,8 +59,9 @@ const setTip = (selector, tip, options={}) => {
             ]
         },
         zIndex: 999999,
-        delay: [700, 0],
-        duration: 0,
+        delay: 0,
+        animation: "scale",
+        duration: [200, 200],
         hideOnClick: false,
         touch: false,
         ...options
@@ -74,7 +75,7 @@ setTip('#brush-row', 'B');
 setTip('#radial-row', 'D');
 setTip('#eraser-row', 'E');
 setTip('#brushFill-row', 'F');
-setTip('#image-row', 'G');
+setTip('#image-main-row', 'G');
 setTip('#strokePicker-row', 'I');
 setTip('#fillPicker-row', 'J');
 setTip('#bucket-row', 'K');

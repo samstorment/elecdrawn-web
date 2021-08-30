@@ -2,7 +2,7 @@ import CanvasState from '../canvas/canvas-state.js';
 
 let hotkeys = document.querySelector("#hotkeys-container");
 let canvases = document.querySelectorAll(".canvas");
-let drawingArea = document.querySelector("#drawing-area");
+let activityContainer = document.querySelector("#activity-container");
 let sidebar = document.querySelector("#sidebar");
 
 let canvas = document.querySelector("#canvas");
@@ -18,7 +18,7 @@ hotkeysButton.addEventListener('click', () => {
             element.style.visibility = "hidden";
         });
         hotkeys.style.display = "flex";
-        drawingArea.style.display = "none";
+        activityContainer.style.display = "none";
     }
 });
 
@@ -30,7 +30,7 @@ function closeHotkeys() {
         element.style.visibility = "visible";
     });
     hotkeys.style.display = "none";
-    drawingArea.style.display = "flex";
+    activityContainer.style.display = "flex";
 }
 
 let burgerButton = document.querySelector("#burger-button");

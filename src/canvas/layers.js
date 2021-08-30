@@ -13,7 +13,9 @@ container.addEventListener('mousedown', e => {
     startY = bodyMouse.mouseY;
     startHeight = container.offsetHeight;
 
-    if (containerMouse.mouseY <= 4) resizeAllowed = true;
+    if (containerMouse.mouseY <= 4) {
+        resizeAllowed = true;
+    }
 });
 
 window.addEventListener('mousemove', e => {
@@ -27,5 +29,7 @@ window.addEventListener('mousemove', e => {
 });
 
 window.addEventListener('mouseup', e => {
-    resizeAllowed = false;
+    if (resizeAllowed) {
+        resizeAllowed = false;
+    }
 });

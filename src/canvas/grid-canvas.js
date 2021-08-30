@@ -7,7 +7,7 @@ let sizeInput = document.querySelector('#grid-square-size');
 let resetButton = document.querySelector('#grid-reset-button');
 
 // gray and lightgray
-const defaultColor1 = '#808080';
+const defaultColor1 = '#ffffff';
 const defaultColor2 = '#d3d3d3';
 const defaultSize = 15;
 
