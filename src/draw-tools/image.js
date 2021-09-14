@@ -70,7 +70,7 @@ export default class ImageTool extends Tool {
             }
 
             if (files.length > 0) this.uploadFiles(files);
-            else if (src) this.addImage('WOWO' || 'nameless', src);
+            else if (src) this.addImage('Image', src);
         });
     }
 
